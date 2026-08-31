@@ -1,0 +1,57 @@
+{
+  "name": "Swiftly.io",
+  "version": "1.0.0",
+  "description": "African fintech payment platform - MVP Phase",
+
+  "agents": {
+    "planner": {
+      "enabled": true,
+      "role": "Plans architecture and system design",
+      "focus": ["architecture", "system-design", "scalability", "performance"]
+    },
+
+    "code": {
+      "enabled": true,
+      "role": "Writes implementation code",
+      "focus": ["typescript", "nodejs", "react", "api-design", "database"]
+    },
+
+    "security": {
+      "enabled": true,
+      "role": "Security audits and vulnerability scanning",
+      "focus": ["encryption", "authentication", "authorization", "data-protection", "compliance"]
+    },
+
+    "testing": {
+      "enabled": true,
+      "role": "Writes tests and quality assurance",
+      "focus": ["unit-tests", "integration-tests", "e2e-tests", "load-testing", "coverage"]
+    },
+
+    "memory": {
+      "enabled": true,
+      "role": "Maintains context between sessions",
+      "focus": ["persistence", "knowledge-base", "documentation", "decision-log"]
+    }
+  },
+
+  "constraints": {
+    "language": "TypeScript",
+    "framework": "Next.js 14+",
+    "database": "PostgreSQL (Supabase)",
+    "frontend": "React + Tailwind CSS",
+    "deployment": "Vercel",
+    "testing": "Jest + Playwright + K6",
+    "security": "Semgrep + Zod + OWASP",
+    "monitoring": "Sentry"
+  },
+
+  "project": {
+    "phase": "MVP (Days 1-30)",
+    "branches": ["SwiftlyTrack"],
+    "screens": 24,
+    "foundation_prompts": ["PROMPT #PAYMENT", "PROMPT #INPUT", "PROMPT #TRANSACTIONS"],
+    "cost_mvp": "$0/month (free tiers)",
+    "cost_phase2": "$180-200/month (paid tiers)"
+  }
+}
