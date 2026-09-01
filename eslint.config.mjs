@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Nested tooling submodule — not part of the Swiftly.io codebase.
+    "ecc/**",
+    // Test files run via `node --test`, not linted with the app rules.
+    "tests/**",
   ]),
 ]);
 
