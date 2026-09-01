@@ -1,0 +1,5 @@
+# nested tooling repo — not part of the Swiftly.io codebase
+ecc/
+graphify-out/
+.next/
+node_modules/
