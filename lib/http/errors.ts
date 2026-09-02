@@ -32,6 +32,19 @@ export class BadRequestError extends ApiError {
   }
 }
 
+/**
+ * 400 — the request body / query / params failed Zod validation
+ * (SECURITY MASTERPLAN — Point 10). `details` carries `error.flatten()` so the
+ * client can map messages back to fields; the messages are already generic and
+ * user-facing (French), never a raw parser dump.
+ */
+export class ValidationError extends ApiError {
+  constructor(message = "Données invalides.", details?: unknown) {
+    super(400, "VALIDATION_ERROR", message, details);
+    this.name = "ValidationError";
+  }
+}
+
 /** 401 — no valid session. The client should (re-)authenticate. */
 export class UnauthorizedError extends ApiError {
   constructor(message = "Authentification requise.") {
