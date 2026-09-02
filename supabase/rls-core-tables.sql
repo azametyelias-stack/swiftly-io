@@ -3,6 +3,11 @@
 -- SECURITY MASTERPLAN — Point 4 (Row-Level Security)
 -- ============================================================================
 --
+--   ⚠️ SUPERSEDED (2026-09-02) by supabase/migrations/0002_core_schema.sql,
+--   which creates the core tables AND writes these policies inline (explicit
+--   per-table statements, so tests/db/rls.test.ts can verify them). This file
+--   is kept for reference / history only — do not apply it separately.
+--
 --   STATUS: TEMPLATE — *not* a migration, not run by `supabase db push`.
 --
 --   The core schema (users, accounts, transactions, …) is created by

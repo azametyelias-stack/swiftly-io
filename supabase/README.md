@@ -16,13 +16,14 @@ _SQL Editor_ → paste the contents of each file in `migrations/` in order and r
 | File | Purpose |
 | --- | --- |
 | `0001_privacy_consent.sql` | `consent_logs` (append-only audit trail) + `privacy_settings` (current state) for the GDPR/CCPA consent system. |
+| `0002_core_schema.sql` | Core app schema (`users`, `accounts`, `categories`, `people`, `transactions`, `templates`, `budgets`, `projects`, `alerts`, `reports`) + RLS + system-category seed + `public.account_balance()` (derived balance, no `balance` column). See `docs/3-PRODUCT (Design et Wireframes)/BUILD-PLAN.md` § P1. |
 
 Not a migration:
 
 | File | Purpose |
 | --- | --- |
-| `rls-core-tables.sql` | **Template** — RLS policies for the core tables (users, accounts, transactions, …). Apply *after* the core schema is created by PROMPT #PAYMENT (Day 9). Not run by `supabase db push`. |
-| `invitation-codes.sql` | **Template** — `public.invitation_codes` (closed-beta sign-up, SECURITY MASTERPLAN Point 19). Hash-at-rest, server-write-only. Apply with the auth-screens lot. Not run by `supabase db push`. |
+| `rls-core-tables.sql` | **Superseded by `0002_core_schema.sql`** (which writes the same policies inline). Kept for reference only. |
+| `invitation-codes.sql` | **Template** — `public.invitation_codes` (closed-beta sign-up, SECURITY MASTERPLAN Point 19). Hash-at-rest, server-write-only. Apply with the auth-screens lot (Lot 1). Not run by `supabase db push`. |
 
 ## Backups & disaster recovery (SECURITY MASTERPLAN — Point 20)
 
@@ -56,10 +57,11 @@ RLS is the **second** line of defence. The **first** is the API layer (see
 | --- | --- | --- | --- |
 | `consent_logs` | ✅ on | none (deny-all) + `revoke update,delete,truncate` | append-only, server-write-only — correct |
 | `privacy_settings` | ✅ on | none (deny-all) | server-write-only — correct |
+| `users` | ✅ on | select/insert/update self; no delete | owner col is `id` |
+| `accounts`, `categories`, `people`, `transactions`, `templates`, `budgets`, `projects`, `alerts`, `reports` | ✅ on | 4 owner policies (`auth.uid() = user_id`) | `categories` also allows reading system rows (`user_id is null`) |
 
-Core tables (users, accounts, categories, transactions, budgets, projects,
-templates, people, alerts, reports) **do not exist yet** — their policies are
-staged in `rls-core-tables.sql`.
+Core tables created in `0002_core_schema.sql` (2026-09-02). `public.account_balance(uuid)`
+is `security invoker`, so RLS on the underlying tables still applies.
 
 `refresh_tokens`: handled by Supabase Auth in the `auth` schema. Do **not**
 create a `public.refresh_tokens` table.
