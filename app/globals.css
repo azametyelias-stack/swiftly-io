@@ -1,17 +1,206 @@
 @import "tailwindcss";
 
+/* ============================================================================
+   SWIFTLY DESIGN SYSTEM — tokens in code  (BUILD-PLAN.md § P3)
+
+   Sources of truth:
+     • Colour / type / geometry / motion  → DESIGN-HANDOFF/README.md
+       (§ Couleur, § Typographie, § Format des montants, § Géométrie, § Motion)
+     • Value corrections                  → DESIGN-RECONCILIATION.md § 2
+       brand/accent #152BC7 · surface/page #EBEBEF · semantic/out #A80010
+
+   Rules:
+     • No hex in a component — always a token (`bg-surface-card`, `text-text-primary`…).
+     • One set of names, two sets of values, resolved by the active theme.
+     • The identity zone (night gradient, onboarding, bank cards, toast) never
+       theme-flips: it always uses --brand-deep / --ink-*.
+
+   Theme states (viewer + screen-22 toggle):
+     • bare :root                       → light
+     • @media (prefers-color-scheme: dark) on :root:not([data-theme="light"])
+                                        → follows the OS
+     • :root[data-theme="dark"|"light"] → explicit toggle, wins both ways
+   ========================================================================== */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
+
+  /* — Surfaces — */
+  --surface-page: #ebebef; /* app background — never pure black/white */
+  --surface-card: #ffffff; /* list cards, content blocks */
+  --surface-elev: #ffffff; /* modal sheets, drawer */
+  --surface-field: #ececef; /* inputs, numeric keypad */
+  --surface-divider: #e3e4e8; /* card borders, separators */
+  --surface-hairline: #ededf1; /* inner rules, neutral badge */
+  --surface-rail: #e2e2e7; /* progress rails, field border */
+  --surface-control-off: #d2d3d9; /* switch off, secondary button */
+
+  /* — Text — */
+  --text-primary: #0a0a0c; /* amounts, titles, labels */
+  --text-secondary: #5a5c63; /* descriptions, field labels */
+  --text-tertiary: #8a8c93; /* timestamps, mentions */
+  --text-quaternary: #c4c5cc; /* chevrons, dashed strokes */
+
+  /* — Action / brand — */
+  --action-primary: #0a0a0c; /* primary button — full inversion */
+  --action-on-primary: #ffffff; /* text on the primary button */
+  --brand-deep: #0a1466; /* night-gradient base — invariant */
+  --brand-accent: #152bc7; /* links, switches, information */
+
+  /* — Semantic — */
+  --semantic-in: #006b3c; /* income, goals reached (on light) */
+  --semantic-in-bg: #e6f4ec; /* "income" badge fill */
+  --semantic-out: #a80010; /* expense, alerts, destructive */
+  --semantic-out-bg: #fbeaea; /* "expense" badge fill */
+  --semantic-warn: #f5a524; /* budget bars, threshold crossed */
+  --semantic-warn-text: #8a5a00; /* percentage in alert */
+
+  /* — Ink (identity zone / toast — invariant across themes) — */
+  --ink-surface: #0a0a0c;
+  --ink-on-surface: #ffffff;
+  /* The green that sits on ink / night: #1DCF02. On light/white: --semantic-in.
+     No other green exists. */
+  --ink-in: #1dcf02;
+
+  /* — Starter aliases (kept until app/page.tsx becomes SCREEN-01) — */
+  --background: var(--surface-page);
+  --foreground: var(--text-primary);
+
+  /* — Geometry (§ Géométrie) — */
+  --radius-card: 20px;
+  --pad-card: 16px;
+  --radius-block: 18px;
+  --radius-sheet-top: 24px;
+  --radius-content-top: 28px;
+  --size-card-icon: 48px;
+  --radius-icon: 14px;
+  --gap-icon-text: 16px;
+  --gap-cards: 12px;
+  --margin-screen: 16px;
+  --stroke-svg: 1.7px;
+  --rail-height: 8px;
+  --radius-pill: 999px;
+  --size-select: 48px;
+  --size-list-button: 52px;
+  --size-primary-button: 56px;
+  --row-setting: 56px;
+  --tap-min: 44px;
+  --switch-w: 50px;
+  --switch-h: 30px;
+  --switch-knob: 24px;
+
+  /* — Motion: four durations, two curves (§ Motion) — */
+  --dur-tap: 120ms; /* response at contact — keypad key, filter pill */
+  --dur-toggle: 180ms; /* switch / checkbox / button press (160–180) */
+  --dur-sheet: 280ms; /* modal sheet, side drawer (260–280) */
+  --dur-curve: 1200ms; /* balance-curve trace */
+  --ease-out: ease-out; /* contact response */
+  --ease-standard: cubic-bezier(0.23, 1, 0.32, 1); /* toggle / press */
+  --ease-emphasized: cubic-bezier(0.32, 0.72, 0, 1); /* sheet / drawer / curve */
 }
 
+/* Dark — OS preference, unless the user pinned "light" on screen 22 */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --surface-page: #121318;
+    --surface-card: #1c1d23;
+    --surface-elev: #25262e;
+    --surface-field: #1c1d23;
+    --surface-divider: #2c2e36;
+    --surface-hairline: #2c2e36;
+    --surface-rail: #383a44;
+    --surface-control-off: #383a44;
+
+    --text-primary: #f2f2f5;
+    --text-secondary: #a6a8b4;
+    --text-tertiary: #7e808c;
+    --text-quaternary: #5e606c;
+
+    --action-primary: #f2f2f5;
+    --action-on-primary: #0a0a0c;
+    --brand-accent: #7c8cff;
+
+    --semantic-in: #1dcf02;
+    --semantic-in-bg: #1c1d23;
+    --semantic-out: #ff6166;
+    --semantic-out-bg: #1c1d23;
+    --semantic-warn: #f5a524;
+    --semantic-warn-text: #f5a524;
+  }
+}
+
+/* Dark — explicit screen-22 toggle, wins in both directions */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --surface-page: #121318;
+  --surface-card: #1c1d23;
+  --surface-elev: #25262e;
+  --surface-field: #1c1d23;
+  --surface-divider: #2c2e36;
+  --surface-hairline: #2c2e36;
+  --surface-rail: #383a44;
+  --surface-control-off: #383a44;
+
+  --text-primary: #f2f2f5;
+  --text-secondary: #a6a8b4;
+  --text-tertiary: #7e808c;
+  --text-quaternary: #5e606c;
+
+  --action-primary: #f2f2f5;
+  --action-on-primary: #0a0a0c;
+  --brand-accent: #7c8cff;
+
+  --semantic-in: #1dcf02;
+  --semantic-in-bg: #1c1d23;
+  --semantic-out: #ff6166;
+  --semantic-out-bg: #1c1d23;
+  --semantic-warn: #f5a524;
+  --semantic-warn-text: #f5a524;
+}
+
+/* ---- Tailwind theme: expose tokens as utilities ------------------------------
+   `inline` so the utilities emit `var(--token)` (theme-aware) instead of
+   resolving to a fixed hex at build time. */
 @theme inline {
+  --color-surface-page: var(--surface-page);
+  --color-surface-card: var(--surface-card);
+  --color-surface-elev: var(--surface-elev);
+  --color-surface-field: var(--surface-field);
+  --color-surface-divider: var(--surface-divider);
+  --color-surface-hairline: var(--surface-hairline);
+  --color-surface-rail: var(--surface-rail);
+  --color-surface-control-off: var(--surface-control-off);
+
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-text-quaternary: var(--text-quaternary);
+
+  --color-action-primary: var(--action-primary);
+  --color-action-on-primary: var(--action-on-primary);
+  --color-brand-deep: var(--brand-deep);
+  --color-brand-accent: var(--brand-accent);
+
+  --color-semantic-in: var(--semantic-in);
+  --color-semantic-in-bg: var(--semantic-in-bg);
+  --color-semantic-out: var(--semantic-out);
+  --color-semantic-out-bg: var(--semantic-out-bg);
+  --color-semantic-warn: var(--semantic-warn);
+  --color-semantic-warn-text: var(--semantic-warn-text);
+
+  --color-ink-surface: var(--ink-surface);
+  --color-ink-on-surface: var(--ink-on-surface);
+  --color-ink-in: var(--ink-in);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 
-  /* Privacy / consent design tokens (SCREEN-20/21/22) */
+  /* DEPRECATED — privacy screens 19–21 only (app/privacy, components/privacy).
+     Lot 6 reconciles those screens onto the tokens above and deletes these.
+     Do NOT use --color-sf-* / --animate-* in new code. */
   --color-sf-blue: #2563eb;
   --color-sf-blue-dark: #1d4ed8;
   --color-sf-blue-darker: #1e40af;
@@ -24,13 +213,76 @@
   --color-sf-border: #e5e7eb;
   --color-sf-surface: #f3f4f6;
   --color-sf-subtle: #f9fafb;
-
   --animate-consent-in: consent-slide-up 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   --animate-consent-out: consent-slide-down 0.3s ease-in forwards;
   --animate-toast-in: toast-in 0.3s ease-out;
   --animate-toast-out: toast-out 0.3s ease-in forwards;
 }
 
+/* ---- Fonts (plain @theme so the --font-* vars land on :root) ---------------- */
+@theme {
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui,
+    "Helvetica Neue", Helvetica, sans-serif;
+  --font-mono:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
+  /* Georgia is STRICTLY the logotype — never a title, amount or label. */
+  --font-logo: Georgia, "Times New Roman", serif;
+}
+
+/* ============================================================================
+   Typography roles (§ Typographie). Used by components from P5 on.
+   Every amount carries tabular-nums — no exception.
+   ========================================================================== */
+.t-balance {
+  font-size: 34px;
+  line-height: 1.02;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+.t-amount-input {
+  font-size: 44px;
+  line-height: 1.05;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  font-variant-numeric: tabular-nums;
+}
+.t-screen-title {
+  font-size: 19px;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.t-section-title {
+  font-size: 17px;
+  line-height: 1.3;
+  font-weight: 700;
+  letter-spacing: -0.012em;
+}
+.t-body {
+  font-size: 15px;
+  line-height: 1.45;
+  font-weight: 400;
+}
+.t-secondary {
+  font-size: 13px;
+  line-height: 1.45;
+  font-weight: 400;
+}
+.t-label {
+  font-size: 11px;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Keyframes for the DEPRECATED --animate-* tokens (privacy screens 19–21 only). */
 @keyframes consent-slide-up {
   from {
     opacity: 0;
@@ -41,7 +293,6 @@
     transform: translateY(0);
   }
 }
-
 @keyframes consent-slide-down {
   from {
     opacity: 1;
@@ -52,7 +303,6 @@
     transform: translateY(100px);
   }
 }
-
 @keyframes toast-in {
   from {
     opacity: 0;
@@ -63,7 +313,6 @@
     transform: translateY(0);
   }
 }
-
 @keyframes toast-out {
   from {
     opacity: 1;
@@ -73,11 +322,21 @@
   }
 }
 
+/* ============================================================================
+   Base
+   ========================================================================== */
+body {
+  background: var(--surface-page);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+}
+
+/* Under prefers-reduced-motion, translations and progressive drawing become a
+   120 ms fade; state changes stay instant — they carry information (§ Motion). */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
-
   *,
   *::before,
   *::after {
@@ -85,17 +344,4 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
 }

@@ -63,14 +63,15 @@ Migration `supabase/migrations/0002_core_schema.sql`. Tables (colonnes détaill�
 ### P2 — Validation Zod  (= PROMPT #INPUT, utilisé immédiatement)
 `lib/validation/` : `Amount`, `Currency`, `AccountInput`, `TransactionInput` (× expense/income/transfer), `TemplateInput`, `BudgetInput`, `ProjectInput`, `PeopleInput`. Helper `parseBody()` pour les route handlers (voir `lib/validation/README.md`). Chaque route `app/api/**` valide en entrée. Messages FR.
 
-### P3 — Design system en code
-Remplace les jetons provisoires `--color-sf-*` de `app/globals.css`.
-- **24 jetons couleur** clair + sombre depuis `Documentation développeurs.dc.html` §01. Déclarés sur `:root` + `@media (prefers-color-scheme: dark)` + `:root[data-theme]` (toggle thème écran 22). Zéro hex en dur dans un composant.
-- **Typo** : pile système Apple (`-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Helvetica Neue", Helvetica, sans-serif`) — retirer Geist. 7 rôles de texte (§02). Georgia **réservé au logotype**.
-- **Géométrie** : les 16 valeurs opposables (§02) en variables (`--radius-card: 20`, etc.).
-- **Motion** : 4 durées / 2 courbes (§06) en variables + fallback `prefers-reduced-motion` (fondu 120 ms).
-- **Format des montants** : `lib/format/money.ts` — séparateur U+2009, moins U+2212, `+`/pas de signe selon le sens, `tabular-nums`, mode masqué `•• •••`. Testé.
-- **Fond nuit** : `nuit.jpg` → `public/`, converti WebP/AVIF, servi via un layout partagé (voir `DESIGN-GLOBAL.md` §3). `objectif-spheres.jpg` idem pour le bandeau d'objectif.
+### P3 — Design system en code — ✅ FAIT (2026-09-02)
+`app/globals.css` réécrit ; source = `DESIGN-HANDOFF/README.md` (§ Couleur / Typographie / Format des montants / Géométrie / Motion) + corrections `DESIGN-RECONCILIATION.md` §2.
+- **24 jetons couleur** clair + sombre sur `:root` (raw hex) → `@media (prefers-color-scheme: dark) :root:not([data-theme="light"])` + `:root[data-theme="dark"]` (toggle écran 22, gagne dans les 2 sens). Exposés en utilitaires Tailwind via `@theme inline` (`bg-surface-card`, `text-text-primary`, `text-semantic-out`…). Zéro hex en dur dans un composant.
+- Les anciens `--color-sf-*` + `--animate-*` sont **conservés tels quels** dans un bloc `@theme inline` marqué **DEPRECATED** — utilisés uniquement par les écrans privacy 19–21 ; le **Lot 6** les migre sur les vrais jetons et supprime le bloc.
+- **Typo** : pile système Apple via `@theme { --font-sans }` (pas de `next/font`, Geist retiré de `app/layout.tsx`). 7 rôles `.t-*` (`.t-balance`, `.t-amount-input`, `.t-screen-title`, `.t-section-title`, `.t-body`, `.t-secondary`, `.t-label`) + `.tabular`. `--font-logo` (Georgia) réservé au logotype.
+- **Géométrie** : 19 variables (`--radius-card: 20px`, `--radius-pill: 999px`, `--switch-w/h/knob`, `--tap-min: 44px`, …).
+- **Motion** : `--dur-tap 120ms` / `--dur-toggle 180ms` / `--dur-sheet 280ms` / `--dur-curve 1200ms` + `--ease-standard cubic-bezier(.23,1,.32,1)` / `--ease-emphasized cubic-bezier(.32,.72,0,1)` + fallback `prefers-reduced-motion`.
+- **Format des montants** : `lib/format/money.ts` (`formatBalance` / `formatSigned` / `formatMoney`) — U+2009, U+2212, `+`/pas de signe, suffixe séparé par une espace normale, masqué `•• •••` longueur fixe, entiers (D1). 8 tests `tests/format/money.test.ts`. Doc `lib/format/README.md`.
+- **Fond nuit** : `nuit.jpg` + `objectif-spheres.jpg` → `public/brand/`, servis via `next/image` (AVIF/WebP + srcset au runtime, cache navigateur — `DESIGN-GLOBAL.md` §3). Le composant `NightBackdrop` qui les enveloppe arrive au Lot 1 (P5). Voir `public/brand/README.md`.
 
 ### P4 — Shell de navigation
 - `components/nav/AppHeader` : bouton gauche = menu (niveau racine) ou chevron retour (sous-écran) ; titre centré ; cloche + pastille non-lus à droite. Hauteur 56.
@@ -177,7 +178,7 @@ Ordre = `SWIFTLY-CARTE-PRODUIT`. **Validation en fin de lot** par Elias avant le
 
 ```
 P0 Semgrep(L1) ─ P1 schéma DB ─ P2 Zod(L2) ─ P3 design system ─ P4 nav shell ─ P5 (au fil de l'eau)
-   ✅ fait          ✅ fait        ✅ fait
+   ✅ fait          ✅ fait        ✅ fait        ✅ fait          ← ici
         │
         ▼
 LOT 1 ──▶ [valid.] ──▶ LOT 2 ──▶ [valid.] ──▶ LOT 3 ──▶ [valid.] ──▶ LOT 4 ──▶ [valid.] ──▶ LOT 5 ──▶ [valid.] ──▶ LOT 6 ──▶ [valid.]
@@ -187,4 +188,4 @@ L1 Semgrep : à chaque push, tous les lots.   L2 Zod : à chaque route, tous les
 LOT 6 peut démarrer en parallèle dès la fin du LOT 1.   Revue L3 finale + scan complet à Day 29.
 ```
 
-**Prochaine action** : P3 — design system dans `app/globals.css` + `lib/format/money.ts`.
+**Prochaine action** : P4 — shell de navigation (`AppHeader`, `MenuDrawer`, route group `(app)` protégé).
