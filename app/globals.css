@@ -322,6 +322,17 @@
   }
 }
 
+/* Nav menu — marquee for a label too long for its row (SCREEN-05 § 4).
+   Two copies in the track; -50% scrolls exactly one copy width. */
+@keyframes nav-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
 /* ============================================================================
    Base
    ========================================================================== */

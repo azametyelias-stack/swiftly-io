@@ -73,19 +73,23 @@ Migration `supabase/migrations/0002_core_schema.sql`. Tables (colonnes détaill�
 - **Format des montants** : `lib/format/money.ts` (`formatBalance` / `formatSigned` / `formatMoney`) — U+2009, U+2212, `+`/pas de signe, suffixe séparé par une espace normale, masqué `•• •••` longueur fixe, entiers (D1). 8 tests `tests/format/money.test.ts`. Doc `lib/format/README.md`.
 - **Fond nuit** : `nuit.jpg` + `objectif-spheres.jpg` → `public/brand/`, servis via `next/image` (AVIF/WebP + srcset au runtime, cache navigateur — `DESIGN-GLOBAL.md` §3). Le composant `NightBackdrop` qui les enveloppe arrive au Lot 1 (P5). Voir `public/brand/README.md`.
 
-### P4 — Shell de navigation
-- `components/nav/AppHeader` : bouton gauche = menu (niveau racine) ou chevron retour (sous-écran) ; titre centré ; cloche + pastille non-lus à droite. Hauteur 56.
-- `components/nav/MenuDrawer` : ouverture par **swipe gauche→droite**, l'écran courant est poussé, bande visible sur le bord (style app Claude, `05-menu-navigation.md`). ~10 entrées, item actif mis en évidence, libellé long en marquee.
-- Distinction racine / sous-écran + continuité directionnelle (droite↔droite, bas↔bas ; modale jamais latérale).
-- `(app)` route group protégé (redirection vers `/` si pas de session).
+### P4 — Shell de navigation — ✅ FAIT (2026-09-02)
+- `lib/nav/items.ts` : les 10 entrées de menu + `isRootPath()` / `activeNavItem()` (pur, testé — `tests/nav/items.test.ts`).
+- `components/nav/AppHeader.tsx` : hauteur 56, bouton circulaire 40 à gauche (menu au niveau racine via `useNavShell().openMenu`, chevron retour sinon — `isRootPath`), titre centré, cloche `→ /alertes` + pastille `semantic/out` si `unreadCount>0`. Zone d'appui étendue à 44 (`after:-inset-1`). Prop `tone="default"|"onDark"`. Rendu **par chaque écran** (titre variable).
+- `components/nav/NavShell.tsx` : conteneur swipe-reveal (`05-menu-navigation.md`) — le menu est dessous, l'écran courant glisse à droite (`translate3d`, `--ease-emphasized`), bande de 52 visible. Ouverture par swipe depuis le bord gauche (`OPEN_ZONE 28`), fermeture par swipe retour ou tap sur la bande. Pointer Events + `setPointerCapture`, `touch-action: pan-y`, verrou de scroll, ferme à la navigation, `prefers-reduced-motion` respecté. Contexte `useNavShell()` (fichier `useNavShell.ts` séparé pour éviter le cycle d'import).
+- `components/nav/MenuDrawer.tsx` : titre « Menu » + raccourci profil (`→ /parametres`), les 10 sections (`NAV_ITEMS`), item actif sur `surface/card` + texte `text/primary`, `MarqueeText` pour les libellés trop longs (statique + `truncate` sous reduced-motion), `ThemeToggle` en pied. Fond = `brand/deep` (placeholder du `NightBackdrop` qui arrive au Lot 1).
+- `components/nav/MarqueeText.tsx` (mesure overflow via `ResizeObserver`, `@keyframes nav-marquee` dans globals.css) · `components/nav/ThemeToggle.tsx` (cycle système/clair/sombre → `data-theme` + `localStorage`, script anti-flash `<head>` = TODO SCREEN-22) · `components/nav/icons.tsx` (jeu d'icônes ligne placeholder).
+- **Auth** : le modèle est **session Supabase côté navigateur** + `Authorization: Bearer` par requête API (pas de cookie → pas de garde côté serveur). `lib/supabase/client.ts` (client navigateur anon), `components/auth/SessionProvider.tsx` (`useSession()` → `status/userId/accessToken`), `components/auth/RequireSession.tsx` (redirige vers `/` si non connecté — l'API reste la vraie frontière via `withAuth`).
+- `app/(app)/layout.tsx` = `SessionProvider > RequireSession > NavShell`. 10 pages **stub** `app/(app)/<section>/page.tsx` (juste `<AppHeader>` + « écran construit au Lot N ») pour que le menu résolve — **chaque lot remplace la stub de sa section**. Tant que le Lot 1 (login) n'est pas fait, tout `(app)/*` redirige vers `/`.
+- Continuité directionnelle (droite↔droite, modale jamais latérale) : convention à appliquer écran par écran dès le Lot 2.
 
 ### P5 — Composants transverses (les 14)
 Construits au fil des lots mais **spec unique** (§03 de la doc). Le lot indiqué est celui qui l'introduit :
 
 | Composant | Lot | Composant | Lot |
 |---|---|---|---|
-| Barre de navigation | P4 | Interrupteur | 6 |
-| Tiroir latéral | P4 | Rangée de paramètre | 6 |
+| Barre de navigation | ✅ P4 | Interrupteur | 6 |
+| Tiroir latéral | ✅ P4 | Rangée de paramètre | 6 |
 | Bouton principal (verre poli / encre) | 1 | Carte de solde | 2 |
 | Toast | ✅ existe (à réaligner) | Courbe de solde | 2 |
 | Feuille modale | 2 | Carte de liste (+ variante progression) | 3 |
@@ -178,7 +182,7 @@ Ordre = `SWIFTLY-CARTE-PRODUIT`. **Validation en fin de lot** par Elias avant le
 
 ```
 P0 Semgrep(L1) ─ P1 schéma DB ─ P2 Zod(L2) ─ P3 design system ─ P4 nav shell ─ P5 (au fil de l'eau)
-   ✅ fait          ✅ fait        ✅ fait        ✅ fait          ← ici
+   ✅ fait          ✅ fait        ✅ fait        ✅ fait          ✅ fait      ← démarre au Lot 1
         │
         ▼
 LOT 1 ──▶ [valid.] ──▶ LOT 2 ──▶ [valid.] ──▶ LOT 3 ──▶ [valid.] ──▶ LOT 4 ──▶ [valid.] ──▶ LOT 5 ──▶ [valid.] ──▶ LOT 6 ──▶ [valid.]
@@ -188,4 +192,4 @@ L1 Semgrep : à chaque push, tous les lots.   L2 Zod : à chaque route, tous les
 LOT 6 peut démarrer en parallèle dès la fin du LOT 1.   Revue L3 finale + scan complet à Day 29.
 ```
 
-**Prochaine action** : P4 — shell de navigation (`AppHeader`, `MenuDrawer`, route group `(app)` protégé).
+**Prochaine action** : LOT 1 — Onboarding & Auth (écrans 01-03). Débloque tout le reste + remplit la session Supabase que le shell P4 attend.
