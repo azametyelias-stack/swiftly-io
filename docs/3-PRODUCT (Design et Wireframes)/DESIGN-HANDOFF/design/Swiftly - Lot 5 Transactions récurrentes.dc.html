@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<style>
+  html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  body {
+    margin: 0; background: #F4F4F6; color: #0A0A0C;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 17px; line-height: 1.45; text-wrap: pretty;
+  }
+  a { color: #152BC7; text-decoration: none; }
+  a:hover { color: #0A1466; }
+  @keyframes swl-pulse { 0%,100% { opacity: .5 } 50% { opacity: .85 } }
+  @keyframes swl-rise { from { transform: translateY(8px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
+  @keyframes swl-pop { from { transform: scale(0.96); opacity: 0 } to { transform: scale(1); opacity: 1 } }
+</style>
+</helmet>
+
+<section style="padding:56px 48px 96px;display:flex;flex-direction:column;gap:40px">
+
+  <div id="6a" style="display:flex;flex-direction:column;gap:24px;max-width:820px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#FFF;background:#0A0A0C;border-radius:6px;padding:5px 9px">6a</span>
+      <span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#6E7079">Lot 5 — Transactions récurrentes · écrans 14 Templates et 15 Budgets</span>
+    </div>
+    <h1 style="margin:0;font-size:44px;line-height:1.04;letter-spacing:-0.035em;font-weight:600">Un seul objet de liste, deux usages</h1>
+    <p style="margin:0;font-size:19px;line-height:1.5;color:#5A5C63;max-width:680px">Vos deux maquettes disent la même chose avec des mains différentes : une icône, un nom, une donnée à droite. Le lot les réunit sous une seule carte — même icône de 48, même rythme de 8, même bloc de texte — et ne laisse varier que la donnée : un montant pour un template, une progression pour un budget. C'est ce qui fait qu'un utilisateur qui a appris Templates sait déjà lire Budgets.</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(236px,1fr));gap:12px;max-width:1180px">
+    <div style="background:#FFF;border:1px solid #DCDDE3;border-radius:16px;padding:20px 22px;display:flex;flex-direction:column;gap:6px">
+      <span style="font-size:13px;font-weight:600;color:#152BC7">Grille de 8</span>
+      <span style="font-size:15px;line-height:1.4;color:#5A5C63">Icône 48, carte 16 de padding, 12 entre les cartes, barre 8, bouton 52. Vos maquettes flottaient entre 14 et 19 px de marge — l'œil le sent sans savoir le nommer.</span>
+    </div>
+    <div style="background:#FFF;border:1px solid #DCDDE3;border-radius:16px;padding:20px 22px;display:flex;flex-direction:column;gap:6px">
+      <span style="font-size:13px;font-weight:600;color:#152BC7">Une voix par niveau</span>
+      <span style="font-size:15px;line-height:1.4;color:#5A5C63">Nom en 17/700 avec tracking négatif, description en 13/400 gris, donnée en 17/700 tabulaire. Vos titres portaient un tracking positif : sur du gras, il désolidarise les lettres et fait perdre 20 % de vitesse de lecture.</span>
+    </div>
+    <div style="background:#FFF;border:1px solid #DCDDE3;border-radius:16px;padding:20px 22px;display:flex;flex-direction:column;gap:6px">
+      <span style="font-size:13px;font-weight:600;color:#152BC7">Le type est un badge, pas une phrase</span>
+      <span style="font-size:15px;line-height:1.4;color:#5A5C63">« Dépense » en rouge plein texte pesait autant que le nom du template. En badge 11 majuscules, l'information reste immédiate et cesse de concurrencer le titre.</span>
+    </div>
+    <div style="background:#FFF;border:1px solid #DCDDE3;border-radius:16px;padding:20px 22px;display:flex;flex-direction:column;gap:6px">
+      <span style="font-size:13px;font-weight:600;color:#152BC7">Trois seuils, votre règle</span>
+      <span style="font-size:15px;line-height:1.4;color:#5A5C63">0–50 % vert, 51–91 % ambre, 92 %+ rouge, exactement comme le document Budgets. Le pourcentage prend la couleur de la barre : une seule décision de couleur par carte.</span>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;align-items:baseline;gap:14px;border-top:1px solid #DCDDE3;padding-top:24px">
+      <span style="font-size:13px;font-weight:600;color:#6E7079">14</span>
+      <h2 style="margin:0;font-size:28px;letter-spacing:-0.026em;font-weight:600">Templates</h2>
+      <span style="font-size:15px;color:#6E7079">Filtre « Tout » + tri « Récent » · appui = lancer · appui long = menu · swipe droite = supprimer</span>
+    </div>
+
+    <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start">
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Liste — 5 templates</span>
+        <div data-screen-label="14 Templates" style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#0A1466;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;flex-direction:column">
+          <div style="position:absolute;inset:0;background:url('assets/nuit.jpg') center/cover no-repeat #0A1466"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,10,60,.5) 0%,rgba(6,10,60,.7) 100%)"></div>
+          <div style="position:relative;flex:none;color:#FFF">
+            <div style="height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;font-size:15px;font-weight:600;letter-spacing:-0.01em">
+              <span style="font-variant-numeric:tabular-nums">9:41</span>
+              <span style="display:flex;align-items:center;gap:6px;flex:none;white-space:nowrap"><span style="display:flex;align-items:flex-end;gap:2px;height:11px"><span style="width:3px;height:4px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:6px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:8px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:11px;border-radius:1px;background:#FFF"></span></span><span style="width:14px;height:11px;background:#FFF;clip-path:polygon(50% 100%,0% 32%,20% 14%,50% 5%,80% 14%,100% 32%)"></span><span style="display:flex;align-items:center;gap:1px"><span style="width:23px;height:11px;border-radius:3px;border:1px solid rgba(255,255,255,.55);padding:1px;display:flex"><span style="width:70%;background:#FFF;border-radius:2px"></span></span><span style="width:2px;height:4px;border-radius:0 1px 1px 0;background:rgba(255,255,255,.55)"></span></span></span>
+            </div>
+            <div style="height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px">
+              <button type="button" style="width:40px;height:40px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 5 8 12l6.5 7"></path></svg>
+              </button>
+              <span style="font-size:19px;font-weight:700;letter-spacing:-0.02em">Templates</span>
+              <button type="button" style="width:40px;height:40px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"></path></svg>
+              </button>
+            </div>
+          </div>
+
+          <div style="position:relative;flex:1;border-radius:28px 28px 0 0;background:#EBEBEF;padding:16px 16px 0;display:flex;flex-direction:column;gap:16px;overflow:hidden">
+            <div style="display:flex;gap:12px;flex:none">
+              <div style="flex:1;height:48px;border-radius:14px;background:#FFF;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:15px;font-weight:600">Tout<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#0A0A0C" stroke-width="1.8" stroke-linecap="round"><path d="M2.5 4.5 6 8l3.5-3.5"></path></svg></div>
+              <div style="flex:1;height:48px;border-radius:14px;background:#FFF;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:15px;font-weight:600">Récent<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#0A0A0C" stroke-width="1.8" stroke-linecap="round"><path d="M2.5 4.5 6 8l3.5-3.5"></path></svg></div>
+            </div>
+
+            <div style="flex:1;display:flex;flex-direction:column;gap:12px;overflow:hidden">
+              <div style="background:#FFF;border-radius:20px;padding:16px;display:flex;align-items:center;gap:16px;cursor:pointer;transition:transform 160ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.985)">
+                <div style="width:48px;height:48px;border-radius:14px;background:#0A0A0C;display:flex;align-items:center;justify-content:center;flex:none">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.5h16v3.5H4z"></path><path d="M6 14.5 7.5 9h9l1.5 5.5"></path><circle cx="7.5" cy="18.5" r="1.6"></circle><circle cx="16.5" cy="18.5" r="1.6"></circle></svg>
+                </div>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px">
+                  <span style="font-size:17px;font-weight:700;letter-spacing:-0.012em">Transport</span>
+                  <span style="font-size:13px;color:#8A8C93;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Pour me rendre au travail</span>
+                  <span style="font-size:11px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:#A80010;background:#FBEAEA;border-radius:6px;padding:3px 7px;align-self:flex-start">Dépense</span>
+                </div>
+                <span style="font-size:17px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;flex:none">600 F</span>
+              </div>
+
+              <div style="background:#FFF;border-radius:20px;padding:16px;display:flex;align-items:center;gap:16px">
+                <div style="width:48px;height:48px;border-radius:14px;background:#0A0A0C;display:flex;align-items:center;justify-content:center;flex:none">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h16v10H4z"></path><circle cx="12" cy="14" r="2.4"></circle><path d="M8 6h8"></path></svg>
+                </div>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px">
+                  <span style="font-size:17px;font-weight:700;letter-spacing:-0.012em">Salaire</span>
+                  <span style="font-size:13px;color:#8A8C93;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Mon salaire du mois</span>
+                  <span style="font-size:11px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:#006B3C;background:#E6F4EC;border-radius:6px;padding:3px 7px;align-self:flex-start">Revenu</span>
+                </div>
+                <span style="font-size:17px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;flex:none">90 000 F</span>
+              </div>
+
+              <div style="background:#FFF;border-radius:20px;padding:16px;display:flex;align-items:center;gap:16px">
+                <div style="width:48px;height:48px;border-radius:14px;background:#0A0A0C;display:flex;align-items:center;justify-content:center;flex:none">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 18h14M6 18V9.5h12V18"></path><path d="M9 9.5V6.5h6v3"></path><path d="M12 12v3.5"></path></svg>
+                </div>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px">
+                  <span style="font-size:17px;font-weight:700;letter-spacing:-0.012em">Épargne</span>
+                  <span style="font-size:13px;color:#8A8C93;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Pour acheter une voiture</span>
+                  <span style="font-size:11px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:#A80010;background:#FBEAEA;border-radius:6px;padding:3px 7px;align-self:flex-start">Dépense</span>
+                </div>
+                <span style="font-size:17px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;flex:none">1 000 F</span>
+              </div>
+
+              <div style="background:#FFF;border-radius:20px;padding:16px;display:flex;align-items:center;gap:16px">
+                <div style="width:48px;height:48px;border-radius:14px;background:#0A0A0C;display:flex;align-items:center;justify-content:center;flex:none">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5 12 4.5l8 6V19H4z"></path><path d="M10 19v-5h4v5"></path></svg>
+                </div>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px">
+                  <span style="font-size:17px;font-weight:700;letter-spacing:-0.012em">Loyer maison</span>
+                  <span style="font-size:13px;color:#8A8C93;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Chaque 5 du mois</span>
+                  <span style="font-size:11px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:#A80010;background:#FBEAEA;border-radius:6px;padding:3px 7px;align-self:flex-start">Dépense</span>
+                </div>
+                <span style="font-size:17px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;flex:none">85 000 F</span>
+              </div>
+
+              <div style="background:#FFF;border-radius:20px;padding:16px;display:flex;align-items:center;gap:16px">
+                <div style="width:48px;height:48px;border-radius:14px;background:#0A0A0C;display:flex;align-items:center;justify-content:center;flex:none">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="12" rx="2"></rect><path d="M8 20h8M12 17v3"></path></svg>
+                </div>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px">
+                  <span style="font-size:17px;font-weight:700;letter-spacing:-0.012em">Freelance</span>
+                  <span style="font-size:13px;color:#8A8C93;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Missions design</span>
+                  <span style="font-size:11px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:#006B3C;background:#E6F4EC;border-radius:6px;padding:3px 7px;align-self:flex-start">Revenu</span>
+                </div>
+                <span style="font-size:17px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;flex:none">30 000 F</span>
+              </div>
+            </div>
+
+            <div style="flex:none;padding:16px 16px 24px;margin:0 -16px;background:linear-gradient(180deg,rgba(235,235,239,0) 0%,#EBEBEF 45%);display:flex;justify-content:center">
+              <button type="button" style="height:52px;padding:0 28px;border:0;border-radius:999px;background:#0A0A0C;color:#FFF;font-family:inherit;font-size:17px;font-weight:600;letter-spacing:-0.01em;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform 160ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.97)">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="2.1" stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"></path></svg>Créer Template
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Aucun template — état vide</span>
+        <div data-screen-label="14b Templates vide" style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#0A1466;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;flex-direction:column">
+          <div style="position:absolute;inset:0;background:url('assets/nuit.jpg') center/cover no-repeat #0A1466"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,10,60,.5) 0%,rgba(6,10,60,.7) 100%)"></div>
+          <div style="position:relative;flex:none;color:#FFF">
+            <div style="height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;font-size:15px;font-weight:600">
+              <span style="font-variant-numeric:tabular-nums">9:41</span>
+              <span style="display:flex;align-items:center;gap:6px;flex:none;white-space:nowrap"><span style="display:flex;align-items:flex-end;gap:2px;height:11px"><span style="width:3px;height:4px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:6px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:8px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:11px;border-radius:1px;background:#FFF"></span></span><span style="width:14px;height:11px;background:#FFF;clip-path:polygon(50% 100%,0% 32%,20% 14%,50% 5%,80% 14%,100% 32%)"></span><span style="display:flex;align-items:center;gap:1px"><span style="width:23px;height:11px;border-radius:3px;border:1px solid rgba(255,255,255,.55);padding:1px;display:flex"><span style="width:70%;background:#FFF;border-radius:2px"></span></span><span style="width:2px;height:4px;border-radius:0 1px 1px 0;background:rgba(255,255,255,.55)"></span></span></span>
+            </div>
+            <div style="height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px">
+              <button type="button" style="width:40px;height:40px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 5 8 12l6.5 7"></path></svg>
+              </button>
+              <span style="font-size:19px;font-weight:700;letter-spacing:-0.02em">Templates</span>
+              <button type="button" style="width:40px;height:40px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"></path></svg>
+              </button>
+            </div>
+          </div>
+
+          <div style="position:relative;flex:1;border-radius:28px 28px 0 0;background:#EBEBEF;padding:16px;display:flex;flex-direction:column;overflow:hidden">
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;text-align:center;padding:0 16px">
+              <div style="width:72px;height:72px;border-radius:22px;background:#FFF;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:center">
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#8A8C93" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="10" height="10" rx="2"></rect><path d="M10 20h8a2 2 0 0 0 2-2v-8"></path></svg>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <span style="font-size:24px;font-weight:700;letter-spacing:-0.022em">Aucun template</span>
+                <span style="font-size:15px;line-height:1.5;color:#5A5C63">Gagnez du temps — Créez des templates pour vos transactions récurrentes (loyer, salaire, transport) et enregistrez-les en un clic.</span>
+              </div>
+              <button type="button" style="height:52px;padding:0 28px;border:0;border-radius:999px;background:#0A0A0C;color:#FFF;font-family:inherit;font-size:17px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform 160ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.97)">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="2.1" stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"></path></svg>Créer Template
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Appui long — Ouvrir / Modifier / Supprimer</span>
+        <div data-screen-label="14c Templates appui long" style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#EBEBEF;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;flex-direction:column">
+          <div style="position:absolute;inset:0;background:url('assets/nuit.jpg') center/cover no-repeat #0A1466"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,10,60,.5) 0%,rgba(6,10,60,.7) 100%)"></div>
+          <div style="position:relative;flex:none;color:#FFF;filter:brightness(.72)">
+            <div style="height:44px"></div>
+            <div style="height:56px;display:flex;align-items:center;justify-content:center"><span style="font-size:19px;font-weight:700;letter-spacing:-0.02em">Templates</span></div>
+          </div>
+          <div style="position:relative;flex:1;border-radius:28px 28px 0 0;background:#EBEBEF;padding:16px 16px 0;display:flex;flex-direction:column;gap:16px;overflow:hidden">
+            <div style="display:flex;gap:12px;flex:none;opacity:.45">
+              <div style="flex:1;height:48px;border-radius:14px;background:#FFF;border:1px solid #E2E2E7"></div>
+              <div style="flex:1;height:48px;border-radius:14px;background:#FFF;border:1px solid #E2E2E7"></div>
+            </div>
+            <div style="background:#FFF;border-radius:20px;padding:16px;display:flex;align-items:center;gap:16px;flex:none;transform:scale(1.02);box-shadow:0 2px 6px rgba(10,10,12,.1),0 18px 40px rgba(10,10,12,.2)">
+              <div style="width:48px;height:48px;border-radius:14px;background:#0A0A0C;display:flex;align-items:center;justify-content:center;flex:none">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.5h16v3.5H4z"></path><path d="M6 14.5 7.5 9h9l1.5 5.5"></path><circle cx="7.5" cy="18.5" r="1.6"></circle><circle cx="16.5" cy="18.5" r="1.6"></circle></svg>
+              </div>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px">
+                <span style="font-size:17px;font-weight:700;letter-spacing:-0.012em">Transport</span>
+                <span style="font-size:13px;color:#8A8C93">Pour me rendre au travail</span>
+                <span style="font-size:11px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:#A80010;background:#FBEAEA;border-radius:6px;padding:3px 7px;align-self:flex-start">Dépense</span>
+              </div>
+              <span style="font-size:17px;font-weight:700;font-variant-numeric:tabular-nums;flex:none">600 F</span>
+            </div>
+            <div style="flex:1;background:rgba(10,10,12,.36);margin:-8px -16px 0"></div>
+          </div>
+
+          <div style="position:absolute;left:0;right:0;bottom:0;background:#FFF;border-radius:26px 26px 0 0;padding:8px 16px 24px;display:flex;flex-direction:column;box-shadow:0 -8px 40px rgba(10,10,12,.22);animation:swl-rise 320ms cubic-bezier(0.23,1,0.32,1)">
+            <div style="width:38px;height:5px;border-radius:999px;background:#DCDDE3;margin:8px auto 16px"></div>
+            <div style="padding:0 4px 16px;display:flex;flex-direction:column;gap:4px">
+              <span style="font-size:17px;font-weight:700;letter-spacing:-0.014em">Transport</span>
+              <span style="font-size:13px;color:#8A8C93">Lancé 14 fois · dernière fois hier</span>
+            </div>
+            <div style="height:56px;display:flex;align-items:center;gap:16px;border-top:1px solid #EDEDF1;cursor:pointer">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0A0A0C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M8 5.5 18.5 12 8 18.5z"></path></svg>
+              <span style="font-size:17px;font-weight:600;flex:1">Ouvrir la transaction</span>
+              <span style="font-size:13px;color:#8A8C93">600 F pré-rempli</span>
+            </div>
+            <div style="height:56px;display:flex;align-items:center;gap:16px;border-top:1px solid #EDEDF1;cursor:pointer">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0A0A0C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M4 20h4L20 8l-4-4L4 16z"></path></svg>
+              <span style="font-size:17px;font-weight:600;flex:1">Modifier le template</span>
+            </div>
+            <div style="height:56px;display:flex;align-items:center;gap:16px;border-top:1px solid #EDEDF1;cursor:pointer">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A80010" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M5 7h14M9 7V4.5h6V7M7 7l1 13h8l1-13"></path></svg>
+              <span style="font-size:17px;font-weight:600;flex:1;color:#A80010">Supprimer</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Swipe droite — confirmation de suppression</span>
+        <div data-screen-label="14d Suppression" style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#EBEBEF;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;flex-direction:column">
+          <div style="position:absolute;inset:0;background:url('assets/nuit.jpg') center/cover no-repeat #0A1466"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,10,60,.5) 0%,rgba(6,10,60,.7) 100%)"></div>
+          <div style="position:relative;flex:none;color:#FFF;filter:brightness(.72)">
+            <div style="height:44px"></div>
+            <div style="height:56px;display:flex;align-items:center;justify-content:center"><span style="font-size:19px;font-weight:700;letter-spacing:-0.02em">Templates</span></div>
+          </div>
+          <div style="position:relative;flex:1;border-radius:28px 28px 0 0;background:#EBEBEF;padding:16px 16px 0;display:flex;flex-direction:column;gap:16px;overflow:hidden">
+            <div style="display:flex;gap:12px;flex:none;opacity:.45">
+              <div style="flex:1;height:48px;border-radius:14px;background:#FFF;border:1px solid #E2E2E7"></div>
+              <div style="flex:1;height:48px;border-radius:14px;background:#FFF;border:1px solid #E2E2E7"></div>
+            </div>
+            <div style="flex:none;border-radius:20px;background:#A80010;display:flex;align-items:center;overflow:hidden;position:relative;height:96px">
+              <div style="width:88px;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#FFF">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14M9 7V4.5h6V7M7 7l1 13h8l1-13"></path></svg>
+                <span style="font-size:12px;font-weight:700">Supprimer</span>
+              </div>
+              <div style="flex:1;align-self:stretch;box-sizing:border-box;background:#FFF;border-radius:20px;padding:16px;display:flex;align-items:center;gap:16px;box-shadow:-6px 0 16px rgba(10,10,12,.12)">
+                <div style="width:48px;height:48px;border-radius:14px;background:#0A0A0C;display:flex;align-items:center;justify-content:center;flex:none">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.5h16v3.5H4z"></path><path d="M6 14.5 7.5 9h9l1.5 5.5"></path><circle cx="7.5" cy="18.5" r="1.6"></circle><circle cx="16.5" cy="18.5" r="1.6"></circle></svg>
+                </div>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+                  <span style="font-size:17px;font-weight:700;letter-spacing:-0.012em">Transport</span>
+                  <span style="font-size:13px;color:#8A8C93">Pour me rendre au travail</span>
+                </div>
+              </div>
+            </div>
+            <div style="flex:1;background:rgba(10,10,12,.36);margin:-8px -16px 0;display:flex;align-items:center;justify-content:center;padding:0 24px">
+              <div style="width:100%;background:#FFF;border-radius:24px;padding:24px;display:flex;flex-direction:column;gap:16px;text-align:center;box-shadow:0 2px 6px rgba(10,10,12,.12),0 24px 60px rgba(10,10,12,.28);animation:swl-pop 200ms cubic-bezier(0.23,1,0.32,1)">
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <span style="font-size:19px;font-weight:700;letter-spacing:-0.018em">Supprimer ce template ?</span>
+                  <span style="font-size:15px;line-height:1.45;color:#5A5C63">« Transport » et son montant pré-rempli seront retirés. Les transactions déjà enregistrées ne changent pas.</span>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <button type="button" style="height:52px;border:0;border-radius:999px;background:#A80010;color:#FFF;font-family:inherit;font-size:17px;font-weight:600;cursor:pointer;transition:transform 160ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.97)">Supprimer</button>
+                  <button type="button" style="height:52px;border:1px solid #D2D3D9;border-radius:999px;background:#FFF;color:#0A0A0C;font-family:inherit;font-size:17px;font-weight:600;cursor:pointer;transition:transform 160ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.97)">Annuler</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="width:300px;display:flex;flex-direction:column;gap:14px;padding-top:34px">
+        <div style="background:#FFF;border:1px solid #DCDDE3;border-radius:16px;padding:18px 20px;display:flex;flex-direction:column;gap:8px">
+          <span style="font-size:15px;font-weight:700">Le montant n'est pas signé</span>
+          <span style="font-size:14px;line-height:1.5;color:#5A5C63">Votre maquette affiche « 600 F » en noir avec le type juste en dessous : c'est juste, et on le garde. Le badge porte déjà le sens ; colorer aussi le montant dirait deux fois la même chose et volerait le rouge à ce qui compte vraiment — les alertes de budget.</span>
+        </div>
+        <div style="background:#FFF;border:1px solid #DCDDE3;border-radius:16px;padding:18px 20px;display:flex;flex-direction:column;gap:8px">
+          <span style="font-size:15px;font-weight:700">« 90.000 F » devient « 90 000 F »</span>
+          <span style="font-size:14px;line-height:1.5;color:#5A5C63">Un seul séparateur de milliers dans toute l'app : l'espace insécable. Le point est un séparateur décimal ailleurs — sur un écran d'argent, l'ambiguïté n'est pas une option. Chiffres tabulaires pour que la colonne de droite ne danse pas au scroll.</span>
+        </div>
+        <div style="background:#FFF;border:1px solid #DCDDE3;border-radius:16px;padding:18px 20px;display:flex;flex-direction:column;gap:8px">
+          <span style="font-size:15px;font-weight:700">Deux sélecteurs, deux rôles</span>
+          <span style="font-size:14px;line-height:1.5;color:#5A5C63">« Tout » filtre, « Récent » trie. Ils ont la même forme parce qu'ils ont le même poids, et ils restent côte à côte en haut : le contenu défile dessous, eux ne bougent pas.</span>
+        </div>
+        <div style="background:#FFF;border:1px solid #DCDDE3;border-radius:16px;padding:18px 20px;display:flex;flex-direction:column;gap:8px">
+          <span style="font-size:15px;font-weight:700">La suppression demande confirmation</span>
+          <span style="font-size:14px;line-height:1.5;color:#5A5C63">Point de clarification n° 10 de votre doc : oui, confirmation. Un swipe est trop facile à déclencher en poche, et le geste ne dit pas ce qu'il détruit. La boîte le nomme, et rassure sur les transactions passées.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;align-items:baseline;gap:14px;border-top:1px solid #DCDDE3;padding-top:24px">
+      <span style="font-size:13px;font-weight:600;color:#6E7079">15</span>
+      <h2 style="margin:0;font-size:28px;letter-spacing:-0.026em;font-weight:600">Budgets</h2>
+      <span style="font-size:15px;color:#6E7079">Tri « Récent » · vert 0–50 % · ambre 51–91 % · rouge 92 %+</span>
+    </div>
+
+    <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start">
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Liste — les trois seuils</span>
+        <div data-screen-label="15 Budgets" style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#0A1466;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;flex-direction:column">
+          <div style="position:absolute;inset:0;background:url('assets/nuit.jpg') center/cover no-repeat #0A1466"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,10,60,.5) 0%,rgba(6,10,60,.7) 100%)"></div>
+          <div style="position:relative;flex:none;color:#FFF">
+            <div style="height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;font-size:15px;font-weight:600">
+              <span style="font-variant-numeric:tabular-nums">9:41</span>
+              <span style="display:flex;align-items:center;gap:6px;flex:none;white-space:nowrap"><span style="display:flex;align-items:flex-end;gap:2px;height:11px"><span style="width:3px;height:4px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:6px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:8px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:11px;border-radius:1px;background:#FFF"></span></span><span style="width:14px;height:11px;background:#FFF;clip-path:polygon(50% 100%,0% 32%,20% 14%,50% 5%,80% 14%,100% 32%)"></span><span style="display:flex;align-items:center;gap:1px"><span style="width:23px;height:11px;border-radius:3px;border:1px solid rgba(255,255,255,.55);padding:1px;display:flex"><span style="width:70%;background:#FFF;border-radius:2px"></span></span><span style="width:2px;height:4px;border-radius:0 1px 1px 0;background:rgba(255,255,255,.55)"></span></span></span>
+            </div>
+            <div style="height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px">
+              <button type="button" style="width:40px;height:40px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 5 8 12l6.5 7"></path></svg>
+              </button>
+              <span style="font-size:19px;font-weight:700;letter-spacing:-0.02em">Budgets</span>
+              <button type="button" style="width:40px;height:40px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"></path></svg>
+              </button>
+            </div>
+          </div>
+
+          <div style="position:relative;flex:1;border-radius:28px 28px 0 0;background:#EBEBEF;padding:16px 16px 0;display:flex;flex-direction:column;gap:16px;overflow:hidden">
+            <div style="display:flex;justify-content:flex-end;flex:none">
+              <div style="width:172px;height:48px;border-radius:14px;background:#FFF;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:15px;font-weight:600">Récent<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#0A0A0C" stroke-width="1.8" stroke-linecap="round"><path d="M2.5 4.5 6 8l3.5-3.5"></path></svg></div>
+            </div>
+
+            <div style="flex:1;display:flex;flex-direction:column;gap:12px;overflow:hidden">
+              <div style="background:#FFF;border-radius:20px;padding:16px;display:flex;gap:16px;cursor:pointer;transition:transform 160ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.985)">
+                <div style="width:48px;height:48px;border-radius:14px;background:#0A0A0C;display:flex;align-items:center;justify-content:center;flex:none">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v7a2.5 2.5 0 0 0 5 0V4M9.5 13v7"></path><path d="M16.5 4c1.6 0 2.5 1.4 2.5 4s-.9 4-2.5 4M16.5 12v8"></path></svg>
+                </div>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px">
+                  <div style="display:flex;align-items:baseline;gap:8px">
+                    <span style="font-size:17px;font-weight:700;letter-spacing:-0.012em;flex:1">Alimentation</span>
+                    <span style="font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;color:#8A5A00;flex:none">75 %</span>
+                  </div>
+                  <div style="height:8px;border-radius:999px;background:#E2E2E7;overflow:hidden"><div style="width:75%;height:100%;background:#F5A524;border-radius:999px"></div></div>
+                  <span style="font-size:13px;color:#5A5C63;font-variant-numeric:tabular-nums">75 000 / 100 000 FCFA</span>
+                </div>
+              </div>
+
+              <div style="background:#FFF;border-radius:20px;padding:16px;display:flex;gap:16px">
+                <div style="width:48px;height:48px;border-radius:14px;background:#0A0A0C;display:flex;align-items:center;justify-content:center;flex:none">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.5h16v3.5H4z"></path><path d="M6 14.5 7.5 9h9l1.5 5.5"></path><circle cx="7.5" cy="18.5" r="1.6"></circle><circle cx="16.5" cy="18.5" r="1.6"></circle></svg>
+                </div>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px">
+                  <div style="display:flex;align-items:baseline;gap:8px">
+                    <span style="font-size:17px;font-weight:700;letter-spacing:-0.012em;flex:1">Transport</span>
+                    <span style="font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;color:#006B3C;flex:none">45 %</span>
+                  </div>
+                  <div style="height:8px;border-radius:999px;background:#E2E2E7;overflow:hidden"><div style="width:45%;height:100%;background:#006B3C;border-radius:999px"></div></div>
+                  <span style="font-size:13px;color:#5A5C63;font-variant-numeric:tabular-nums">22 500 / 50 000 FCFA</span>
+                </div>
+              </div>
+
+              <div style="background:#FFF;border-radius:20px;padding:16px;display:flex;gap:16px">
+                <div style="width:48px;height:48px;border-radius:14px;background:#0A0A0C;display:flex;align-items:center;justify-content:center;flex:none">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="12" rx="2"></rect><path d="M12 9.5v5M9.5 12h5"></path></svg>
+                </div>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px">
+                  <div style="display:flex;align-items:baseline;gap:8px">
+                    <span style="font-size:17px;font-weight:700;letter-spacing:-0.012em;flex:1">Loisirs</span>
+                    <span style="font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;color:#A80010;flex:none">92 %</span>
+                  </div>
+                  <div style="height:8px;border-radius:999px;background:#E2E2E7;overflow:hidden"><div style="width:92%;height:100%;background:#A80010;border-radius:999px"></div></div>
+                  <div style="display:flex;align-items:baseline;gap:8px">
+                    <span style="font-size:13px;color:#5A5C63;font-variant-numeric:tabular-nums;flex:1">27 600 / 30 000 FCFA</span>
+                    <span style="font-size:12px;font-weight:700;letter-spacing:0.03em;text-transform:uppercase;color:#A80010;flex:none">Alerte envoyée</span>
+                  </div>
+                </div>
+              </div>
+
+              <div style="background:#FFF;border-radius:20px;padding:16px;display:flex;gap:16px">
+                <div style="width:48px;height:48px;border-radius:14px;background:#0A0A0C;display:flex;align-items:center;justify-content:center;flex:none">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5v11M6.5 12h11"></path><circle cx="12" cy="12" r="8.5"></circle></svg>
+                </div>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px">
+                  <div style="display:flex;align-items:baseline;gap:8px">
+                    <span style="font-size:17px;font-weight:700;letter-spacing:-0.012em;flex:1">Santé</span>
+                    <span style="font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;color:#8A8C93;flex:none">0 %</span>
+                  </div>
+                  <div style="height:8px;border-radius:999px;background:#E2E2E7"></div>
+                  <span style="font-size:13px;color:#5A5C63;font-variant-numeric:tabular-nums">0 / 30 000 FCFA · aucune dépense ce mois</span>
+                </div>
+              </div>
+            </div>
+
+            <div style="flex:none;padding:16px 16px 24px;margin:0 -16px;background:linear-gradient(180deg,rgba(235,235,239,0) 0%,#EBEBEF 45%);display:flex;justify-content:center">
+              <button type="button" style="height:52px;padding:0 28px;border:0;border-radius:999px;background:#0A0A0C;color:#FFF;font-family:inherit;font-size:17px;font-weight:600;letter-spacing:-0.01em;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform 160ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.97)">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="2.1" stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"></path></svg>Créer Budget
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Aucun budget — état vide</span>
+        <div data-screen-label="15b Budgets vide" style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#0A1466;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;flex-direction:column">
+          <div style="position:absolute;inset:0;background:url('assets/nuit.jpg') center/cover no-repeat #0A1466"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,10,60,.5) 0%,rgba(6,10,60,.7) 100%)"></div>
+          <div style="position:relative;flex:none;color:#FFF">
+            <div style="height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;font-size:15px;font-weight:600">
+              <span style="font-variant-numeric:tabular-nums">9:41</span>
+              <span style="display:flex;align-items:center;gap:6px;flex:none;white-space:nowrap"><span style="display:flex;align-items:flex-end;gap:2px;height:11px"><span style="width:3px;height:4px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:6px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:8px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:11px;border-radius:1px;background:#FFF"></span></span><span style="width:14px;height:11px;background:#FFF;clip-path:polygon(50% 100%,0% 32%,20% 14%,50% 5%,80% 14%,100% 32%)"></span><span style="display:flex;align-items:center;gap:1px"><span style="width:23px;height:11px;border-radius:3px;border:1px solid rgba(255,255,255,.55);padding:1px;display:flex"><span style="width:70%;background:#FFF;border-radius:2px"></span></span><span style="width:2px;height:4px;border-radius:0 1px 1px 0;background:rgba(255,255,255,.55)"></span></span></span>
+            </div>
+            <div style="height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px">
+              <button type="button" style="width:40px;height:40px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 5 8 12l6.5 7"></path></svg>
+              </button>
+              <span style="font-size:19px;font-weight:700;letter-spacing:-0.02em">Budgets</span>
+              <button type="button" style="width:40px;height:40px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"></path></svg>
+              </button>
+            </div>
+          </div>
+
+          <div style="position:relative;flex:1;border-radius:28px 28px 0 0;background:#EBEBEF;padding:16px;display:flex;flex-direction:column;overflow:hidden">
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;text-align:center;padding:0 16px">
+              <div style="width:72px;height:72px;border-radius:22px;background:#FFF;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:center">
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#8A8C93" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15h16"></path><path d="M4 9h9"></path><circle cx="16" cy="9" r="2"></circle><circle cx="9" cy="15" r="2"></circle></svg>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <span style="font-size:24px;font-weight:700;letter-spacing:-0.022em">Aucun budget</span>
+                <span style="font-size:15px;line-height:1.5;color:#5A5C63">Maîtrisez vos dépenses — Créez des budgets par catégorie pour suivre et contrôler vos limites de dépenses, et recevez des alertes si vous dépassez.</span>
+              </div>
+              <button type="button" style="height:52px;padding:0 28px;border:0;border-radius:999px;background:#0A0A0C;color:#FFF;font-family:inherit;font-size:17px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform 160ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.97)">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="2.1" stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"></path></svg>Créer Budget
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Détail d'un budget — proposition à valider</span>
+        <div data-screen-label="15c Budget détail" style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#0A1466;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;flex-direction:column">
+          <div style="position:absolute;inset:0;background:url('assets/nuit.jpg') center/cover no-repeat #0A1466"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,10,60,.5) 0%,rgba(6,10,60,.7) 100%)"></div>
+          <div style="position:relative;flex:none;color:#FFF">
+            <div style="height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;font-size:15px;font-weight:600">
+              <span style="font-variant-numeric:tabular-nums">9:41</span>
+              <span style="display:flex;align-items:center;gap:6px;flex:none;white-space:nowrap"><span style="display:flex;align-items:flex-end;gap:2px;height:11px"><span style="width:3px;height:4px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:6px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:8px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:11px;border-radius:1px;background:#FFF"></span></span><span style="width:14px;height:11px;background:#FFF;clip-path:polygon(50% 100%,0% 32%,20% 14%,50% 5%,80% 14%,100% 32%)"></span><span style="display:flex;align-items:center;gap:1px"><span style="width:23px;height:11px;border-radius:3px;border:1px solid rgba(255,255,255,.55);padding:1px;display:flex"><span style="width:70%;background:#FFF;border-radius:2px"></span></span><span style="width:2px;height:4px;border-radius:0 1px 1px 0;background:rgba(255,255,255,.55)"></span></span></span>
+            </div>
+            <div style="height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px">
+              <button type="button" style="width:40px;height:40px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 5 8 12l6.5 7"></path></svg>
+              </button>
+              <span style="font-size:19px;font-weight:700;letter-spacing:-0.02em">Loisirs</span>
+              <button type="button" style="width:40px;height:40px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="#FFF" stroke="none"><circle cx="12" cy="5.5" r="1.7"></circle><circle cx="12" cy="12" r="1.7"></circle><circle cx="12" cy="18.5" r="1.7"></circle></svg>
+              </button>
+            </div>
+          </div>
+
+          <div style="position:relative;flex:1;border-radius:28px 28px 0 0;background:#EBEBEF;padding:16px 16px 0;display:flex;flex-direction:column;gap:16px;overflow:hidden">
+            <div style="flex:none;background:#FBEAEA;border:1px solid #F1CFCF;border-radius:16px;padding:16px;display:flex;gap:12px;align-items:flex-start">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A80010" stroke-width="1.9" stroke-linecap="round" style="flex:none;margin-top:1px"><path d="M12 4 2.8 20h18.4z"></path><path d="M12 10v4M12 17.2v.2"></path></svg>
+              <div style="display:flex;flex-direction:column;gap:4px">
+                <span style="font-size:15px;font-weight:700;color:#A80010">92 % de votre budget est consommé</span>
+                <span style="font-size:13px;line-height:1.45;color:#7C1218">Alerte envoyée le 26 août à 18 h 40 — visible dans le tableau de bord et vos notifications.</span>
+              </div>
+            </div>
+
+            <div style="flex:none;background:#FFF;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:16px">
+              <span style="font-size:13px;color:#8A8C93">Dépensé en août</span>
+              <div style="display:flex;align-items:baseline;gap:8px">
+                <span style="font-size:38px;font-weight:700;letter-spacing:-0.03em;font-variant-numeric:tabular-nums;line-height:1">27 600 F</span>
+                <span style="font-size:15px;color:#8A8C93;font-variant-numeric:tabular-nums">/ 30 000 F</span>
+              </div>
+              <div style="height:8px;border-radius:999px;background:#E2E2E7;overflow:hidden"><div style="width:92%;height:100%;background:#A80010;border-radius:999px"></div></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px 8px;border-top:1px solid #EDEDF1;padding-top:16px">
+                <div style="display:flex;flex-direction:column;gap:2px">
+                  <span style="font-size:12px;color:#8A8C93">Reste</span>
+                  <span style="font-size:19px;font-weight:700;letter-spacing:-0.018em;font-variant-numeric:tabular-nums;color:#A80010">2 400 F</span>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:2px;text-align:right">
+                  <span style="font-size:12px;color:#8A8C93">Jours restants</span>
+                  <span style="font-size:19px;font-weight:700;letter-spacing:-0.018em;font-variant-numeric:tabular-nums">5</span>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:2px">
+                  <span style="font-size:12px;color:#8A8C93">Mois précédent</span>
+                  <span style="font-size:19px;font-weight:700;letter-spacing:-0.018em;font-variant-numeric:tabular-nums">24 100 F</span>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:2px;text-align:right">
+                  <span style="font-size:12px;color:#8A8C93">Transactions</span>
+                  <span style="font-size:19px;font-weight:700;letter-spacing:-0.018em;font-variant-numeric:tabular-nums">9</span>
+                </div>
+              </div>
+            </div>
+
+            <span style="font-size:13px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#6E7079;flex:none">Dépenses de la catégorie</span>
+
+            <div style="flex:1;background:#FFF;border-radius:20px;padding:0 16px;display:flex;flex-direction:column;overflow:hidden">
+              <div style="height:64px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #EDEDF1">
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:600">Sortie cinéma</span><span style="font-size:12px;color:#8A8C93">Hier, 20 h 15</span></div>
+                <span style="font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;flex:none">6 000 F</span>
+              </div>
+              <div style="height:64px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #EDEDF1">
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:600">Abonnement musique</span><span style="font-size:12px;color:#8A8C93">24 août, 9 h 02</span></div>
+                <span style="font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;flex:none">3 500 F</span>
+              </div>
+              <div style="height:64px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #EDEDF1">
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:600">Restaurant entre amis</span><span style="font-size:12px;color:#8A8C93">21 août, 21 h 30</span></div>
+                <span style="font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;flex:none">12 100 F</span>
+              </div>
+              <div style="height:64px;display:flex;align-items:center;gap:12px">
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:600">Match de football</span><span style="font-size:12px;color:#8A8C93">17 août, 16 h 45</span></div>
+                <span style="font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;flex:none">6 000 F</span>
+              </div>
+            </div>
+
+            <div style="flex:none;padding:16px 16px 24px;margin:0 -16px;background:linear-gradient(180deg,rgba(235,235,239,0) 0%,#EBEBEF 45%);display:flex;gap:12px">
+              <button type="button" style="flex:1;height:52px;border:1px solid #D2D3D9;border-radius:999px;background:#FFF;color:#0A0A0C;font-family:inherit;font-size:17px;font-weight:600;cursor:pointer;transition:transform 160ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.97)">Modifier</button>
+              <button type="button" style="flex:1;height:52px;border:0;border-radius:999px;background:#0A0A0C;color:#FFF;font-family:inherit;font-size:17px;font-weight:600;cursor:pointer;transition:transform 160ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.97)">Augmenter la limite</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="width:300px;display:flex;flex-direction:column;gap:14px;padding-top:34px">
+        <div style="background:#FFF;border:1px solid #DCDDE3;border-radius:16px;padding:18px 20px;display:flex;flex-direction:column;gap:8px">
+          <span style="font-size:15px;font-weight:700">Le pourcentage prend la couleur de la barre</span>
+          <span style="font-size:14px;line-height:1.5;color:#5A5C63">Dans votre maquette, Alimentation a une barre orange et un pourcentage orange, Transport une barre verte et un chiffre vert : la règle était déjà là, on l'a juste rendue systématique et on a assombri les teintes pour tenir le contraste AA sur blanc.</span>
+        </div>
+        <div style="background:#FFF;border:1px solid #DCDDE3;border-radius:16px;padding:18px 20px;display:flex;flex-direction:column;gap:8px">
+          <span style="font-size:15px;font-weight:700">Le rail passe en #E2E2E7</span>
+          <span style="font-size:14px;line-height:1.5;color:#5A5C63">Le gris du rail était presque aussi foncé que la barre verte : à 45 %, on ne voyait plus où s'arrêtait le progrès. Un rail plus clair rend la longueur lisible d'un coup d'œil, sans agrandir la barre.</span>
+        </div>
+        <div style="background:#FFF;border:1px solid #DCDDE3;border-radius:16px;padding:18px 20px;display:flex;flex-direction:column;gap:8px">
+          <span style="font-size:15px;font-weight:700">Une carte à 0 % reste une carte</span>
+          <span style="font-size:14px;line-height:1.5;color:#5A5C63">Votre doc prévoit les budgets sans transaction. Rail vide, pourcentage gris, mention « aucune dépense ce mois » : la carte ne ressemble ni à un bug, ni à une alerte.</span>
+        </div>
+        <div style="background:#FFF;border:1px solid #DCDDE3;border-radius:16px;padding:18px 20px;display:flex;flex-direction:column;gap:8px">
+          <span style="font-size:15px;font-weight:700">Ce que le détail répond</span>
+          <span style="font-size:14px;line-height:1.5;color:#5A5C63">Point ouvert n° 11 de votre doc : le détail montre l'historique de la catégorie ET la comparaison au mois précédent, parce que ce sont les deux questions qui suivent « je suis à 92 % ». À valider ou à réduire.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <sc-if value="{{ showSystem }}" hint-placeholder-val="{{ true }}">
+  <div style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;align-items:baseline;gap:14px;border-top:1px solid #DCDDE3;padding-top:24px">
+      <span style="font-size:13px;font-weight:600;color:#6E7079">Système</span>
+      <h2 style="margin:0;font-size:28px;letter-spacing:-0.026em;font-weight:600">La carte de liste, une fois pour toutes</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;max-width:1180px">
+      <div style="background:#FFF;border:1px solid #DCDDE3;border-radius:18px;padding:22px 24px;display:flex;flex-direction:column;gap:14px">
+        <span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Géométrie</span>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:14px">
+          <div style="display:flex;justify-content:space-between;gap:12px"><span style="color:#5A5C63">Carte</span><span style="font-weight:600;font-variant-numeric:tabular-nums">radius 20 · padding 16</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px"><span style="color:#5A5C63">Icône</span><span style="font-weight:600;font-variant-numeric:tabular-nums">48 · radius 14</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px"><span style="color:#5A5C63">Icône ↔ texte</span><span style="font-weight:600;font-variant-numeric:tabular-nums">16</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px"><span style="color:#5A5C63">Entre cartes</span><span style="font-weight:600;font-variant-numeric:tabular-nums">12</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px"><span style="color:#5A5C63">Barre</span><span style="font-weight:600;font-variant-numeric:tabular-nums">8 · radius 999</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px"><span style="color:#5A5C63">Sélecteur · bouton</span><span style="font-weight:600;font-variant-numeric:tabular-nums">48 · 52</span></div>
+        </div>
+      </div>
+      <div style="background:#FFF;border:1px solid #DCDDE3;border-radius:18px;padding:22px 24px;display:flex;flex-direction:column;gap:14px">
+        <span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Voix</span>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px"><span style="font-size:17px;font-weight:700;letter-spacing:-0.012em">Nom</span><span style="font-size:12px;color:#8A8C93;font-family:ui-monospace,'SF Mono',Menlo,monospace">17 · 700 · −0.012em</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px"><span style="font-size:13px;color:#8A8C93">Description</span><span style="font-size:12px;color:#8A8C93;font-family:ui-monospace,'SF Mono',Menlo,monospace">13 · 400</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px"><span style="font-size:11px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:#A80010;background:#FBEAEA;border-radius:6px;padding:3px 7px">Dépense</span><span style="font-size:12px;color:#8A8C93;font-family:ui-monospace,'SF Mono',Menlo,monospace">11 · 700 · caps</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px"><span style="font-size:17px;font-weight:700;font-variant-numeric:tabular-nums">90 000 F</span><span style="font-size:12px;color:#8A8C93;font-family:ui-monospace,'SF Mono',Menlo,monospace">17 · 700 · tnum</span></div>
+        </div>
+      </div>
+      <div style="background:#FFF;border:1px solid #DCDDE3;border-radius:18px;padding:22px 24px;display:flex;flex-direction:column;gap:14px">
+        <span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Seuils de progression</span>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;flex-direction:column;gap:6px"><div style="display:flex;justify-content:space-between;font-size:14px"><span style="color:#5A5C63">0–50 %</span><span style="font-weight:700;color:#006B3C">#006B3C</span></div><div style="height:8px;border-radius:999px;background:#E2E2E7;overflow:hidden"><div style="width:40%;height:100%;background:#006B3C;border-radius:999px"></div></div></div>
+          <div style="display:flex;flex-direction:column;gap:6px"><div style="display:flex;justify-content:space-between;font-size:14px"><span style="color:#5A5C63">51–91 %</span><span style="font-weight:700;color:#8A5A00">#F5A524</span></div><div style="height:8px;border-radius:999px;background:#E2E2E7;overflow:hidden"><div style="width:75%;height:100%;background:#F5A524;border-radius:999px"></div></div></div>
+          <div style="display:flex;flex-direction:column;gap:6px"><div style="display:flex;justify-content:space-between;font-size:14px"><span style="color:#5A5C63">92 %+ · alerte</span><span style="font-weight:700;color:#A80010">#A80010</span></div><div style="height:8px;border-radius:999px;background:#E2E2E7;overflow:hidden"><div style="width:92%;height:100%;background:#A80010;border-radius:999px"></div></div></div>
+        </div>
+      </div>
+      <div style="background:#FFF;border:1px solid #DCDDE3;border-radius:18px;padding:22px 24px;display:flex;flex-direction:column;gap:14px">
+        <span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Gestes, identiques sur les deux écrans</span>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:14px;line-height:1.45">
+          <div style="display:flex;gap:10px"><span style="font-weight:700;width:96px;flex:none">Appui</span><span style="color:#5A5C63">Template : lance la transaction pré-remplie. Budget : ouvre le détail.</span></div>
+          <div style="display:flex;gap:10px"><span style="font-weight:700;width:96px;flex:none">Appui long</span><span style="color:#5A5C63">Feuille d'options — même ordre, destructif en dernier.</span></div>
+          <div style="display:flex;gap:10px"><span style="font-weight:700;width:96px;flex:none">Swipe droite</span><span style="color:#5A5C63">Révèle Supprimer, puis confirmation nommée.</span></div>
+          <div style="display:flex;gap:10px"><span style="font-weight:700;width:96px;flex:none">Retour</span><span style="color:#5A5C63">160 ms, échelle 0,985 au contact — pas au relâchement.</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showSystem&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Sections&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    return { showSystem: this.props.showSystem ?? true };
+  }
+}
+</script>
+</body>
+</html>

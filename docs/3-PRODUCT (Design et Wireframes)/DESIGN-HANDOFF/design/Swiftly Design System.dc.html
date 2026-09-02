@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="page">
+<style>
+  html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  body {
+    margin: 0;
+    background: #F4F4F6;
+    color: #0A0A0C;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 17px;
+    line-height: 1.45;
+    text-wrap: pretty;
+  }
+  a { color: #1B3BF5; text-decoration: none; }
+  a:hover { color: #0A1466; }
+  @keyframes swl-pulse { 0%,100% { opacity: 1 } 50% { opacity: .45 } }
+</style>
+</helmet>
+
+<div style="max-width:1180px;margin:0 auto;padding:0 32px 120px">
+
+  <header style="display:flex;flex-direction:column;gap:40px;padding:88px 0 64px">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:32px;flex-wrap:wrap">
+      <div style="display:flex;flex-direction:column;gap:20px;max-width:640px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:26px;height:26px;border-radius:7px;background:url('assets/nuit.jpg') center/cover no-repeat #0A1466;flex:none"></div>
+          <span style="font-family:Georgia,'Times New Roman',serif;font-size:24px;letter-spacing:-0.01em">Swiftly.io</span>
+        </div>
+        <h1 style="margin:0;font-size:52px;line-height:1.02;letter-spacing:-0.035em;font-weight:600">Design system</h1>
+        <p style="margin:0;font-size:19px;line-height:1.5;color:#5A5C63;max-width:560px">Le langage visuel et gestuel de Swiftly.io — application de gestion financière pour indépendants et TPE. Un seul document : fondations, composants, motion, et les écrans de référence.</p>
+      </div>
+      <div style="display:grid;gap:14px;min-width:220px">
+        <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Version</span><span style="font-size:15px;font-weight:500">{{ version }}</span></div>
+        <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Plateformes</span><span style="font-size:15px;font-weight:500">iOS · Android · Web</span></div>
+        <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Devise</span><span style="font-size:15px;font-weight:500">Franc CFA (F CFA)</span></div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">
+      <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:16px;padding:22px 24px;display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:600;color:#1B3BF5">01 — Clarté</span><span style="font-size:15px;line-height:1.4;color:#5A5C63">Le chiffre d'abord. Tout le reste le sert.</span></div>
+      <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:16px;padding:22px 24px;display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:600;color:#1B3BF5">02 — Réponse</span><span style="font-size:15px;line-height:1.4;color:#5A5C63">Le retour visuel arrive au contact, jamais au relâchement.</span></div>
+      <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:16px;padding:22px 24px;display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:600;color:#1B3BF5">03 — Continuité</span><span style="font-size:15px;line-height:1.4;color:#5A5C63">Ce qui entre par la droite ressort par la droite.</span></div>
+      <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:16px;padding:22px 24px;display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:600;color:#1B3BF5">04 — Retenue</span><span style="font-size:15px;line-height:1.4;color:#5A5C63">Deux couleurs de fond au maximum. Un seul accent.</span></div>
+    </div>
+  </header>
+
+  <section style="padding:56px 0;border-top:1px solid #E3E4E8">
+    <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:32px">
+      <span style="font-size:13px;font-weight:600;color:#8E9099;letter-spacing:0.02em">01</span>
+      <h2 style="margin:0;font-size:32px;letter-spacing:-0.026em;font-weight:600">Couleur</h2>
+    </div>
+
+    <p style="margin:0 0 28px;font-size:17px;line-height:1.5;color:#5A5C63;max-width:640px">Le bleu nuit est réservé aux surfaces d'identité : écrans d'entrée, en-tête du tableau de bord, cartes bancaires. Le corps de l'application reste neutre pour que la donnée porte la couleur.</p>
+
+    <h3 style="margin:0 0 14px;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Marque</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:36px">
+      <div style="border-radius:14px;overflow:hidden;border:1px solid #E3E4E8;background:#FFF">
+        <div style="height:96px;background:url('assets/nuit.jpg') center/cover no-repeat #0A1466"></div>
+        <div style="padding:12px 14px;display:flex;flex-direction:column;gap:2px"><span style="font-size:14px;font-weight:600">Nuit</span><span style="font-size:12px;color:#8E9099;font-variant-numeric:tabular-nums">Dégradé signature</span></div>
+      </div>
+      <div style="border-radius:14px;overflow:hidden;border:1px solid #E3E4E8;background:#FFF">
+        <div style="height:96px;background:#1B3BF5"></div>
+        <div style="padding:12px 14px;display:flex;flex-direction:column;gap:2px"><span style="font-size:14px;font-weight:600">Accent</span><span style="font-size:12px;color:#8E9099;font-variant-numeric:tabular-nums">#1B3BF5</span></div>
+      </div>
+      <div style="border-radius:14px;overflow:hidden;border:1px solid #E3E4E8;background:#FFF">
+        <div style="height:96px;background:#0A1466"></div>
+        <div style="padding:12px 14px;display:flex;flex-direction:column;gap:2px"><span style="font-size:14px;font-weight:600">Profond</span><span style="font-size:12px;color:#8E9099;font-variant-numeric:tabular-nums">#0A1466</span></div>
+      </div>
+      <div style="border-radius:14px;overflow:hidden;border:1px solid #E3E4E8;background:#FFF">
+        <div style="height:96px;background:#05060F"></div>
+        <div style="padding:12px 14px;display:flex;flex-direction:column;gap:2px"><span style="font-size:14px;font-weight:600">Encre nuit</span><span style="font-size:12px;color:#8E9099;font-variant-numeric:tabular-nums">#05060F</span></div>
+      </div>
+      <div style="border-radius:14px;overflow:hidden;border:1px solid #E3E4E8;background:#FFF">
+        <div style="height:96px;background:#0A0A0C"></div>
+        <div style="padding:12px 14px;display:flex;flex-direction:column;gap:2px"><span style="font-size:14px;font-weight:600">Encre</span><span style="font-size:12px;color:#8E9099;font-variant-numeric:tabular-nums">#0A0A0C</span></div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px;margin-bottom:36px">
+      <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:18px;padding:24px">
+        <h3 style="margin:0 0 16px;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Surfaces — clair</h3>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;gap:12px"><div style="width:44px;height:32px;border-radius:8px;background:#F4F4F6;border:1px solid #E3E4E8;flex:none"></div><span style="font-size:15px;font-weight:500;flex:1">Fond</span><span style="font-size:13px;color:#8E9099;font-variant-numeric:tabular-nums">#F4F4F6</span></div>
+          <div style="display:flex;align-items:center;gap:12px"><div style="width:44px;height:32px;border-radius:8px;background:#FFFFFF;border:1px solid #E3E4E8;flex:none"></div><span style="font-size:15px;font-weight:500;flex:1">Carte</span><span style="font-size:13px;color:#8E9099;font-variant-numeric:tabular-nums">#FFFFFF</span></div>
+          <div style="display:flex;align-items:center;gap:12px"><div style="width:44px;height:32px;border-radius:8px;background:#ECECEF;border:1px solid #E3E4E8;flex:none"></div><span style="font-size:15px;font-weight:500;flex:1">Champ</span><span style="font-size:13px;color:#8E9099;font-variant-numeric:tabular-nums">#ECECEF</span></div>
+          <div style="display:flex;align-items:center;gap:12px"><div style="width:44px;height:32px;border-radius:8px;background:#E3E4E8;flex:none"></div><span style="font-size:15px;font-weight:500;flex:1">Séparateur</span><span style="font-size:13px;color:#8E9099;font-variant-numeric:tabular-nums">#E3E4E8</span></div>
+        </div>
+      </div>
+      <div style="background:#0E1020;border:1px solid #1E2136;border-radius:18px;padding:24px">
+        <h3 style="margin:0 0 16px;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#7A7D93">Surfaces — sombre</h3>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;gap:12px"><div style="width:44px;height:32px;border-radius:8px;background:#05060F;border:1px solid #1E2136;flex:none"></div><span style="font-size:15px;font-weight:500;flex:1;color:#F2F3F8">Fond</span><span style="font-size:13px;color:#7A7D93;font-variant-numeric:tabular-nums">#05060F</span></div>
+          <div style="display:flex;align-items:center;gap:12px"><div style="width:44px;height:32px;border-radius:8px;background:#0E1020;border:1px solid #1E2136;flex:none"></div><span style="font-size:15px;font-weight:500;flex:1;color:#F2F3F8">Carte</span><span style="font-size:13px;color:#7A7D93;font-variant-numeric:tabular-nums">#0E1020</span></div>
+          <div style="display:flex;align-items:center;gap:12px"><div style="width:44px;height:32px;border-radius:8px;background:#181B2E;border:1px solid #1E2136;flex:none"></div><span style="font-size:15px;font-weight:500;flex:1;color:#F2F3F8">Champ</span><span style="font-size:13px;color:#7A7D93;font-variant-numeric:tabular-nums">#181B2E</span></div>
+          <div style="display:flex;align-items:center;gap:12px"><div style="width:44px;height:32px;border-radius:8px;background:#1E2136;flex:none"></div><span style="font-size:15px;font-weight:500;flex:1;color:#F2F3F8">Séparateur</span><span style="font-size:13px;color:#7A7D93;font-variant-numeric:tabular-nums">#1E2136</span></div>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="margin:0 0 14px;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Sémantique</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:36px">
+      <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:10px"><div style="width:14px;height:14px;border-radius:4px;background:#006B3C"></div><span style="font-size:15px;font-weight:600">Revenu</span></div>
+        <span style="font-size:24px;font-weight:600;letter-spacing:-0.02em;color:#006B3C;font-variant-numeric:tabular-nums">+67 000 F</span>
+        <span style="font-size:12px;color:#8E9099;font-variant-numeric:tabular-nums">#006B3C · fond #E6F4EC</span>
+      </div>
+      <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:10px"><div style="width:14px;height:14px;border-radius:4px;background:#A80010"></div><span style="font-size:15px;font-weight:600">Dépense</span></div>
+        <span style="font-size:24px;font-weight:600;letter-spacing:-0.02em;color:#A80010;font-variant-numeric:tabular-nums">−32 200 F</span>
+        <span style="font-size:12px;color:#8E9099;font-variant-numeric:tabular-nums">#A80010 · fond #FBEAEA</span>
+      </div>
+      <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:10px"><div style="width:14px;height:14px;border-radius:4px;background:#F5A524"></div><span style="font-size:15px;font-weight:600">Alerte</span></div>
+        <span style="font-size:24px;font-weight:600;letter-spacing:-0.02em;color:#B87503;font-variant-numeric:tabular-nums">82 %</span>
+        <span style="font-size:12px;color:#8E9099;font-variant-numeric:tabular-nums">#F5A524 · texte #B87503</span>
+      </div>
+      <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:10px"><div style="width:14px;height:14px;border-radius:4px;background:#1B3BF5"></div><span style="font-size:15px;font-weight:600">Information</span></div>
+        <span style="font-size:24px;font-weight:600;letter-spacing:-0.02em;color:#1B3BF5;font-variant-numeric:tabular-nums">Neutre</span>
+        <span style="font-size:12px;color:#8E9099;font-variant-numeric:tabular-nums">#1B3BF5 · fond #EAEEFE</span>
+      </div>
+    </div>
+
+    <h3 style="margin:0 0 8px;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Catégories</h3>
+    <p style="margin:0 0 14px;font-size:15px;color:#5A5C63;max-width:600px">Cinq teintes fixes, attribuées dans l'ordre. Une catégorie garde sa couleur d'un écran à l'autre — c'est ce qui rend les graphiques lisibles sans légende.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px">
+      <div style="display:flex;align-items:center;gap:9px;background:#FFF;border:1px solid #E3E4E8;border-radius:999px;padding:9px 16px 9px 12px"><div style="width:12px;height:12px;border-radius:999px;background:#1B3BF5"></div><span style="font-size:14px;font-weight:500">Loisirs</span></div>
+      <div style="display:flex;align-items:center;gap:9px;background:#FFF;border:1px solid #E3E4E8;border-radius:999px;padding:9px 16px 9px 12px"><div style="width:12px;height:12px;border-radius:999px;background:#29ABE2"></div><span style="font-size:14px;font-weight:500">Alimentation</span></div>
+      <div style="display:flex;align-items:center;gap:9px;background:#FFF;border:1px solid #E3E4E8;border-radius:999px;padding:9px 16px 9px 12px"><div style="width:12px;height:12px;border-radius:999px;background:#A3121A"></div><span style="font-size:14px;font-weight:500">Transport</span></div>
+      <div style="display:flex;align-items:center;gap:9px;background:#FFF;border:1px solid #E3E4E8;border-radius:999px;padding:9px 16px 9px 12px"><div style="width:12px;height:12px;border-radius:999px;background:#006B3C"></div><span style="font-size:14px;font-weight:500">Salaire</span></div>
+      <div style="display:flex;align-items:center;gap:9px;background:#FFF;border:1px solid #E3E4E8;border-radius:999px;padding:9px 16px 9px 12px"><div style="width:12px;height:12px;border-radius:999px;background:#F5A524"></div><span style="font-size:14px;font-weight:500">Loyer</span></div>
+    </div>
+  </section>
+
+  <section style="padding:56px 0;border-top:1px solid #E3E4E8">
+    <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:32px">
+      <span style="font-size:13px;font-weight:600;color:#8E9099;letter-spacing:0.02em">02</span>
+      <h2 style="margin:0;font-size:32px;letter-spacing:-0.026em;font-weight:600">Typographie</h2>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin-bottom:36px">
+      <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:18px;padding:24px">
+        <span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Interface</span>
+        <div style="font-size:44px;font-weight:600;letter-spacing:-0.03em;margin:10px 0 6px">SF Pro</div>
+        <p style="margin:0;font-size:15px;line-height:1.5;color:#5A5C63">La pile système Apple. Elle apporte gratuitement l'optical sizing, les tables de tracking et les chiffres tabulaires — c'est exactement ce qu'une interface financière demande. Sur Android et Web elle retombe sur Helvetica Neue puis Helvetica.</p>
+        <div style="margin-top:14px;padding:12px 14px;background:#F4F4F6;border-radius:10px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12px;line-height:1.6;color:#3A3C42">-apple-system, BlinkMacSystemFont,<br>"SF&nbsp;Pro&nbsp;Text", system-ui,<br>"Helvetica&nbsp;Neue", Helvetica, sans-serif</div>
+      </div>
+      <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:18px;padding:24px">
+        <span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Marque</span>
+        <div style="font-family:Georgia,'Times New Roman',serif;font-size:44px;letter-spacing:-0.015em;margin:10px 0 6px">Swiftly.io</div>
+        <p style="margin:0;font-size:15px;line-height:1.5;color:#5A5C63">Le sérif du logotype reste strictement réservé au logotype. Aucun titre, aucun montant, aucun libellé. C'est le contraste entre ce sérif et l'interface neutre qui fait la signature de la marque.</p>
+        <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+          <span style="font-size:12px;font-weight:600;color:#006B3C;background:#E6F4EC;border-radius:6px;padding:5px 10px">Logotype, splash</span>
+          <span style="font-size:12px;font-weight:600;color:#A80010;background:#FBEAEA;border-radius:6px;padding:5px 10px">Jamais dans l'UI</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="margin:0 0 6px;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Échelle</h3>
+    <p style="margin:0 0 18px;font-size:15px;color:#5A5C63;max-width:620px">Le tracking dépend de la taille : négatif quand le texte grandit, neutre à zéro sur le corps de texte. Une valeur unique de <code style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:13px;background:#ECECEF;padding:2px 6px;border-radius:5px">letter-spacing</code> pour toute l'app serait fausse quelque part.</p>
+
+    <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:18px;overflow:hidden">
+      <div style="display:grid;grid-template-columns:1fr 210px;gap:24px;padding:22px 24px;border-bottom:1px solid #E3E4E8;align-items:end">
+        <div style="font-size:40px;font-weight:600;letter-spacing:-0.03em;line-height:1.05">182 900 F CFA</div>
+        <div style="display:flex;flex-direction:column;gap:2px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12px;color:#8E9099"><span style="color:#0A0A0C;font-weight:600">Display / 40</span><span>600 · 1.05 · −0.030em · tnum</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 210px;gap:24px;padding:22px 24px;border-bottom:1px solid #E3E4E8;align-items:end">
+        <div style="font-size:28px;font-weight:600;letter-spacing:-0.022em;line-height:1.15">Répartition des dépenses</div>
+        <div style="display:flex;flex-direction:column;gap:2px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12px;color:#8E9099"><span style="color:#0A0A0C;font-weight:600">Title 1 / 28</span><span>600 · 1.15 · −0.022em</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 210px;gap:24px;padding:22px 24px;border-bottom:1px solid #E3E4E8;align-items:end">
+        <div style="font-size:22px;font-weight:600;letter-spacing:-0.018em;line-height:1.2">Comptes et cartes</div>
+        <div style="display:flex;flex-direction:column;gap:2px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12px;color:#8E9099"><span style="color:#0A0A0C;font-weight:600">Title 2 / 22</span><span>600 · 1.20 · −0.018em</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 210px;gap:24px;padding:22px 24px;border-bottom:1px solid #E3E4E8;align-items:end">
+        <div style="font-size:17px;font-weight:600;letter-spacing:-0.012em;line-height:1.3">Nouvelle transaction</div>
+        <div style="display:flex;flex-direction:column;gap:2px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12px;color:#8E9099"><span style="color:#0A0A0C;font-weight:600">Headline / 17</span><span>600 · 1.30 · −0.012em</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 210px;gap:24px;padding:22px 24px;border-bottom:1px solid #E3E4E8;align-items:end">
+        <div style="font-size:17px;font-weight:400;line-height:1.45;color:#3A3C42">Suivez vos entrées et vos sorties, catégorie par catégorie, sans quitter l'écran.</div>
+        <div style="display:flex;flex-direction:column;gap:2px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12px;color:#8E9099"><span style="color:#0A0A0C;font-weight:600">Body / 17</span><span>400 · 1.45 · 0em</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 210px;gap:24px;padding:22px 24px;border-bottom:1px solid #E3E4E8;align-items:end">
+        <div style="font-size:13px;font-weight:500;letter-spacing:0.005em;line-height:1.4;color:#5A5C63">Aujourd'hui, 9 h 37 · Alimentation</div>
+        <div style="display:flex;flex-direction:column;gap:2px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12px;color:#8E9099"><span style="color:#0A0A0C;font-weight:600">Footnote / 13</span><span>500 · 1.40 · +0.005em</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 210px;gap:24px;padding:22px 24px;align-items:end">
+        <div style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Solde total</div>
+        <div style="display:flex;flex-direction:column;gap:2px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12px;color:#8E9099"><span style="color:#0A0A0C;font-weight:600">Caption / 11</span><span>600 · 1.30 · +0.080em · caps</span></div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin-top:20px">
+      <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:16px;padding:20px 22px">
+        <h4 style="margin:0 0 10px;font-size:15px;font-weight:600">Trois règles non négociables</h4>
+        <ul style="margin:0;padding-left:18px;font-size:15px;line-height:1.6;color:#5A5C63">
+          <li>Tout montant utilise <code style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:13px;background:#ECECEF;padding:1px 5px;border-radius:4px">font-variant-numeric: tabular-nums</code>, sinon les colonnes dansent.</li>
+          <li>La hiérarchie se construit par la graisse avant la taille.</li>
+          <li>Espacements en <code style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:13px;background:#ECECEF;padding:1px 5px;border-radius:4px">rem</code>, pour suivre Dynamic Type.</li>
+        </ul>
+      </div>
+      <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:16px;padding:20px 22px">
+        <h4 style="margin:0 0 10px;font-size:15px;font-weight:600">Format des montants</h4>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:15px">
+          <div style="display:flex;justify-content:space-between;gap:12px"><span style="color:#5A5C63">Solde principal</span><span style="font-weight:600;font-variant-numeric:tabular-nums">182 900 F CFA</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px"><span style="color:#5A5C63">En liste</span><span style="font-weight:600;font-variant-numeric:tabular-nums">−1 500 F</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px"><span style="color:#5A5C63">Variation</span><span style="font-weight:600;font-variant-numeric:tabular-nums;color:#006B3C">+17 800 F (9,29 %)</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px"><span style="color:#5A5C63">Abrégé (axes)</span><span style="font-weight:600;font-variant-numeric:tabular-nums">45 K</span></div>
+        </div>
+        <p style="margin:12px 0 0;font-size:13px;color:#8E9099">Espace insécable comme séparateur de milliers, virgule décimale, tiret demi-cadratin pour le négatif.</p>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding:56px 0;border-top:1px solid #E3E4E8">
+    <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:32px">
+      <span style="font-size:13px;font-weight:600;color:#8E9099;letter-spacing:0.02em">03</span>
+      <h2 style="margin:0;font-size:32px;letter-spacing:-0.026em;font-weight:600">Espace, rayon, élévation</h2>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px">
+      <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:18px;padding:24px">
+        <h3 style="margin:0 0 4px;font-size:15px;font-weight:600">Échelle 4 pt</h3>
+        <p style="margin:0 0 18px;font-size:13px;color:#8E9099">Toute distance est un multiple de 4. Aucune exception.</p>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;align-items:center;gap:12px"><span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12px;color:#8E9099;width:26px;text-align:right">4</span><div style="height:12px;width:4px;background:#1B3BF5;border-radius:2px"></div></div>
+          <div style="display:flex;align-items:center;gap:12px"><span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12px;color:#8E9099;width:26px;text-align:right">8</span><div style="height:12px;width:8px;background:#1B3BF5;border-radius:2px"></div></div>
+          <div style="display:flex;align-items:center;gap:12px"><span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12px;color:#8E9099;width:26px;text-align:right">12</span><div style="height:12px;width:12px;background:#1B3BF5;border-radius:2px"></div></div>
+          <div style="display:flex;align-items:center;gap:12px"><span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12px;color:#8E9099;width:26px;text-align:right">16</span><div style="height:12px;width:16px;background:#1B3BF5;border-radius:2px"></div></div>
+          <div style="display:flex;align-items:center;gap:12px"><span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12px;color:#8E9099;width:26px;text-align:right">24</span><div style="height:12px;width:24px;background:#1B3BF5;border-radius:2px"></div></div>
+          <div style="display:flex;align-items:center;gap:12px"><span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12px;color:#8E9099;width:26px;text-align:right">32</span><div style="height:12px;width:32px;background:#1B3BF5;border-radius:2px"></div></div>
+          <div style="display:flex;align-items:center;gap:12px"><span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12px;color:#8E9099;width:26px;text-align:right">48</span><div style="height:12px;width:48px;background:#1B3BF5;border-radius:2px"></div></div>
+          <div style="display:flex;align-items:center;gap:12px"><span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12px;color:#8E9099;width:26px;text-align:right">72</span><div style="height:12px;width:72px;background:#1B3BF5;border-radius:2px"></div></div>
+        </div>
+      </div>
+
+      <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:18px;padding:24px">
+        <h3 style="margin:0 0 4px;font-size:15px;font-weight:600">Rayons</h3>
+        <p style="margin:0 0 18px;font-size:13px;color:#8E9099">Plus la surface est grande, plus le rayon est généreux.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:12px">
+          <div style="display:flex;flex-direction:column;gap:6px;align-items:center"><div style="width:64px;height:52px;background:#ECECEF;border-radius:8px"></div><span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;color:#8E9099">8 · badge</span></div>
+          <div style="display:flex;flex-direction:column;gap:6px;align-items:center"><div style="width:64px;height:52px;background:#ECECEF;border-radius:12px"></div><span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;color:#8E9099">12 · champ</span></div>
+          <div style="display:flex;flex-direction:column;gap:6px;align-items:center"><div style="width:64px;height:52px;background:#ECECEF;border-radius:16px"></div><span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;color:#8E9099">16 · carte</span></div>
+          <div style="display:flex;flex-direction:column;gap:6px;align-items:center"><div style="width:64px;height:52px;background:#ECECEF;border-radius:24px"></div><span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;color:#8E9099">24 · panneau</span></div>
+          <div style="display:flex;flex-direction:column;gap:6px;align-items:center"><div style="width:64px;height:52px;background:#ECECEF;border-radius:999px"></div><span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;color:#8E9099">plein · bouton</span></div>
+        </div>
+      </div>
+
+      <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:18px;padding:24px">
+        <h3 style="margin:0 0 4px;font-size:15px;font-weight:600">Élévation</h3>
+        <p style="margin:0 0 18px;font-size:13px;color:#8E9099">Trois niveaux. L'ombre porte la hiérarchie, jamais la décoration.</p>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:12px;padding:14px 16px;font-size:14px;display:flex;justify-content:space-between"><span style="font-weight:500">Plat</span><span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;color:#8E9099">bordure seule</span></div>
+          <div style="background:#FFF;border-radius:12px;padding:14px 16px;font-size:14px;box-shadow:0 1px 2px rgba(10,10,12,.06),0 4px 12px rgba(10,10,12,.05);display:flex;justify-content:space-between"><span style="font-weight:500">Carte</span><span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;color:#8E9099">y 4 · b 12</span></div>
+          <div style="background:#FFF;border-radius:12px;padding:14px 16px;font-size:14px;box-shadow:0 2px 6px rgba(10,10,12,.08),0 16px 40px rgba(10,10,12,.12);display:flex;justify-content:space-between"><span style="font-weight:500">Feuille</span><span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;color:#8E9099">y 16 · b 40</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <sc-if value="{{ showMotion }}" hint-placeholder-val="{{ true }}">
+  <section style="padding:56px 0;border-top:1px solid #E3E4E8">
+    <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:14px">
+      <span style="font-size:13px;font-weight:600;color:#8E9099;letter-spacing:0.02em">04</span>
+      <h2 style="margin:0;font-size:32px;letter-spacing:-0.026em;font-weight:600">Motion</h2>
+    </div>
+    <p style="margin:0 0 32px;font-size:17px;line-height:1.5;color:#5A5C63;max-width:660px">Le mouvement n'est pas une couche ajoutée après les pixels. Deux principes gouvernent tout : le retour visuel part de l'appui, et toute animation reste interruptible — on doit pouvoir rattraper une feuille en train de se fermer et la ramener.</p>
+
+    <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:18px;overflow:hidden;margin-bottom:20px">
+      <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1.6fr;gap:16px;padding:14px 24px;background:#F4F4F6;font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">
+        <span>Interaction</span><span>Durée</span><span>Courbe</span><span>Note</span>
+      </div>
+      <sc-for list="{{ motion }}" as="m" hint-placeholder-count="6">
+        <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1.6fr;gap:16px;padding:16px 24px;border-top:1px solid #E3E4E8;align-items:center">
+          <span style="font-size:15px;font-weight:500">{{ m.name }}</span>
+          <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:13px;color:#0A0A0C">{{ m.dur }}</span>
+          <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12px;color:#5A5C63">{{ m.ease }}</span>
+          <span style="font-size:13px;line-height:1.45;color:#8E9099">{{ m.note }}</span>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px">
+      <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:16px">
+        <div>
+          <h4 style="margin:0 0 4px;font-size:15px;font-weight:600">Appui</h4>
+          <p style="margin:0;font-size:13px;line-height:1.45;color:#8E9099">Le bouton descend à 0,97 dès le contact. 160 ms, ease-out. Essayez.</p>
+        </div>
+        <button type="button" style="border:0;background:#0A0A0C;color:#FFF;font-family:inherit;font-size:17px;font-weight:600;letter-spacing:-0.01em;padding:16px 24px;border-radius:999px;cursor:pointer;transition:transform 160ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.97)">Confirmer</button>
+      </div>
+      <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:16px">
+        <div>
+          <h4 style="margin:0 0 4px;font-size:15px;font-weight:600">Ressort de référence</h4>
+          <p style="margin:0;font-size:13px;line-height:1.45;color:#8E9099">Critique par défaut, aucun dépassement. Le rebond est réservé aux gestes qui portaient déjà de l'élan.</p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:13px">
+          <div style="display:flex;justify-content:space-between;background:#F4F4F6;padding:10px 14px;border-radius:10px"><span style="color:#5A5C63">UI par défaut</span><span>damping 1.0 · 0.35 s</span></div>
+          <div style="display:flex;justify-content:space-between;background:#F4F4F6;padding:10px 14px;border-radius:10px"><span style="color:#5A5C63">Feuille</span><span>damping 0.8 · 0.30 s</span></div>
+          <div style="display:flex;justify-content:space-between;background:#F4F4F6;padding:10px 14px;border-radius:10px"><span style="color:#5A5C63">Lancer</span><span>damping 0.8 · 0.40 s</span></div>
+        </div>
+      </div>
+      <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:14px">
+        <div>
+          <h4 style="margin:0 0 4px;font-size:15px;font-weight:600">Ce qui ne s'animera jamais</h4>
+          <p style="margin:0;font-size:13px;line-height:1.45;color:#8E9099">Une action vue cent fois par jour doit être instantanée.</p>
+        </div>
+        <ul style="margin:0;padding-left:18px;font-size:14px;line-height:1.7;color:#5A5C63">
+          <li>Ouverture de la palette de recherche</li>
+          <li>Bascule d'onglet au clavier</li>
+          <li>Masquage du solde</li>
+          <li>Changement de compte dans le sélecteur</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+  </sc-if>
+
+  <section style="padding:56px 0;border-top:1px solid #E3E4E8">
+    <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:32px">
+      <span style="font-size:13px;font-weight:600;color:#8E9099;letter-spacing:0.02em">05</span>
+      <h2 style="margin:0;font-size:32px;letter-spacing:-0.026em;font-weight:600">Composants</h2>
+    </div>
+
+    <h3 style="margin:0 0 16px;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Boutons</h3>
+    <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:18px;padding:28px;margin-bottom:20px;display:flex;flex-wrap:wrap;gap:14px;align-items:center">
+      <button type="button" style="border:0;background:#0A0A0C;color:#FFF;font-family:inherit;font-size:17px;font-weight:600;letter-spacing:-0.01em;padding:16px 28px;border-radius:999px;cursor:pointer;min-height:52px;transition:transform 160ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.97)">Principal</button>
+      <button type="button" style="border:0;background:#1B3BF5;color:#FFF;font-family:inherit;font-size:17px;font-weight:600;letter-spacing:-0.01em;padding:16px 28px;border-radius:999px;cursor:pointer;min-height:52px;transition:transform 160ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.97)">Accent</button>
+      <button type="button" style="border:1px solid #D6D7DC;background:#FFF;color:#0A0A0C;font-family:inherit;font-size:17px;font-weight:600;letter-spacing:-0.01em;padding:16px 28px;border-radius:999px;cursor:pointer;min-height:52px;transition:transform 160ms cubic-bezier(0.23,1,0.32,1),background 160ms ease" style-hover="background:#F4F4F6" style-active="transform:scale(0.97)">Secondaire</button>
+      <button type="button" style="border:0;background:transparent;color:#1B3BF5;font-family:inherit;font-size:17px;font-weight:600;letter-spacing:-0.01em;padding:16px 20px;border-radius:999px;cursor:pointer;min-height:52px;transition:transform 160ms cubic-bezier(0.23,1,0.32,1),background 160ms ease" style-hover="background:#EAEEFE" style-active="transform:scale(0.97)">Discret</button>
+      <button type="button" style="border:0;background:#A80010;color:#FFF;font-family:inherit;font-size:17px;font-weight:600;letter-spacing:-0.01em;padding:16px 28px;border-radius:999px;cursor:pointer;min-height:52px;transition:transform 160ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.97)">Destructif</button>
+      <button type="button" disabled="disabled" style="border:0;background:#ECECEF;color:#A9ABB3;font-family:inherit;font-size:17px;font-weight:600;letter-spacing:-0.01em;padding:16px 28px;border-radius:999px;min-height:52px;cursor:not-allowed">Inactif</button>
+      <span style="font-size:13px;color:#8E9099;margin-left:4px">Hauteur minimale 52 px — jamais moins de 44 px de cible tactile.</span>
+    </div>
+
+    <h3 style="margin:0 0 16px;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Saisie</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin-bottom:20px">
+      <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:16px">
+        <label style="display:flex;flex-direction:column;gap:7px">
+          <span style="font-size:13px;font-weight:600;color:#5A5C63">Montant</span>
+          <input type="text" value="12 500" style="font-family:inherit;font-size:17px;font-weight:600;font-variant-numeric:tabular-nums;padding:15px 16px;border-radius:12px;border:1px solid #D6D7DC;background:#FFF;color:#0A0A0C;outline:none;transition:border-color 150ms ease,box-shadow 150ms ease" style-focus="border-color:#1B3BF5;box-shadow:0 0 0 3px rgba(27,59,245,.15)">
+        </label>
+        <label style="display:flex;flex-direction:column;gap:7px">
+          <span style="font-size:13px;font-weight:600;color:#5A5C63">Libellé</span>
+          <input type="text" placeholder="Ex. Fourniture bureau" style="font-family:inherit;font-size:17px;padding:15px 16px;border-radius:12px;border:1px solid #D6D7DC;background:#FFF;color:#0A0A0C;outline:none;transition:border-color 150ms ease,box-shadow 150ms ease" style-focus="border-color:#1B3BF5;box-shadow:0 0 0 3px rgba(27,59,245,.15)">
+        </label>
+        <label style="display:flex;flex-direction:column;gap:7px">
+          <span style="font-size:13px;font-weight:600;color:#A80010">Catégorie</span>
+          <input type="text" value="" placeholder="Requis" style="font-family:inherit;font-size:17px;padding:15px 16px;border-radius:12px;border:1px solid #A80010;background:#FFF;color:#0A0A0C;outline:none">
+          <span style="font-size:13px;color:#A80010">Choisissez une catégorie pour classer cette dépense.</span>
+        </label>
+      </div>
+      <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:14px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Code d'invitation</span>
+        <div style="display:flex;gap:10px">
+          <sc-for list="{{ otp }}" as="d" hint-placeholder-count="6">
+            <div style="flex:1;aspect-ratio:0.82;border-radius:12px;border:1px solid #D6D7DC;background:#FFF;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:600;font-variant-numeric:tabular-nums;box-shadow:0 1px 2px rgba(10,10,12,.05)">{{ d.v }}</div>
+          </sc-for>
+        </div>
+        <p style="margin:0;font-size:13px;line-height:1.45;color:#8E9099">La case active prend la bordure d'accent et un halo de 3 px. Le curseur avance de lui-même ; le retour arrière ramène à la case précédente.</p>
+        <div style="display:flex;gap:10px;align-items:center;margin-top:2px">
+          <div style="width:52px;height:32px;border-radius:999px;background:#1B3BF5;padding:3px;display:flex;justify-content:flex-end;align-items:center;transition:background 200ms ease"><div style="width:26px;height:26px;border-radius:999px;background:#FFF;box-shadow:0 1px 3px rgba(0,0,0,.2)"></div></div>
+          <span style="font-size:15px">Masquer les montants</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="margin:0 0 16px;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Solde et variation</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px;margin-bottom:20px">
+      <div style="border-radius:20px;padding:28px;background:url('assets/nuit.jpg') center/cover no-repeat #0A1466;color:#FFF;display:flex;flex-direction:column;gap:6px">
+        <span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,.6)">Solde total</span>
+        <span style="font-size:40px;font-weight:600;letter-spacing:-0.03em;font-variant-numeric:tabular-nums;line-height:1.05">182 900 F CFA</span>
+        <div style="display:flex;align-items:baseline;gap:10px;margin-top:4px">
+          <span style="font-size:15px;font-weight:600;color:#4ADE80;font-variant-numeric:tabular-nums">↑ 17 800 F (9,29 %)</span>
+          <span style="font-size:13px;color:rgba(255,255,255,.55)">vs. hier</span>
+        </div>
+      </div>
+      <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:20px;padding:24px;display:grid;grid-template-columns:repeat(2,1fr);gap:20px">
+        <div style="display:flex;flex-direction:column;gap:3px"><span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Solde début</span><span style="font-size:22px;font-weight:600;letter-spacing:-0.018em;font-variant-numeric:tabular-nums">148 100 F</span></div>
+        <div style="display:flex;flex-direction:column;gap:3px"><span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Solde actuel</span><span style="font-size:22px;font-weight:600;letter-spacing:-0.018em;font-variant-numeric:tabular-nums">182 900 F</span></div>
+        <div style="display:flex;flex-direction:column;gap:3px"><span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Revenus</span><span style="font-size:22px;font-weight:600;letter-spacing:-0.018em;font-variant-numeric:tabular-nums;color:#006B3C">67 000 F</span></div>
+        <div style="display:flex;flex-direction:column;gap:3px"><span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Dépenses</span><span style="font-size:22px;font-weight:600;letter-spacing:-0.018em;font-variant-numeric:tabular-nums;color:#A80010">32 200 F</span></div>
+      </div>
+    </div>
+
+    <h3 style="margin:0 0 16px;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Données</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin-bottom:20px">
+      <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:18px;padding:24px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:18px">
+          <span style="font-size:15px;font-weight:600">Évolution du solde</span>
+          <span style="font-size:12px;font-weight:600;color:#006B3C;background:#E6F4EC;border-radius:6px;padding:4px 9px;font-variant-numeric:tabular-nums;white-space:nowrap">34 800 F</span>
+        </div>
+        {{ chart }}
+        <div style="display:flex;justify-content:space-between;margin-top:10px;font-size:11px;font-weight:600;letter-spacing:0.04em;color:#8E9099">
+          <span>0h–6h</span><span>6h–12h</span><span>12h–18h</span><span>18h–00h</span>
+        </div>
+      </div>
+      <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:18px;padding:24px;display:flex;gap:24px;align-items:center;flex-wrap:wrap">
+        <div style="width:150px;height:150px;border-radius:999px;flex:none;background:conic-gradient(#1B3BF5 0 40%,#29ABE2 40% 73%,#A3121A 73% 93%,#F5A524 93% 100%);display:flex;align-items:center;justify-content:center">
+          <div style="width:104px;height:104px;border-radius:999px;background:#FFF;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px">
+            <span style="font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#8E9099">Dépenses</span>
+            <span style="font-size:20px;font-weight:600;letter-spacing:-0.02em;font-variant-numeric:tabular-nums">32 200 F</span>
+            <span style="font-size:12px;font-weight:600;color:#A80010;font-variant-numeric:tabular-nums">↓ 14,3 %</span>
+          </div>
+        </div>
+        <div style="flex:1;min-width:170px;display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:center;gap:10px"><div style="width:10px;height:10px;border-radius:3px;background:#1B3BF5;flex:none"></div><span style="font-size:14px;font-weight:500;flex:1">Loisirs</span><span style="font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;flex:none">11 000 F</span><span style="font-size:13px;color:#8E9099;font-variant-numeric:tabular-nums;width:34px;text-align:right;white-space:nowrap;flex:none">40 %</span></div>
+          <div style="display:flex;align-items:center;gap:10px"><div style="width:10px;height:10px;border-radius:3px;background:#29ABE2;flex:none"></div><span style="font-size:14px;font-weight:500;flex:1">Alimentation</span><span style="font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;flex:none">9 800 F</span><span style="font-size:13px;color:#8E9099;font-variant-numeric:tabular-nums;width:34px;text-align:right;white-space:nowrap;flex:none">33 %</span></div>
+          <div style="display:flex;align-items:center;gap:10px"><div style="width:10px;height:10px;border-radius:3px;background:#A3121A;flex:none"></div><span style="font-size:14px;font-weight:500;flex:1">Transport</span><span style="font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;flex:none">8 200 F</span><span style="font-size:13px;color:#8E9099;font-variant-numeric:tabular-nums;width:34px;text-align:right;white-space:nowrap;flex:none">20 %</span></div>
+          <div style="display:flex;align-items:center;gap:10px"><div style="width:10px;height:10px;border-radius:3px;background:#F5A524;flex:none"></div><span style="font-size:14px;font-weight:500;flex:1">Loyer</span><span style="font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;flex:none">3 200 F</span><span style="font-size:13px;color:#8E9099;font-variant-numeric:tabular-nums;width:34px;text-align:right;white-space:nowrap;flex:none">7 %</span></div>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="margin:0 0 16px;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Liste de transactions</h3>
+    <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:18px;overflow:hidden;margin-bottom:20px">
+      <sc-for list="{{ tx }}" as="t" hint-placeholder-count="4">
+        <div style="display:flex;align-items:center;gap:14px;padding:16px 20px;border-bottom:1px solid #EFEFF2;transition:background 150ms ease" style-hover="background:#FAFAFB">
+          <div style="width:44px;height:44px;border-radius:12px;background:#0A0A0C;color:#FFF;display:flex;align-items:center;justify-content:center;font-size:19px;flex:none">{{ t.icon }}</div>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+            <span style="font-size:16px;font-weight:600;letter-spacing:-0.01em">{{ t.title }}</span>
+            <span style="font-size:13px;color:#8E9099;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ t.meta }}</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+            <span style="font-size:16px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;color:{{ t.color }}">{{ t.amount }}</span>
+            <span style="font-size:12px;color:#8E9099">{{ t.kind }}</span>
+          </div>
+        </div>
+      </sc-for>
+      <div style="padding:14px 20px;text-align:center"><a href="#" style="font-size:15px;font-weight:600">Voir plus</a></div>
+    </div>
+
+    <h3 style="margin:0 0 16px;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Objectif, badges, navigation</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px">
+      <div style="border-radius:18px;padding:22px;background:url('assets/nuit.jpg') center/cover no-repeat #0A1466;color:#FFF;display:flex;flex-direction:column;gap:12px">
+        <span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,.6)">Objectif du mois</span>
+        <span style="font-size:22px;font-weight:600;letter-spacing:-0.018em;font-variant-numeric:tabular-nums">Épargne 100 000 F</span>
+        <div style="height:8px;border-radius:999px;background:rgba(255,255,255,.22);overflow:hidden"><div style="width:75%;height:100%;background:#FFF;border-radius:999px"></div></div>
+        <span style="font-size:13px;color:rgba(255,255,255,.7);font-variant-numeric:tabular-nums">75 000 F / 100 000 F</span>
+      </div>
+      <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:18px;padding:22px;display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <span style="font-size:12px;font-weight:600;color:#006B3C;background:#E6F4EC;border-radius:8px;padding:6px 11px">Rapproché</span>
+          <span style="font-size:12px;font-weight:600;color:#B87503;background:#FEF6E7;border-radius:8px;padding:6px 11px">En attente</span>
+          <span style="font-size:12px;font-weight:600;color:#A3121A;background:#FBEAEA;border-radius:8px;padding:6px 11px">Rejeté</span>
+          <span style="font-size:12px;font-weight:600;color:#1B3BF5;background:#EAEEFE;border-radius:8px;padding:6px 11px">Récurrent</span>
+          <span style="font-size:12px;font-weight:600;color:#5A5C63;background:#ECECEF;border-radius:8px;padding:6px 11px">Brouillon</span>
+        </div>
+        <div style="display:flex;gap:8px;background:#ECECEF;border-radius:12px;padding:4px">
+          <div style="flex:1;text-align:center;font-size:14px;font-weight:600;padding:9px;border-radius:9px;background:#FFF;box-shadow:0 1px 3px rgba(10,10,12,.1)">Aperçu</div>
+          <div style="flex:1;text-align:center;font-size:14px;font-weight:500;padding:9px;border-radius:9px;color:#5A5C63">Dépenses</div>
+          <div style="flex:1;text-align:center;font-size:14px;font-weight:500;padding:9px;border-radius:9px;color:#5A5C63">Revenus</div>
+        </div>
+      </div>
+      <div style="background:#05060F;border:1px solid #1E2136;border-radius:18px;padding:22px;display:flex;flex-direction:column;gap:16px">
+        <span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#7A7D93">Barre d'onglets — sombre</span>
+        <div style="display:flex;justify-content:space-around;align-items:center;background:rgba(20,22,40,.72);backdrop-filter:blur(20px) saturate(180%);border:1px solid rgba(255,255,255,.08);border-radius:22px;padding:12px 8px">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:5px;min-width:56px"><span style="font-size:19px;color:#FFF">◈</span><span style="font-size:10px;font-weight:600;color:#FFF">Accueil</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:5px;min-width:56px"><span style="font-size:19px;color:#6E7290">◎</span><span style="font-size:10px;font-weight:600;color:#6E7290">Stats</span></div>
+          <div style="display:flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:999px;background:#1B3BF5;color:#FFF;font-size:22px;font-weight:400">+</div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:5px;min-width:56px"><span style="font-size:19px;color:#6E7290">▤</span><span style="font-size:10px;font-weight:600;color:#6E7290">Comptes</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:5px;min-width:56px"><span style="font-size:19px;color:#6E7290">◍</span><span style="font-size:10px;font-weight:600;color:#6E7290">Profil</span></div>
+        </div>
+        <p style="margin:0;font-size:13px;line-height:1.45;color:#7A7D93">Barre translucide, le contenu défile dessous. Jamais une surface translucide posée sur une autre.</p>
+      </div>
+    </div>
+  </section>
+
+  <sc-if value="{{ showScreens }}" hint-placeholder-val="{{ true }}">
+  <section style="padding:56px 0;border-top:1px solid #E3E4E8">
+    <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:14px">
+      <span style="font-size:13px;font-weight:600;color:#8E9099;letter-spacing:0.02em">06</span>
+      <h2 style="margin:0;font-size:32px;letter-spacing:-0.026em;font-weight:600">Écrans de référence</h2>
+    </div>
+    <p style="margin:0 0 32px;font-size:17px;line-height:1.5;color:#5A5C63;max-width:660px">Le système appliqué. La bande d'identité en dégradé tient le haut de l'écran, le corps redescend sur le fond neutre — c'est ce contraste qui donne la profondeur, pas l'ombre.</p>
+
+    <div style="display:flex;gap:32px;flex-wrap:wrap">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Accueil</span>
+        <div style="width:340px;border-radius:38px;overflow:hidden;background:#F4F4F6;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16)">
+          <div style="background:url('assets/nuit.jpg') center/cover no-repeat #0A1466;padding:44px 20px 24px;color:#FFF">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+              <div style="width:38px;height:38px;border-radius:999px;background:rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;font-size:16px">☰</div>
+              <span style="font-family:Georgia,serif;font-size:19px">Swiftly.io</span>
+              <div style="width:38px;height:38px;border-radius:999px;background:rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;font-size:16px">◔</div>
+            </div>
+            <span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,.55)">Solde total</span>
+            <div style="font-size:34px;font-weight:600;letter-spacing:-0.03em;font-variant-numeric:tabular-nums;line-height:1.1;margin:4px 0 6px">182 900 F CFA</div>
+            <div style="font-size:14px;font-weight:600;color:#4ADE80;font-variant-numeric:tabular-nums">↑ 17 800 F (9,29 %) <span style="color:rgba(255,255,255,.5);font-weight:400">vs. hier</span></div>
+            <div style="margin-top:20px">{{ chartMini }}</div>
+          </div>
+          <div style="padding:20px;display:flex;flex-direction:column;gap:14px;margin-top:-14px;background:#F4F4F6;border-radius:24px 24px 0 0;position:relative">
+            <button type="button" style="border:0;background:#0A0A0C;color:#FFF;font-family:inherit;font-size:16px;font-weight:600;padding:15px;border-radius:999px;cursor:pointer;transition:transform 160ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.97)">+ Nouvelle transaction</button>
+            <div style="background:#FFF;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:16px;font-weight:600">Comptes et cartes</span><a href="#" style="font-size:13px;font-weight:600">Tout voir</a></div>
+              <div style="display:flex;align-items:center;gap:12px;background:#F4F4F6;border-radius:12px;padding:12px"><div style="width:32px;height:32px;border-radius:9px;background:#1B3BF5"></div><span style="flex:1;font-size:14px;font-weight:500">Compte principal</span><span style="font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;flex:none">182 900 F</span></div>
+              <div style="display:flex;align-items:center;gap:12px;background:#F4F4F6;border-radius:12px;padding:12px"><div style="width:32px;height:32px;border-radius:9px;background:#006B3C"></div><span style="flex:1;font-size:14px;font-weight:500">Épargne</span><span style="font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;flex:none">1 320 000 F</span></div>
+              <div style="display:flex;align-items:center;gap:12px;background:#F4F4F6;border-radius:12px;padding:12px"><div style="width:32px;height:32px;border-radius:9px;background:#0A0A0C"></div><span style="flex:1;font-size:14px;font-weight:500">Carte ····4242</span><span style="font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;flex:none">80 700 F</span></div>
+            </div>
+            <div style="background:#FFF;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:6px">
+              <span style="font-size:16px;font-weight:600;margin-bottom:6px">Historique récent</span>
+              <div style="display:flex;align-items:center;gap:12px"><div style="width:36px;height:36px;border-radius:10px;background:#0A0A0C;color:#FFF;display:flex;align-items:center;justify-content:center;font-size:15px">↘</div><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600">Alimentation</div><div style="font-size:12px;color:#8E9099">Aujourd'hui, 9 h 37</div></div><span style="font-size:14px;font-weight:600;color:#A80010;font-variant-numeric:tabular-nums;white-space:nowrap;flex:none">−1 500 F</span></div>
+              <div style="height:1px;background:#EFEFF2;margin:8px 0"></div>
+              <div style="display:flex;align-items:center;gap:12px"><div style="width:36px;height:36px;border-radius:10px;background:#0A0A0C;color:#FFF;display:flex;align-items:center;justify-content:center;font-size:15px">↗</div><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600">Main d'œuvre</div><div style="font-size:12px;color:#8E9099">Aujourd'hui, 6 h 37</div></div><span style="font-size:14px;font-weight:600;color:#006B3C;font-variant-numeric:tabular-nums;white-space:nowrap;flex:none">+7 000 F</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Statistiques</span>
+        <div style="width:340px;border-radius:38px;overflow:hidden;background:#F4F4F6;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16)">
+          <div style="background:url('assets/nuit.jpg') center/cover no-repeat #0A1466;padding:44px 20px 22px;color:#FFF;display:flex;align-items:center;justify-content:space-between">
+            <span style="font-size:18px">‹</span>
+            <span style="font-size:17px;font-weight:600;letter-spacing:-0.012em">Statistiques</span>
+            <span style="font-size:20px">+</span>
+          </div>
+          <div style="padding:18px 20px 24px;display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;gap:10px">
+              <div style="flex:1;background:#FFF;border:1px solid #E3E4E8;border-radius:999px;padding:10px 14px;font-size:13px;font-weight:600;display:flex;justify-content:space-between">Aperçu <span style="color:#8E9099">⌄</span></div>
+              <div style="flex:1;background:#FFF;border:1px solid #E3E4E8;border-radius:999px;padding:10px 14px;font-size:13px;font-weight:600;display:flex;justify-content:space-between">Aujourd'hui <span style="color:#8E9099">⌄</span></div>
+            </div>
+            <div style="background:#FFF;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:14px">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+                <div><div style="font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#8E9099">Revenus</div><div style="font-size:19px;font-weight:600;color:#006B3C;font-variant-numeric:tabular-nums;letter-spacing:-0.018em">67 000 F</div></div>
+                <div><div style="font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#8E9099">Dépenses</div><div style="font-size:19px;font-weight:600;color:#A80010;font-variant-numeric:tabular-nums;letter-spacing:-0.018em">32 200 F</div></div>
+              </div>
+              <div style="background:#E6F4EC;border-radius:12px;padding:14px;text-align:center">
+                <div style="font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#006B3C">Bénéfice net</div>
+                <div style="font-size:26px;font-weight:600;letter-spacing:-0.024em;font-variant-numeric:tabular-nums;color:#0A0A0C">+ 34 800 F</div>
+                <div style="font-size:13px;font-weight:600;color:#006B3C;font-variant-numeric:tabular-nums">↑ 17 800 F (9,29 %)</div>
+              </div>
+            </div>
+            <div style="background:#FFF;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:16px">
+              <span style="font-size:15px;font-weight:600">Répartition des dépenses</span>
+              <div style="display:flex;justify-content:center">
+                <div style="width:132px;height:132px;border-radius:999px;background:conic-gradient(#1B3BF5 0 40%,#29ABE2 40% 73%,#A3121A 73% 93%,#F5A524 93% 100%);display:flex;align-items:center;justify-content:center">
+                  <div style="width:92px;height:92px;border-radius:999px;background:#FFF;display:flex;flex-direction:column;align-items:center;justify-content:center">
+                    <span style="font-size:9px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#8E9099">Total</span>
+                    <span style="font-size:17px;font-weight:600;letter-spacing:-0.02em;font-variant-numeric:tabular-nums">32 200 F</span>
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;align-items:center;gap:9px"><div style="width:9px;height:9px;border-radius:3px;background:#1B3BF5"></div><span style="flex:1;font-size:13px;font-weight:500">Loisirs</span><span style="font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;flex:none">11 000 F</span><span style="font-size:12px;color:#8E9099;width:32px;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;flex:none">40 %</span></div>
+                <div style="display:flex;align-items:center;gap:9px"><div style="width:9px;height:9px;border-radius:3px;background:#29ABE2"></div><span style="flex:1;font-size:13px;font-weight:500">Alimentation</span><span style="font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;flex:none">9 800 F</span><span style="font-size:12px;color:#8E9099;width:32px;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;flex:none">33 %</span></div>
+                <div style="display:flex;align-items:center;gap:9px"><div style="width:9px;height:9px;border-radius:3px;background:#A3121A"></div><span style="flex:1;font-size:13px;font-weight:500">Transport</span><span style="font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;flex:none">8 200 F</span><span style="font-size:12px;color:#8E9099;width:32px;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;flex:none">20 %</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Connexion</span>
+        <div style="width:340px;border-radius:38px;overflow:hidden;background:#ECECEF;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16)">
+          <div style="background:url('assets/nuit.jpg') center/cover no-repeat #0A1466;padding:44px 20px 30px;color:#FFF;text-align:center">
+            <span style="font-size:17px;font-weight:600;letter-spacing:-0.012em">Connexion</span>
+          </div>
+          <div style="background:#ECECEF;border-radius:26px 26px 0 0;margin-top:-16px;padding:34px 24px 40px;display:flex;flex-direction:column;gap:26px;min-height:420px">
+            <h4 style="margin:0;font-size:20px;font-weight:600;letter-spacing:-0.018em;text-align:center">Saisissez le code d'invitation</h4>
+            <div style="display:flex;gap:8px">
+              <div style="flex:1;aspect-ratio:0.8;border-radius:11px;background:#FFF;border:2px solid #1B3BF5;box-shadow:0 0 0 3px rgba(27,59,245,.15);display:flex;align-items:center;justify-content:center"><div style="width:2px;height:22px;background:#1B3BF5;animation:swl-pulse 1.1s ease-in-out infinite"></div></div>
+              <div style="flex:1;aspect-ratio:0.8;border-radius:11px;background:#FFF;border:1px solid #D6D7DC"></div>
+              <div style="flex:1;aspect-ratio:0.8;border-radius:11px;background:#FFF;border:1px solid #D6D7DC"></div>
+              <div style="flex:1;aspect-ratio:0.8;border-radius:11px;background:#FFF;border:1px solid #D6D7DC"></div>
+              <div style="flex:1;aspect-ratio:0.8;border-radius:11px;background:#FFF;border:1px solid #D6D7DC"></div>
+              <div style="flex:1;aspect-ratio:0.8;border-radius:11px;background:#FFF;border:1px solid #D6D7DC"></div>
+            </div>
+            <button type="button" style="border:0;background:#0A0A0C;color:#FFF;font-family:inherit;font-size:17px;font-weight:600;padding:17px;border-radius:999px;cursor:pointer;transition:transform 160ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.97)">Confirmer</button>
+            <p style="margin:0;font-size:13px;line-height:1.5;color:#5A5C63;text-align:center">Le code vous a été envoyé par votre gestionnaire de compte. Il expire au bout de 15 minutes.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  </sc-if>
+
+  <section style="padding:56px 0;border-top:1px solid #E3E4E8">
+    <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:32px">
+      <span style="font-size:13px;font-weight:600;color:#8E9099;letter-spacing:0.02em">07</span>
+      <h2 style="margin:0;font-size:32px;letter-spacing:-0.026em;font-weight:600">À faire, à ne pas faire</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1px;background:#E3E4E8;border:1px solid #E3E4E8;border-radius:18px;overflow:hidden">
+      <sc-for list="{{ rules }}" as="r" hint-placeholder-count="6">
+        <div style="background:#FFF;padding:22px 24px;display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;gap:9px">
+            <span style="font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#006B3C;background:#E6F4EC;border-radius:6px;padding:4px 8px">Faire</span>
+          </div>
+          <span style="font-size:15px;line-height:1.45;font-weight:500">{{ r.do }}</span>
+          <div style="height:1px;background:#EFEFF2;margin:2px 0"></div>
+          <div style="display:flex;align-items:center;gap:9px">
+            <span style="font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#A3121A;background:#FBEAEA;border-radius:6px;padding:4px 8px">Éviter</span>
+          </div>
+          <span style="font-size:15px;line-height:1.45;color:#5A5C63">{{ r.dont }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <footer style="padding:48px 0 0;border-top:1px solid #E3E4E8;display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:baseline">
+    <div style="display:flex;align-items:center;gap:9px">
+      <div style="width:20px;height:20px;border-radius:6px;background:url('assets/nuit.jpg') center/cover no-repeat #0A1466"></div>
+      <span style="font-family:Georgia,serif;font-size:18px">Swiftly.io</span>
+    </div>
+    <span style="font-size:13px;color:#8E9099">Design system {{ version }} — accessibilité : contraste AA minimum, cibles ≥ 44 px, <code style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12px;background:#ECECEF;padding:2px 6px;border-radius:5px">prefers-reduced-motion</code> respecté partout.</span>
+  </footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showMotion&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Sections&quot;},&quot;showScreens&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Sections&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const area = React.createElement('svg', {
+      viewBox: '0 0 320 110', width: '100%', height: 110, preserveAspectRatio: 'none',
+      style: { display: 'block' }, key: 'c'
+    }, [
+      React.createElement('defs', { key: 'd' },
+        React.createElement('linearGradient', { id: 'swlFill', x1: '0', y1: '0', x2: '0', y2: '1' }, [
+          React.createElement('stop', { key: 'a', offset: '0%', stopColor: '#006B3C', stopOpacity: 0.32 }),
+          React.createElement('stop', { key: 'b', offset: '100%', stopColor: '#006B3C', stopOpacity: 0 })
+        ])
+      ),
+      React.createElement('path', { key: 'f', fill: 'url(#swlFill)', d: 'M0 104 C 40 102, 70 96, 96 66 C 112 46, 122 92, 140 92 C 158 92, 168 34, 190 34 C 210 34, 214 96, 240 98 C 266 100, 286 40, 320 8 L 320 110 L 0 110 Z' }),
+      React.createElement('path', { key: 'l', fill: 'none', stroke: '#006B3C', strokeWidth: 2.5, strokeLinecap: 'round', d: 'M0 104 C 40 102, 70 96, 96 66 C 112 46, 122 92, 140 92 C 158 92, 168 34, 190 34 C 210 34, 214 96, 240 98 C 266 100, 286 40, 320 8' }),
+      React.createElement('circle', { key: 'p', cx: 318, cy: 9, r: 5, fill: '#FFFFFF', stroke: '#006B3C', strokeWidth: 3 })
+    ]);
+
+    const mini = React.createElement('svg', {
+      viewBox: '0 0 300 78', width: '100%', height: 78, preserveAspectRatio: 'none', style: { display: 'block' }
+    }, [
+      React.createElement('defs', { key: 'd' },
+        React.createElement('linearGradient', { id: 'swlFillMini', x1: '0', y1: '0', x2: '0', y2: '1' }, [
+          React.createElement('stop', { key: 'a', offset: '0%', stopColor: '#4ADE80', stopOpacity: 0.4 }),
+          React.createElement('stop', { key: 'b', offset: '100%', stopColor: '#4ADE80', stopOpacity: 0 })
+        ])
+      ),
+      React.createElement('path', { key: 'f', fill: 'url(#swlFillMini)', d: 'M0 72 C 36 70, 62 66, 88 44 C 102 30, 112 64, 130 64 C 148 64, 156 22, 178 22 C 196 22, 200 66, 224 68 C 248 70, 268 26, 300 6 L 300 78 L 0 78 Z' }),
+      React.createElement('path', { key: 'l', fill: 'none', stroke: '#4ADE80', strokeWidth: 2.2, strokeLinecap: 'round', d: 'M0 72 C 36 70, 62 66, 88 44 C 102 30, 112 64, 130 64 C 148 64, 156 22, 178 22 C 196 22, 200 66, 224 68 C 248 70, 268 26, 300 6' })
+    ]);
+
+    return {
+      version: 'v1.0',
+      showMotion: this.props.showMotion ?? true,
+      showScreens: this.props.showScreens ?? true,
+      chart: area,
+      chartMini: mini,
+      otp: [{ v: '4' }, { v: '9' }, { v: '2' }, { v: '' }, { v: '' }, { v: '' }],
+      motion: [
+        { name: 'Appui sur un bouton', dur: '160 ms', ease: 'ease-out fort', note: 'Déclenché au contact, pas au relâchement.' },
+        { name: 'Infobulle', dur: '125 ms', ease: 'ease-out fort', note: 'Les suivantes s\u2019ouvrent sans délai ni animation.' },
+        { name: 'Menu, sélecteur', dur: '180 ms', ease: 'ease-out fort', note: 'Origine sur le déclencheur, jamais au centre.' },
+        { name: 'Feuille, tiroir', dur: '320 ms', ease: 'ressort 0.8', note: 'Suit le doigt en 1:1, reprend sa vitesse au lâcher.' },
+        { name: 'Sortie de feuille', dur: '200 ms', ease: 'ease-out fort', note: 'La sortie est plus rapide que l\u2019entrée.' },
+        { name: 'Cascade de liste', dur: '50 ms / item', ease: 'ease-out', note: 'Décoratif : n\u2019empêche jamais l\u2019interaction.' }
+      ],
+      tx: [
+        { icon: '↘', title: 'Alimentation', meta: 'Aujourd\u2019hui, 9 h 37 · Spaghetti rouge', amount: '−1 500 F', kind: 'Dépense', color: '#A80010' },
+        { icon: '↘', title: 'Transport', meta: 'Aujourd\u2019hui, 8 h 04 · Zémidjan', amount: '−600 F', kind: 'Dépense', color: '#A80010' },
+        { icon: '↗', title: 'Main d\u2019œuvre', meta: 'Aujourd\u2019hui, 6 h 37 · Création d\u2019affiche', amount: '+7 000 F', kind: 'Revenu', color: '#006B3C' },
+        { icon: '↗', title: 'Freelance', meta: 'Hier, 18 h 12 · Refonte site vitrine', amount: '+30 000 F', kind: 'Revenu', color: '#006B3C' }
+      ],
+      rules: [
+        { do: 'Le dégradé nuit tient l\u2019en-tête et les surfaces d\u2019identité.', dont: 'Un dégradé en fond de liste ou derrière du texte long.' },
+        { do: 'Un seul accent bleu par écran, sur l\u2019action principale.', dont: 'Trois boutons colorés qui se disputent l\u2019attention.' },
+        { do: 'Chiffres tabulaires sur tous les montants.', dont: 'Des chiffres proportionnels qui font danser les colonnes.' },
+        { do: 'Vert pour l\u2019entrée, rouge pour la sortie. Toujours.', dont: 'Le rouge comme couleur de marque ou d\u2019accent décoratif.' },
+        { do: 'Retour visuel dès le contact, animation interruptible.', dont: 'Bloquer l\u2019entrée pendant une transition.' },
+        { do: 'Ce qui entre par la droite ressort par la droite.', dont: 'Entrée par la droite, sortie par le bas.' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<style>
+  html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  body {
+    margin: 0; background: #F4F4F6; color: #0A0A0C;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 17px; line-height: 1.45; text-wrap: pretty;
+  }
+  a { color: #152BC7; text-decoration: none; }
+  a:hover { color: #0A1466; }
+  @keyframes swl-pulse { 0%,100% { opacity: .5 } 50% { opacity: .85 } }
+  @keyframes swl-draw { from { stroke-dashoffset: 1400 } to { stroke-dashoffset: 0 } }
+</style>
+</helmet>
+
+<section style="padding:56px 48px 96px;display:flex;flex-direction:column;gap:40px">
+
+  <div id="1a" style="display:flex;flex-direction:column;gap:24px;max-width:820px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#FFF;background:#0A0A0C;border-radius:6px;padding:5px 9px">1a</span>
+      <span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#6E7079">Lot 4 — Statistiques · écrans 11 à 13</span>
+    </div>
+    <h1 style="margin:0;font-size:44px;line-height:1.04;letter-spacing:-0.035em;font-weight:600">Des chiffres qui racontent une direction</h1>
+    <p style="margin:0;font-size:19px;line-height:1.5;color:#5A5C63;max-width:680px">Trois écrans, une seule mécanique de lecture : une carte par question, un chiffre dominant par carte, une comparaison sous ce chiffre. Les graphiques n'introduisent aucune couleur nouvelle — ils empruntent l'échelle de la marque, et le score reste la seule chose qui a le droit d'être verte.</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(236px,1fr));gap:12px;max-width:1180px">
+    <div style="background:#FFF;border:1px solid #DCDDE3;border-radius:16px;padding:20px 22px;display:flex;flex-direction:column;gap:6px">
+      <span style="font-size:13px;font-weight:600;color:#152BC7">Une échelle par graphique</span>
+      <span style="font-size:15px;line-height:1.4;color:#5A5C63">Les dépenses se lisent sur une rampe bleue du plus foncé au plus clair, les revenus sur une rampe verte. La maquette mélangeait bleu, cyan, vert et bordeaux dans un même donut : quatre couleurs, aucune hiérarchie.</span>
+    </div>
+    <div style="background:#FFF;border:1px solid #DCDDE3;border-radius:16px;padding:20px 22px;display:flex;flex-direction:column;gap:6px">
+      <span style="font-size:13px;font-weight:600;color:#152BC7">Chiffre, puis comparaison</span>
+      <span style="font-size:15px;line-height:1.4;color:#5A5C63">Chaque carte a un seul chiffre en 32 ou 38, et juste dessous sa variation en 13. Jamais deux chiffres de même taille dans une carte.</span>
+    </div>
+    <div style="background:#FFF;border:1px solid #DCDDE3;border-radius:16px;padding:20px 22px;display:flex;flex-direction:column;gap:6px">
+      <span style="font-size:13px;font-weight:600;color:#152BC7">Titre de section hors carte</span>
+      <span style="font-size:15px;line-height:1.4;color:#5A5C63">Le libellé de section vit sur le fond gris, jamais dans la carte blanche. Le scroll devient une suite de chapitres lisibles au pouce.</span>
+    </div>
+    <div style="background:#FFF;border:1px solid #DCDDE3;border-radius:16px;padding:20px 22px;display:flex;flex-direction:column;gap:6px">
+      <span style="font-size:13px;font-weight:600;color:#152BC7">Le vert est réservé</span>
+      <span style="font-size:15px;line-height:1.4;color:#5A5C63">Vert = progrès et score. Rouge = risque et sortie d'argent. Aucune décoration verte ailleurs, sinon le signal se dilue.</span>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;align-items:baseline;gap:14px;border-top:1px solid #DCDDE3;padding-top:24px">
+      <span style="font-size:13px;font-weight:600;color:#6E7079">11</span>
+      <h2 style="margin:0;font-size:28px;letter-spacing:-0.026em;font-weight:600">Statistiques</h2>
+      <span style="font-size:15px;color:#6E7079">Mode Aperçu en quatre sections, plus les modes Dépense et Patrimoine</span>
+    </div>
+
+    <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start">
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Aperçu — vue d'ensemble</span>
+        <div style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#0A1466;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;flex-direction:column">
+          <div style="position:absolute;inset:0;background:url('assets/nuit.jpg') center/cover no-repeat #0A1466"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,10,60,.5) 0%,rgba(6,10,60,.7) 100%)"></div>
+          <div style="position:relative;flex:none;color:#FFF">
+            <div style="height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;font-size:15px;font-weight:600;letter-spacing:-0.01em">
+              <span style="font-variant-numeric:tabular-nums">9:41</span>
+              <span style="display:flex;align-items:center;gap:6px;flex:none;white-space:nowrap"><span style="display:flex;align-items:flex-end;gap:2px;height:11px"><span style="width:3px;height:4px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:6px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:8px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:11px;border-radius:1px;background:#FFF"></span></span><span style="width:14px;height:11px;background:#FFF;clip-path:polygon(50% 100%,0% 32%,20% 14%,50% 5%,80% 14%,100% 32%)"></span><span style="display:flex;align-items:center;gap:1px"><span style="width:23px;height:11px;border-radius:3px;border:1px solid rgba(255,255,255,.55);padding:1px;display:flex"><span style="width:70%;background:#FFF;border-radius:2px"></span></span><span style="width:2px;height:4px;border-radius:0 1px 1px 0;background:rgba(255,255,255,.55)"></span></span></span>
+            </div>
+            <div style="height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px">
+              <button type="button" style="width:40px;height:40px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 5 8 12l6.5 7"></path></svg>
+              </button>
+              <span style="font-size:19px;font-weight:700;letter-spacing:-0.02em">Statistiques</span>
+              <button type="button" style="width:40px;height:40px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"></path></svg>
+              </button>
+            </div>
+          </div>
+
+          <div style="position:relative;flex:1;border-radius:28px 28px 0 0;background:#EBEBEF;padding:16px;display:flex;flex-direction:column;gap:12px;overflow:hidden">
+            <div style="display:flex;gap:12px;flex:none">
+              <div style="flex:1;height:48px;border-radius:14px;background:#FFF;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-size:15px;font-weight:600">Aperçu<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#0A0A0C" stroke-width="1.8" stroke-linecap="round"><path d="M2.5 4.5 6 8l3.5-3.5"></path></svg></div>
+              <div style="flex:1;height:48px;border-radius:14px;background:#FFF;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-size:15px;font-weight:600">Aujourd'hui<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#0A0A0C" stroke-width="1.8" stroke-linecap="round"><path d="M2.5 4.5 6 8l3.5-3.5"></path></svg></div>
+            </div>
+
+            <span style="font-size:13px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#6E7079;flex:none">Vue d'ensemble</span>
+
+            <div style="flex:none;background:#FFF;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:16px">
+              <div style="height:44px;border-radius:999px;background:#0A1466;display:flex;align-items:center;justify-content:center;gap:8px;color:#FFF;font-size:15px">
+                <span style="color:rgba(255,255,255,.66)">Compte</span><span style="font-weight:700">Principal</span>
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#FFF" stroke-width="1.8" stroke-linecap="round"><path d="M2.5 4.5 6 8l3.5-3.5"></path></svg>
+              </div>
+
+              <div style="display:flex;gap:8px;align-items:flex-end">
+                <svg width="264" height="152" viewBox="0 0 264 152" style="flex:none;overflow:visible">
+                  <defs>
+                    <linearGradient id="l4a" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0" stop-color="#1DCF02" stop-opacity=".28"></stop>
+                      <stop offset="1" stop-color="#1DCF02" stop-opacity="0"></stop>
+                    </linearGradient>
+                  </defs>
+                  <path d="M0 132 L264 132" stroke="#EDEDF1" stroke-width="1"></path>
+                  <path d="M0 92 L264 92" stroke="#F3F3F6" stroke-width="1"></path>
+                  <path d="M0 52 L264 52" stroke="#F3F3F6" stroke-width="1"></path>
+                  <path d="M0 118 C26 116 40 108 58 96 C74 86 84 66 98 70 C112 74 116 104 130 106 C142 108 148 84 160 74 C170 66 176 92 188 100 C200 108 206 96 216 76 C228 52 238 26 252 14" fill="none" stroke="#1DCF02" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="1400" style="animation:swl-draw 1.6s cubic-bezier(0.22,1,0.36,1) forwards"></path>
+                  <path d="M0 118 C26 116 40 108 58 96 C74 86 84 66 98 70 C112 74 116 104 130 106 C142 108 148 84 160 74 C170 66 176 92 188 100 C200 108 206 96 216 76 C228 52 238 26 252 14 L252 132 L0 132 Z" fill="url(#l4a)" stroke="none"></path>
+                  <circle cx="252" cy="14" r="5" fill="#1DCF02" stroke="#FFF" stroke-width="2.5"></circle>
+                </svg>
+                <div style="display:flex;flex-direction:column;justify-content:space-between;height:132px;font-size:9px;font-weight:600;color:#A0A2A9;font-variant-numeric:tabular-nums;text-align:right;flex:1">
+                  <span>50 K</span><span>40 K</span><span>30 K</span><span>20 K</span><span>10 K</span><span>1 K</span>
+                </div>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:600;color:#8A8C93;padding-right:32px">
+                <span>0h–6h</span><span>6h–12h</span><span>12h–18h</span><span>18h–00h</span>
+              </div>
+
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px 8px;border-top:1px solid #EDEDF1;padding-top:16px">
+                <div style="display:flex;flex-direction:column;gap:2px">
+                  <span style="font-size:12px;color:#8A8C93">Solde début</span>
+                  <span style="font-size:19px;font-weight:700;letter-spacing:-0.018em;font-variant-numeric:tabular-nums;white-space:nowrap">148 100 F</span>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:2px;text-align:right">
+                  <span style="font-size:12px;color:#8A8C93">Solde actuel</span>
+                  <span style="font-size:19px;font-weight:700;letter-spacing:-0.018em;font-variant-numeric:tabular-nums;white-space:nowrap">182 900 F</span>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:2px">
+                  <span style="font-size:12px;color:#8A8C93">Revenus</span>
+                  <span style="font-size:19px;font-weight:700;letter-spacing:-0.018em;color:#006B3C;font-variant-numeric:tabular-nums;white-space:nowrap">67 000 F</span>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:2px;text-align:right">
+                  <span style="font-size:12px;color:#8A8C93">Dépenses</span>
+                  <span style="font-size:19px;font-weight:700;letter-spacing:-0.018em;color:#A80010;font-variant-numeric:tabular-nums;white-space:nowrap">32 200 F</span>
+                </div>
+              </div>
+
+              <div style="border-radius:16px;background:rgba(0,107,60,.08);padding:14px;display:flex;flex-direction:column;align-items:center;gap:2px">
+                <span style="font-size:12px;font-weight:600;color:#5A5C63">Bénéfice net</span>
+                <span style="font-size:28px;font-weight:700;letter-spacing:-0.028em;color:#006B3C;font-variant-numeric:tabular-nums;white-space:nowrap">+34 800 F</span>
+                <span style="font-size:13px;font-weight:600;color:#006B3C;font-variant-numeric:tabular-nums;white-space:nowrap">↑ 17 800 F · 9,29 % vs hier</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Aperçu — répartition des dépenses</span>
+        <div style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#EBEBEF;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;flex-direction:column;padding:16px;gap:12px">
+          <span style="font-size:13px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#6E7079;flex:none">Répartition des dépenses</span>
+          <div style="flex:none;background:#FFF;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:16px">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+              <div style="height:44px;border-radius:14px;background:#F4F4F6;border:1px solid #E2E2E7;display:flex;align-items:center;gap:10px;padding:0 14px;font-size:14px;font-weight:600">Catégorie<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#0A0A0C" stroke-width="1.8" stroke-linecap="round"><path d="M2.5 4.5 6 8l3.5-3.5"></path></svg></div>
+              <button type="button" style="width:36px;height:36px;border:0;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:0;flex:none">
+                <span style="width:3.5px;height:3.5px;border-radius:999px;background:#6E7079"></span>
+                <span style="width:3.5px;height:3.5px;border-radius:999px;background:#6E7079"></span>
+                <span style="width:3.5px;height:3.5px;border-radius:999px;background:#6E7079"></span>
+              </button>
+            </div>
+
+            <div style="width:184px;height:184px;border-radius:999px;margin:0 auto;background:conic-gradient(#0A1466 0 40%,#2F6BE0 40% 73%,#7FA0F0 73% 93%,#C3CFF7 93% 100%);display:flex;align-items:center;justify-content:center">
+              <div style="width:132px;height:132px;border-radius:999px;background:#FFF;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px">
+                <span style="font-size:11px;color:#8A8C93">Dépenses totales</span>
+                <span style="font-size:26px;font-weight:700;letter-spacing:-0.026em;font-variant-numeric:tabular-nums;white-space:nowrap">32 200 F</span>
+                <span style="font-size:13px;font-weight:600;color:#A80010;font-variant-numeric:tabular-nums;white-space:nowrap">↓ 14,3 %</span>
+                <span style="font-size:11px;color:#8A8C93">vs hier</span>
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column">
+              <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #EDEDF1">
+                <span style="width:32px;height:32px;border-radius:10px;background:#0A1466;display:flex;align-items:center;justify-content:center;flex:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19s-6.5-4.2-6.5-8.4A3.6 3.6 0 0 1 12 8.2a3.6 3.6 0 0 1 6.5 2.4C18.5 14.8 12 19 12 19Z"></path></svg></span>
+                <span style="flex:1;font-size:15px;font-weight:600;letter-spacing:-0.006em">Loisirs</span>
+                <span style="font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap">11 000 F</span>
+                <span style="width:44px;text-align:right;font-size:14px;font-weight:600;color:#0A1466;font-variant-numeric:tabular-nums;white-space:nowrap">40 %</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #EDEDF1">
+                <span style="width:32px;height:32px;border-radius:10px;background:#2F6BE0;display:flex;align-items:center;justify-content:center;flex:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round"><path d="M8 4v7a2 2 0 0 0 4 0V4M10 13v7M16 4c-1.2 1.6-1.6 3-1.4 4.6.1 1 .7 1.4 1.4 1.4V20"></path></svg></span>
+                <span style="flex:1;font-size:15px;font-weight:600;letter-spacing:-0.006em">Alimentation</span>
+                <span style="font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap">9 800 F</span>
+                <span style="width:44px;text-align:right;font-size:14px;font-weight:600;color:#2F6BE0;font-variant-numeric:tabular-nums;white-space:nowrap">33 %</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #EDEDF1">
+                <span style="width:32px;height:32px;border-radius:10px;background:#7FA0F0;display:flex;align-items:center;justify-content:center;flex:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round"><path d="M4 15h16M6 15l1.5-5A2 2 0 0 1 9.4 8.6h5.2a2 2 0 0 1 1.9 1.4L18 15M7.5 18v1M16.5 18v1"></path></svg></span>
+                <span style="flex:1;font-size:15px;font-weight:600;letter-spacing:-0.006em">Transport</span>
+                <span style="font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap">8 200 F</span>
+                <span style="width:44px;text-align:right;font-size:14px;font-weight:600;color:#5A5C63;font-variant-numeric:tabular-nums;white-space:nowrap">20 %</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;padding:12px 0">
+                <span style="width:32px;height:32px;border-radius:10px;background:#C3CFF7;display:flex;align-items:center;justify-content:center;flex:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0A1466" stroke-width="1.9" stroke-linecap="round"><path d="M6 12h12"></path></svg></span>
+                <span style="flex:1;font-size:15px;font-weight:600;letter-spacing:-0.006em;color:#5A5C63">Autres</span>
+                <span style="font-size:15px;font-weight:700;color:#5A5C63;font-variant-numeric:tabular-nums;white-space:nowrap">3 200 F</span>
+                <span style="width:44px;text-align:right;font-size:14px;font-weight:600;color:#8A8C93;font-variant-numeric:tabular-nums;white-space:nowrap">7 %</span>
+              </div>
+            </div>
+
+            <button type="button" style="width:100%;height:44px;border-radius:999px;border:1px solid #E2E2E7;background:#F4F4F6;color:#0A0A0C;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+              Voir plus<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 2.5 8 6l-3.5 3.5"></path></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Aperçu — répartition des revenus</span>
+        <div style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#EBEBEF;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;flex-direction:column;padding:16px;gap:12px">
+          <span style="font-size:13px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#6E7079;flex:none">Répartition des revenus</span>
+          <div style="flex:none;background:#FFF;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:16px">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+              <div style="height:44px;border-radius:14px;background:#F4F4F6;border:1px solid #E2E2E7;display:flex;align-items:center;gap:10px;padding:0 14px;font-size:14px;font-weight:600">Catégorie<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#0A0A0C" stroke-width="1.8" stroke-linecap="round"><path d="M2.5 4.5 6 8l3.5-3.5"></path></svg></div>
+              <button type="button" style="width:36px;height:36px;border:0;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:0;flex:none">
+                <span style="width:3.5px;height:3.5px;border-radius:999px;background:#6E7079"></span>
+                <span style="width:3.5px;height:3.5px;border-radius:999px;background:#6E7079"></span>
+                <span style="width:3.5px;height:3.5px;border-radius:999px;background:#6E7079"></span>
+              </button>
+            </div>
+
+            <div style="width:184px;height:184px;border-radius:999px;margin:0 auto;background:conic-gradient(#00522E 0 43%,#1DA55E 43% 80%,#7FD3A4 80% 100%);display:flex;align-items:center;justify-content:center">
+              <div style="width:132px;height:132px;border-radius:999px;background:#FFF;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px">
+                <span style="font-size:11px;color:#8A8C93">Revenus totaux</span>
+                <span style="font-size:26px;font-weight:700;letter-spacing:-0.026em;font-variant-numeric:tabular-nums;white-space:nowrap">67 000 F</span>
+                <span style="font-size:13px;font-weight:600;color:#006B3C;font-variant-numeric:tabular-nums;white-space:nowrap">↑ 17,3 %</span>
+                <span style="font-size:11px;color:#8A8C93">vs hier</span>
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column">
+              <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #EDEDF1">
+                <span style="width:32px;height:32px;border-radius:10px;background:#00522E;display:flex;align-items:center;justify-content:center;flex:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="7.5"></circle><circle cx="12" cy="12" r="3"></circle></svg></span>
+                <span style="flex:1;font-size:15px;font-weight:600;letter-spacing:-0.006em">Freelance</span>
+                <span style="font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap">30 000 F</span>
+                <span style="width:44px;text-align:right;font-size:14px;font-weight:600;color:#00522E;font-variant-numeric:tabular-nums;white-space:nowrap">43 %</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #EDEDF1">
+                <span style="width:32px;height:32px;border-radius:10px;background:#1DA55E;display:flex;align-items:center;justify-content:center;flex:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round"><path d="M6 9h12l2 10H4L6 9Z"></path><path d="M9 9V7a3 3 0 0 1 6 0v2"></path></svg></span>
+                <span style="flex:1;font-size:15px;font-weight:600;letter-spacing:-0.006em">Salaire</span>
+                <span style="font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap">20 000 F</span>
+                <span style="width:44px;text-align:right;font-size:14px;font-weight:600;color:#1DA55E;font-variant-numeric:tabular-nums;white-space:nowrap">37 %</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;padding:12px 0">
+                <span style="width:32px;height:32px;border-radius:10px;background:#7FD3A4;display:flex;align-items:center;justify-content:center;flex:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00522E" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-6 8 6M6.5 10v9h11v-9"></path></svg></span>
+                <span style="flex:1;font-size:15px;font-weight:600;letter-spacing:-0.006em">Loyer</span>
+                <span style="font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap">17 000 F</span>
+                <span style="width:44px;text-align:right;font-size:14px;font-weight:600;color:#5A5C63;font-variant-numeric:tabular-nums;white-space:nowrap">20 %</span>
+              </div>
+            </div>
+
+            <div style="border-radius:14px;background:rgba(21,43,199,.07);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+              <span style="font-size:13px;color:#33356B">Dont revenus passifs</span>
+              <span style="font-size:15px;font-weight:700;color:#152BC7;font-variant-numeric:tabular-nums;white-space:nowrap">17 000 F · 25 %</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Aperçu — score financier et rapport</span>
+        <div style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#EBEBEF;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;flex-direction:column;padding:16px;gap:12px">
+          <span style="font-size:13px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#6E7079;flex:none">Score financier</span>
+          <div style="flex:none;background:#FFF;border-radius:20px;padding:20px 16px;display:flex;flex-direction:column;gap:20px">
+            <div style="display:flex;align-items:center;gap:20px">
+              <div style="width:132px;height:132px;border-radius:999px;flex:none;background:conic-gradient(#006B3C 0 72%,#E4E4E9 72% 100%);display:flex;align-items:center;justify-content:center">
+                <div style="width:104px;height:104px;border-radius:999px;background:#FFF;display:flex;flex-direction:column;align-items:center;justify-content:center">
+                  <span style="font-size:38px;font-weight:700;letter-spacing:-0.04em;line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap">72</span>
+                  <span style="font-size:12px;font-weight:600;color:#8A8C93">/100</span>
+                </div>
+              </div>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px">
+                <span style="font-size:22px;font-weight:700;letter-spacing:-0.02em;color:#006B3C">Bon</span>
+                <span style="font-size:14px;line-height:1.4;color:#5A5C63">Vous gérez bien vos finances. Visez l'indépendance avec les revenus passifs.</span>
+                <a href="#1a" style="font-size:14px;font-weight:600">Voir l'aide</a>
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:12px;border-top:1px solid #EDEDF1;padding-top:16px">
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px">
+                  <span style="font-size:14px;font-weight:600">Liberté financière</span>
+                  <span style="font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap">35 %</span>
+                </div>
+                <div style="height:6px;border-radius:999px;background:#EDEDF1"><div style="width:35%;height:6px;border-radius:999px;background:#006B3C"></div></div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px">
+                  <span style="font-size:14px;font-weight:600">Taux d'investissement</span>
+                  <span style="font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap">33 %</span>
+                </div>
+                <div style="height:6px;border-radius:999px;background:#EDEDF1"><div style="width:33%;height:6px;border-radius:999px;background:#006B3C"></div></div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px">
+                  <span style="font-size:14px;font-weight:600">Taux d'épargne</span>
+                  <span style="font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap">20 %</span>
+                </div>
+                <div style="height:6px;border-radius:999px;background:#EDEDF1"><div style="width:20%;height:6px;border-radius:999px;background:#006B3C"></div></div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px">
+                  <span style="font-size:14px;font-weight:600">Diversification des revenus</span>
+                  <span style="font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap">2 sources</span>
+                </div>
+                <div style="height:6px;border-radius:999px;background:#EDEDF1"><div style="width:50%;height:6px;border-radius:999px;background:#006B3C"></div></div>
+              </div>
+            </div>
+          </div>
+
+          <div style="flex:1"></div>
+
+          <button type="button" style="flex:none;width:100%;border:0;height:56px;border-radius:999px;cursor:pointer;color:#FFF;font-family:inherit;font-size:17px;font-weight:600;letter-spacing:-0.008em;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(180deg,#33343C 0%,#16171D 46%,#05060A 58%,#20212A 100%);box-shadow:inset 0 1.5px 1px rgba(255,255,255,.4),inset 0 -8px 12px -6px rgba(255,255,255,.16),0 3px 8px rgba(4,6,30,.26),0 12px 26px -8px rgba(4,6,30,.46);transition:transform 160ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.975)">Voir le rapport</button>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Mode Dépense — créé (le mode Revenu en est le miroir vert)</span>
+        <div style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#0A1466;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;flex-direction:column">
+          <div style="position:absolute;inset:0;background:url('assets/nuit.jpg') center/cover no-repeat #0A1466"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,10,60,.5) 0%,rgba(6,10,60,.7) 100%)"></div>
+          <div style="position:relative;flex:none;color:#FFF">
+            <div style="height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;font-size:15px;font-weight:600;letter-spacing:-0.01em">
+              <span style="font-variant-numeric:tabular-nums;white-space:nowrap">9:41</span>
+              <span style="display:flex;align-items:center;gap:6px;flex:none;white-space:nowrap"><span style="display:flex;align-items:flex-end;gap:2px;height:11px"><span style="width:3px;height:4px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:6px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:8px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:11px;border-radius:1px;background:#FFF"></span></span><span style="width:14px;height:11px;background:#FFF;clip-path:polygon(50% 100%,0% 32%,20% 14%,50% 5%,80% 14%,100% 32%)"></span><span style="display:flex;align-items:center;gap:1px"><span style="width:23px;height:11px;border-radius:3px;border:1px solid rgba(255,255,255,.55);padding:1px;display:flex"><span style="width:70%;background:#FFF;border-radius:2px"></span></span><span style="width:2px;height:4px;border-radius:0 1px 1px 0;background:rgba(255,255,255,.55)"></span></span></span>
+            </div>
+            <div style="height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px">
+              <button type="button" style="width:40px;height:40px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 5 8 12l6.5 7"></path></svg>
+              </button>
+              <span style="font-size:19px;font-weight:700;letter-spacing:-0.02em">Statistiques</span>
+              <button type="button" style="width:40px;height:40px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"></path></svg>
+              </button>
+            </div>
+          </div>
+
+          <div style="position:relative;flex:1;border-radius:28px 28px 0 0;background:#EBEBEF;padding:16px;display:flex;flex-direction:column;gap:12px;overflow:hidden">
+            <div style="display:flex;gap:12px;flex:none">
+              <div style="flex:1;height:48px;border-radius:14px;background:#0A1466;color:#FFF;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-size:15px;font-weight:600">Dépense<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#FFF" stroke-width="1.8" stroke-linecap="round"><path d="M2.5 4.5 6 8l3.5-3.5"></path></svg></div>
+              <div style="flex:1;height:48px;border-radius:14px;background:#FFF;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-size:15px;font-weight:600">Ce mois<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#0A0A0C" stroke-width="1.8" stroke-linecap="round"><path d="M2.5 4.5 6 8l3.5-3.5"></path></svg></div>
+            </div>
+
+            <div style="flex:none;background:#FFF;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:4px">
+              <span style="font-size:12px;color:#8A8C93">Dépensé ce mois</span>
+              <span style="font-size:38px;font-weight:700;letter-spacing:-0.036em;color:#A80010;line-height:1.1;font-variant-numeric:tabular-nums;white-space:nowrap">412 800 F</span>
+              <span style="font-size:13px;font-weight:600;color:#006B3C;font-variant-numeric:tabular-nums;white-space:nowrap">↓ 6,2 % vs mois dernier</span>
+              <div style="display:flex;gap:8px;margin-top:12px;align-items:flex-end;height:104px">
+                <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:100%;height:44px;border-radius:6px 6px 0 0;background:#C3CFF7"></div><span style="font-size:10px;font-weight:600;color:#8A8C93">S1</span></div>
+                <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:100%;height:72px;border-radius:6px 6px 0 0;background:#7FA0F0"></div><span style="font-size:10px;font-weight:600;color:#8A8C93">S2</span></div>
+                <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:100%;height:58px;border-radius:6px 6px 0 0;background:#7FA0F0"></div><span style="font-size:10px;font-weight:600;color:#8A8C93">S3</span></div>
+                <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px"><div style="width:100%;height:86px;border-radius:6px 6px 0 0;background:#0A1466"></div><span style="font-size:10px;font-weight:600;color:#0A0A0C">S4</span></div>
+              </div>
+            </div>
+
+            <div style="flex:none;background:#FFF;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:14px">
+              <span style="font-size:15px;font-weight:600;letter-spacing:-0.008em">Investissement contre consommation</span>
+              <div style="height:32px;border-radius:10px;overflow:hidden;display:flex">
+                <div style="width:33%;background:#152BC7;display:flex;align-items:center;justify-content:center;color:#FFF;font-size:12px;font-weight:700">33 %</div>
+                <div style="flex:1;background:#E4E4E9;display:flex;align-items:center;justify-content:center;color:#5A5C63;font-size:12px;font-weight:700">67 %</div>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:13px">
+                <span style="color:#152BC7;font-weight:600">Investissement · 136 200 F</span>
+                <span style="color:#5A5C63;font-weight:600">Consommation · 276 600 F</span>
+              </div>
+            </div>
+
+            <div style="flex:none;background:#FFF;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px">
+              <span style="font-size:15px;font-weight:600;letter-spacing:-0.008em">Postes en hausse</span>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+                <span style="font-size:14px">Loisirs</span>
+                <span style="font-size:14px;font-weight:700;color:#A80010;font-variant-numeric:tabular-nums;white-space:nowrap">+18 %</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+                <span style="font-size:14px">Transport</span>
+                <span style="font-size:14px;font-weight:700;color:#A80010;font-variant-numeric:tabular-nums;white-space:nowrap">+7 %</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Mode Patrimoine — créé</span>
+        <div style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#0A1466;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;flex-direction:column">
+          <div style="position:absolute;inset:0;background:url('assets/nuit.jpg') center/cover no-repeat #0A1466"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,10,60,.5) 0%,rgba(6,10,60,.7) 100%)"></div>
+          <div style="position:relative;flex:none;color:#FFF">
+            <div style="height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;font-size:15px;font-weight:600;letter-spacing:-0.01em">
+              <span style="font-variant-numeric:tabular-nums;white-space:nowrap">9:41</span>
+              <span style="display:flex;align-items:center;gap:6px;flex:none;white-space:nowrap"><span style="display:flex;align-items:flex-end;gap:2px;height:11px"><span style="width:3px;height:4px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:6px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:8px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:11px;border-radius:1px;background:#FFF"></span></span><span style="width:14px;height:11px;background:#FFF;clip-path:polygon(50% 100%,0% 32%,20% 14%,50% 5%,80% 14%,100% 32%)"></span><span style="display:flex;align-items:center;gap:1px"><span style="width:23px;height:11px;border-radius:3px;border:1px solid rgba(255,255,255,.55);padding:1px;display:flex"><span style="width:70%;background:#FFF;border-radius:2px"></span></span><span style="width:2px;height:4px;border-radius:0 1px 1px 0;background:rgba(255,255,255,.55)"></span></span></span>
+            </div>
+            <div style="height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px">
+              <button type="button" style="width:40px;height:40px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 5 8 12l6.5 7"></path></svg>
+              </button>
+              <span style="font-size:19px;font-weight:700;letter-spacing:-0.02em">Statistiques</span>
+              <button type="button" style="width:40px;height:40px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"></path></svg>
+              </button>
+            </div>
+          </div>
+
+          <div style="position:relative;flex:1;border-radius:28px 28px 0 0;background:#EBEBEF;padding:16px;display:flex;flex-direction:column;gap:12px;overflow:hidden">
+            <div style="display:flex;gap:12px;flex:none">
+              <div style="flex:1;height:48px;border-radius:14px;background:#0A1466;color:#FFF;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-size:15px;font-weight:600">Patrimoine<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#FFF" stroke-width="1.8" stroke-linecap="round"><path d="M2.5 4.5 6 8l3.5-3.5"></path></svg></div>
+              <div style="flex:1;height:48px;border-radius:14px;background:#FFF;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-size:15px;font-weight:600">Cette année<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#0A0A0C" stroke-width="1.8" stroke-linecap="round"><path d="M2.5 4.5 6 8l3.5-3.5"></path></svg></div>
+            </div>
+
+            <div style="flex:none;background:#FFF;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:4px">
+              <span style="font-size:12px;color:#8A8C93">Patrimoine estimé</span>
+              <span style="font-size:38px;font-weight:700;letter-spacing:-0.036em;line-height:1.1;font-variant-numeric:tabular-nums;white-space:nowrap">2 486 000 F</span>
+              <span style="font-size:13px;font-weight:600;color:#006B3C;font-variant-numeric:tabular-nums;white-space:nowrap">↑ 312 000 F cette année</span>
+            </div>
+
+            <div style="flex:none;background:#FFF;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px">
+              <span style="font-size:15px;font-weight:600;letter-spacing:-0.008em">Comptes</span>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:10px;border-bottom:1px solid #EDEDF1">
+                <span style="font-size:14px">Cash</span>
+                <span style="font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap">182 900 F</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:10px;border-bottom:1px solid #EDEDF1">
+                <span style="font-size:14px">Mobile Money</span>
+                <span style="font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap">96 400 F</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+                <span style="font-size:14px">Banque</span>
+                <span style="font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap">406 700 F</span>
+              </div>
+            </div>
+
+            <div style="flex:none;background:#FFF;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px">
+              <span style="font-size:15px;font-weight:600;letter-spacing:-0.008em">Projets réalisés</span>
+              <div style="display:flex;align-items:center;gap:12px;padding-bottom:10px;border-bottom:1px solid #EDEDF1">
+                <span style="width:32px;height:32px;border-radius:10px;background:#0A1466;display:flex;align-items:center;justify-content:center;flex:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-6 8 6M6.5 10v9h11v-9"></path></svg></span>
+                <span style="flex:1;font-size:14px;font-weight:600">Terrain Abomey</span>
+                <span style="font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap">1 200 000 F</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px">
+                <span style="width:32px;height:32px;border-radius:10px;background:#2F6BE0;display:flex;align-items:center;justify-content:center;flex:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round"><rect x="4" y="7" width="16" height="12" rx="2.5"></rect><path d="M9 7V5.5h6V7"></path></svg></span>
+                <span style="flex:1;font-size:14px;font-weight:600">Atelier sérigraphie</span>
+                <span style="font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap">600 000 F</span>
+              </div>
+            </div>
+
+            <div style="flex:none;border-radius:14px;background:rgba(21,43,199,.07);padding:12px 14px;display:flex;gap:10px;align-items:flex-start">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#152BC7" stroke-width="1.8" stroke-linecap="round" style="flex:none;margin-top:1px"><circle cx="12" cy="12" r="9"></circle><path d="M12 10.5v6M12 7.5v.5"></path></svg>
+              <span style="font-size:13px;line-height:1.45;color:#33356B">Le patrimoine additionne vos soldes de comptes et la valeur des projets terminés. Il n'entre pas dans le score.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;align-items:baseline;gap:14px;border-top:1px solid #DCDDE3;padding-top:24px">
+      <span style="font-size:13px;font-weight:600;color:#6E7079">12</span>
+      <h2 style="margin:0;font-size:28px;letter-spacing:-0.026em;font-weight:600">Rapport</h2>
+      <span style="font-size:15px;color:#6E7079">Mensuel, généré à la clôture de la période — le score est mentionné, l'indépendance est le sujet</span>
+    </div>
+
+    <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start">
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Vue d'ensemble de la période</span>
+        <div style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#0A1466;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;flex-direction:column">
+          <div style="position:absolute;inset:0;background:url('assets/nuit.jpg') center/cover no-repeat #0A1466"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,10,60,.5) 0%,rgba(6,10,60,.72) 100%)"></div>
+          <div style="position:relative;flex:none;color:#FFF">
+            <div style="height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;font-size:15px;font-weight:600;letter-spacing:-0.01em">
+              <span style="font-variant-numeric:tabular-nums;white-space:nowrap">9:41</span>
+              <span style="display:flex;align-items:center;gap:6px;flex:none;white-space:nowrap"><span style="display:flex;align-items:flex-end;gap:2px;height:11px"><span style="width:3px;height:4px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:6px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:8px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:11px;border-radius:1px;background:#FFF"></span></span><span style="width:14px;height:11px;background:#FFF;clip-path:polygon(50% 100%,0% 32%,20% 14%,50% 5%,80% 14%,100% 32%)"></span><span style="display:flex;align-items:center;gap:1px"><span style="width:23px;height:11px;border-radius:3px;border:1px solid rgba(255,255,255,.55);padding:1px;display:flex"><span style="width:70%;background:#FFF;border-radius:2px"></span></span><span style="width:2px;height:4px;border-radius:0 1px 1px 0;background:rgba(255,255,255,.55)"></span></span></span>
+            </div>
+            <div style="height:56px;display:flex;align-items:center;gap:12px;padding:0 16px">
+              <button type="button" style="width:40px;height:40px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 5 8 12l6.5 7"></path></svg>
+              </button>
+              <span style="flex:1;font-size:19px;font-weight:700;letter-spacing:-0.02em">Rapport</span>
+            </div>
+            <div style="padding:0 16px 24px;display:flex;flex-direction:column;gap:12px">
+              <span style="font-size:26px;font-weight:700;letter-spacing:-0.028em;line-height:1.1">Juin 2026</span>
+              <div style="display:flex;gap:12px">
+                <div style="flex:1;height:44px;border-radius:14px;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-size:14px;font-weight:600">Mois<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#FFF" stroke-width="1.8" stroke-linecap="round"><path d="M2.5 4.5 6 8l3.5-3.5"></path></svg></div>
+                <div style="flex:none;width:44px;height:44px;border-radius:14px;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 5 8 12l6.5 7"></path></svg>
+                </div>
+                <div style="flex:none;width:44px;height:44px;border-radius:14px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 5 16 12l-6.5 7"></path></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="position:relative;flex:1;border-radius:28px 28px 0 0;background:#EBEBEF;padding:16px;display:flex;flex-direction:column;gap:12px;overflow:hidden">
+            <span style="font-size:13px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#6E7079;flex:none">Vue d'ensemble</span>
+
+            <div style="flex:none;background:#FFF;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:16px">
+              <div style="display:flex;flex-direction:column;gap:4px">
+                <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px">
+                  <span style="font-size:14px;color:#6E7079;white-space:nowrap">Revenus totaux</span>
+                  <span style="font-size:13px;font-weight:600;color:#006B3C;font-variant-numeric:tabular-nums;white-space:nowrap">↑ 8,4 %</span>
+                </div>
+                <span style="font-size:28px;font-weight:700;letter-spacing:-0.028em;color:#006B3C;font-variant-numeric:tabular-nums;white-space:nowrap">1 015 000 F</span>
+                <div style="display:flex;gap:8px;margin-top:6px">
+                  <span style="flex:1;border-radius:10px;background:rgba(0,107,60,.08);padding:8px 10px;font-size:11px;font-weight:600;white-space:nowrap;color:#00522E">Actif · 812 000 F</span>
+                  <span style="flex:1;border-radius:10px;background:rgba(21,43,199,.07);padding:8px 10px;font-size:11px;font-weight:600;white-space:nowrap;color:#152BC7">Passif · 203 000 F</span>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:4px;border-top:1px solid #EDEDF1;padding-top:16px">
+                <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px">
+                  <span style="font-size:14px;color:#6E7079;white-space:nowrap">Dépenses totales</span>
+                  <span style="font-size:13px;font-weight:600;color:#006B3C;font-variant-numeric:tabular-nums;white-space:nowrap">↓ 3,1 %</span>
+                </div>
+                <span style="font-size:28px;font-weight:700;letter-spacing:-0.028em;color:#A80010;font-variant-numeric:tabular-nums;white-space:nowrap">812 000 F</span>
+                <div style="display:flex;gap:8px;margin-top:6px">
+                  <span style="flex:1;border-radius:10px;background:rgba(21,43,199,.07);padding:8px 10px;font-size:11px;font-weight:600;white-space:nowrap;color:#152BC7">Investissement · 268 000 F</span>
+                  <span style="flex:1;border-radius:10px;background:#F4F4F6;padding:8px 10px;font-size:11px;font-weight:600;white-space:nowrap;color:#5A5C63">Consommation · 544 000 F</span>
+                </div>
+              </div>
+            </div>
+
+            <div style="flex:none;background:#FFF;border-radius:20px;padding:16px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+              <div style="display:flex;flex-direction:column;gap:2px">
+                <span style="font-size:14px;color:#6E7079;white-space:nowrap">Bilan net</span>
+                <span style="font-size:26px;font-weight:700;letter-spacing:-0.026em;color:#006B3C;font-variant-numeric:tabular-nums;white-space:nowrap">+203 000 F</span>
+              </div>
+              <span style="font-size:13px;font-weight:600;color:#006B3C;background:rgba(0,107,60,.1);border-radius:999px;padding:6px 12px;flex:none;white-space:nowrap">Mois positif</span>
+            </div>
+
+            
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Score et deux premiers critères</span>
+        <div style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#EBEBEF;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;flex-direction:column;padding:16px;gap:12px">
+          <span style="font-size:13px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#6E7079;flex:none">Votre score financier</span>
+          <div style="flex:none;background:#FFF;border-radius:20px;padding:16px;display:flex;align-items:center;gap:16px">
+            <div style="width:110px;height:110px;border-radius:999px;flex:none;background:conic-gradient(#006B3C 0 72%,#E4E4E9 72% 100%);display:flex;align-items:center;justify-content:center">
+              <div style="width:86px;height:86px;border-radius:999px;background:#FFF;display:flex;flex-direction:column;align-items:center;justify-content:center">
+                <span style="font-size:32px;font-weight:700;letter-spacing:-0.04em;line-height:1;font-variant-numeric:tabular-nums">72</span>
+                <span style="font-size:11px;font-weight:600;color:#8A8C93">/100</span>
+              </div>
+            </div>
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px">
+              <span style="font-size:20px;font-weight:700;letter-spacing:-0.018em;color:#006B3C">Bon</span>
+              <span style="font-size:13px;font-weight:600;color:#006B3C;font-variant-numeric:tabular-nums">↑ +5 points vs mai 2026</span>
+              <a href="#1a" style="font-size:14px;font-weight:600">Voir l'aide</a>
+            </div>
+          </div>
+
+          <span style="font-size:13px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#6E7079;flex:none">Analyse des critères</span>
+
+          <div style="flex:none;background:#FFF;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;align-items:center;gap:12px">
+              <span style="width:40px;height:40px;border-radius:12px;background:#00522E;display:flex;align-items:center;justify-content:center;flex:none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17l5-6 4 3 6-8"></path><path d="M15 6h4v4"></path></svg></span>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+                <span style="font-size:15px;font-weight:600;letter-spacing:-0.008em">Liberté financière</span>
+                <span style="font-size:12px;color:#8A8C93">Poids 40 %</span>
+              </div>
+              <div style="flex:none;display:flex;flex-direction:column;align-items:flex-end">
+                <span style="font-size:20px;font-weight:700;letter-spacing:-0.018em;font-variant-numeric:tabular-nums">35 %</span>
+                <span style="font-size:12px;font-weight:600;color:#A80010;font-variant-numeric:tabular-nums">↓ −0,5 %</span>
+              </div>
+            </div>
+            <div style="height:6px;border-radius:999px;background:#EDEDF1;position:relative">
+              <div style="width:35%;height:6px;border-radius:999px;background:#006B3C"></div>
+              <span style="position:absolute;left:32%;top:-4px;width:2px;height:14px;border-radius:999px;background:#0A0A0C"></span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:#6E7079">
+              <span>Vous : 35 %</span><span>Moyenne stade « Moyen » : 32 %</span>
+            </div>
+            <span style="font-size:13px;line-height:1.45;color:#5A5C63">Bon progrès — continuez à développer vos revenus passifs.</span>
+          </div>
+
+          <div style="flex:none;background:#FFF;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;align-items:center;gap:12px">
+              <span style="width:40px;height:40px;border-radius:12px;background:#152BC7;display:flex;align-items:center;justify-content:center;flex:none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16M7 20V9l5-4 5 4v11M10.5 20v-5h3v5"></path></svg></span>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+                <span style="font-size:15px;font-weight:600;letter-spacing:-0.008em">Taux d'investissement</span>
+                <span style="font-size:12px;color:#8A8C93">Poids 25 %</span>
+              </div>
+              <div style="flex:none;display:flex;flex-direction:column;align-items:flex-end">
+                <span style="font-size:20px;font-weight:700;letter-spacing:-0.018em;font-variant-numeric:tabular-nums">33 %</span>
+                <span style="font-size:12px;font-weight:600;color:#006B3C;font-variant-numeric:tabular-nums">↑ +2 %</span>
+              </div>
+            </div>
+            <div style="height:6px;border-radius:999px;background:#EDEDF1;position:relative">
+              <div style="width:33%;height:6px;border-radius:999px;background:#006B3C"></div>
+              <span style="position:absolute;left:28%;top:-4px;width:2px;height:14px;border-radius:999px;background:#0A0A0C"></span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:#6E7079">
+              <span>Vous : 33 %</span><span>Moyenne : 28 %</span>
+            </div>
+            <span style="font-size:13px;line-height:1.45;color:#5A5C63">Au-dessus de la moyenne — vos dépenses construisent du patrimoine.</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Deux derniers critères et projection</span>
+        <div style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#EBEBEF;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;flex-direction:column;padding:16px;gap:12px">
+          <div style="flex:none;background:#FFF;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;align-items:center;gap:12px">
+              <span style="width:40px;height:40px;border-radius:12px;background:#1DA55E;display:flex;align-items:center;justify-content:center;flex:none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a6 6 0 0 1 6-6h5a5 5 0 0 1 5 5v5a2 2 0 0 1-2 2h-2M4 12v6h6"></path><circle cx="16" cy="11" r="1"></circle></svg></span>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+                <span style="font-size:15px;font-weight:600;letter-spacing:-0.008em">Taux d'épargne</span>
+                <span style="font-size:12px;color:#8A8C93">Poids 25 %</span>
+              </div>
+              <div style="flex:none;display:flex;flex-direction:column;align-items:flex-end">
+                <span style="font-size:20px;font-weight:700;letter-spacing:-0.018em;font-variant-numeric:tabular-nums">20 %</span>
+                <span style="font-size:12px;font-weight:600;color:#006B3C;font-variant-numeric:tabular-nums">↑ +3 %</span>
+              </div>
+            </div>
+            <div style="height:6px;border-radius:999px;background:#EDEDF1;position:relative">
+              <div style="width:20%;height:6px;border-radius:999px;background:#006B3C"></div>
+              <span style="position:absolute;left:18%;top:-4px;width:2px;height:14px;border-radius:999px;background:#0A0A0C"></span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:#6E7079">
+              <span>Vous : 20 %</span><span>Moyenne : 18 %</span>
+            </div>
+            <span style="font-size:13px;line-height:1.45;color:#5A5C63">Bon travail — l'épargne finance vos investissements futurs.</span>
+          </div>
+
+          <div style="flex:none;background:#FFF;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;align-items:center;gap:12px">
+              <span style="width:40px;height:40px;border-radius:12px;background:#0A1466;display:flex;align-items:center;justify-content:center;flex:none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v-7M12 13 7 8M12 13l5-5"></path><circle cx="12" cy="21" r="1"></circle><circle cx="6" cy="7" r="2"></circle><circle cx="18" cy="7" r="2"></circle></svg></span>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+                <span style="font-size:15px;font-weight:600;letter-spacing:-0.008em">Diversification des revenus</span>
+                <span style="font-size:12px;color:#8A8C93">Poids 10 %</span>
+              </div>
+              <div style="flex:none;display:flex;flex-direction:column;align-items:flex-end">
+                <span style="font-size:20px;font-weight:700;letter-spacing:-0.018em;font-variant-numeric:tabular-nums">2</span>
+                <span style="font-size:12px;font-weight:600;color:#8A8C93">Stable</span>
+              </div>
+            </div>
+            <div style="height:6px;border-radius:999px;background:#EDEDF1;position:relative">
+              <div style="width:50%;height:6px;border-radius:999px;background:#006B3C"></div>
+              <span style="position:absolute;left:45%;top:-4px;width:2px;height:14px;border-radius:999px;background:#0A0A0C"></span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:#6E7079">
+              <span>Vous : 2 sources</span><span>Moyenne : 1,8 source</span>
+            </div>
+            <span style="font-size:13px;line-height:1.45;color:#5A5C63">Un filet de sécurité existe, mais une troisième source vous rendrait résilient.</span>
+          </div>
+
+          <span style="font-size:13px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#6E7079;flex:none">Votre chemin vers l'indépendance</span>
+
+          <div style="flex:none;background:#FFF;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;align-items:baseline;justify-content:space-between">
+                <span style="font-size:28px;font-weight:700;letter-spacing:-0.028em;color:#006B3C;font-variant-numeric:tabular-nums">45 %</span>
+                <span style="font-size:13px;color:#6E7079">du chemin parcouru</span>
+              </div>
+              <div style="height:10px;border-radius:999px;background:#EDEDF1"><div style="width:45%;height:10px;border-radius:999px;background:linear-gradient(90deg,#00522E,#1DA55E)"></div></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <span style="font-size:15px;font-weight:600;letter-spacing:-0.008em">À ce rythme, dans 18 mois</span>
+              <span style="font-size:14px;color:#5A5C63">Prévision : décembre 2027</span>
+            </div>
+            <span style="font-size:13px;line-height:1.45;color:#8A8C93">Cette projection suppose que vos tendances se maintiennent. Des changements de revenus ou dépenses peuvent modifier cette date.</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Points forts, priorité, recommandations</span>
+        <div style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#EBEBEF;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;flex-direction:column;padding:16px;gap:12px">
+          <span style="font-size:13px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#6E7079;flex:none">Ce que vous avez bien fait</span>
+          <div style="flex:none;background:#FFF;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;gap:10px;align-items:flex-start">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#006B3C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:2px"><path d="M5 12.5 10 17l9-9.5"></path></svg>
+              <span style="font-size:14px;line-height:1.45">Vous avez augmenté votre taux d'épargne de 3 % — continuez.</span>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#006B3C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:2px"><path d="M5 12.5 10 17l9-9.5"></path></svg>
+              <span style="font-size:14px;line-height:1.45">Vos revenus passifs ont progressé de 15 % — excellente diversification.</span>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#006B3C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:2px"><path d="M5 12.5 10 17l9-9.5"></path></svg>
+              <span style="font-size:14px;line-height:1.45">Vous avez réduit vos dépenses de consommation de 8 % — prudence maintenue.</span>
+            </div>
+          </div>
+
+          <span style="font-size:13px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#6E7079;flex:none">Votre priorité</span>
+          <div style="flex:none;background:#0A1466;border-radius:20px;padding:18px 16px;display:flex;flex-direction:column;gap:12px;color:#FFF">
+            <span style="font-size:17px;font-weight:600;letter-spacing:-0.012em;line-height:1.3">Votre diversification des revenus est faible — une seule source dominante.</span>
+            <span style="font-size:14px;line-height:1.5;color:rgba(255,255,255,.72)">C'est un risque. Si vous perdez ce revenu, tout s'arrête.</span>
+            <div style="height:1px;background:rgba(255,255,255,.16)"></div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <span style="font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:rgba(255,255,255,.5)">Action recommandée</span>
+              <span style="font-size:14px;line-height:1.5">Développez une deuxième source de revenu — freelance, petit commerce, ou investissement passif.</span>
+            </div>
+            <div style="border-radius:12px;background:rgba(29,207,2,.14);padding:10px 12px;display:flex;flex-direction:column;gap:2px">
+              <span style="font-size:13px;font-weight:600;color:#8FE87C">Impact estimé</span>
+              <span style="font-size:13px;line-height:1.45;color:rgba(255,255,255,.86)">+8 à 10 points de score, et six mois de gagnés sur votre date d'indépendance.</span>
+            </div>
+          </div>
+
+          <span style="font-size:13px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#6E7079;flex:none">Recommandations</span>
+          <div style="flex:none;background:#FFF;border-radius:20px;padding:4px 16px;display:flex;flex-direction:column">
+            <div style="display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid #EDEDF1">
+              <span style="width:22px;height:22px;border-radius:999px;background:#0A1466;color:#FFF;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none;margin-top:1px">1</span>
+              <span style="font-size:14px;line-height:1.45">Développez une deuxième source de revenu — c'est votre levier majeur.</span>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid #EDEDF1">
+              <span style="width:22px;height:22px;border-radius:999px;background:#152BC7;color:#FFF;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none;margin-top:1px">2</span>
+              <span style="font-size:14px;line-height:1.45">Votre taux d'épargne est bon. Investissez une partie pour générer des revenus passifs.</span>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start;padding:12px 0">
+              <span style="width:22px;height:22px;border-radius:999px;background:#2F6BE0;color:#FFF;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none;margin-top:1px">3</span>
+              <span style="font-size:14px;line-height:1.45">Maintenez vos dépenses d'investissement — c'est ce qui bâtit le patrimoine.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Vide — premier rapport pas encore généré</span>
+        <div style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#0A1466;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;flex-direction:column">
+          <div style="position:absolute;inset:0;background:url('assets/nuit.jpg') center/cover no-repeat #0A1466"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,10,60,.5) 0%,rgba(6,10,60,.72) 100%)"></div>
+          <div style="position:relative;flex:none;color:#FFF">
+            <div style="height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;font-size:15px;font-weight:600;letter-spacing:-0.01em">
+              <span style="font-variant-numeric:tabular-nums">9:41</span>
+              <span style="display:flex;align-items:center;gap:6px;flex:none;white-space:nowrap"><span style="display:flex;align-items:flex-end;gap:2px;height:11px"><span style="width:3px;height:4px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:6px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:8px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:11px;border-radius:1px;background:#FFF"></span></span><span style="width:14px;height:11px;background:#FFF;clip-path:polygon(50% 100%,0% 32%,20% 14%,50% 5%,80% 14%,100% 32%)"></span><span style="display:flex;align-items:center;gap:1px"><span style="width:23px;height:11px;border-radius:3px;border:1px solid rgba(255,255,255,.55);padding:1px;display:flex"><span style="width:70%;background:#FFF;border-radius:2px"></span></span><span style="width:2px;height:4px;border-radius:0 1px 1px 0;background:rgba(255,255,255,.55)"></span></span></span>
+            </div>
+            <div style="height:56px;display:flex;align-items:center;gap:12px;padding:0 16px">
+              <button type="button" style="width:40px;height:40px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 5 8 12l6.5 7"></path></svg>
+              </button>
+              <span style="flex:1;font-size:19px;font-weight:700;letter-spacing:-0.02em">Rapport</span>
+            </div>
+          </div>
+
+          <div style="position:relative;flex:1;border-radius:28px 28px 0 0;background:#EBEBEF;padding:16px;display:flex;flex-direction:column;gap:16px">
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:12px;padding:0 8px 40px">
+              <span style="width:64px;height:64px;border-radius:20px;background:#FFF;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:center;margin-bottom:4px"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8A8C93" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h9l4 4V20a.5.5 0 0 1-.5.5h-12A.5.5 0 0 1 6 20V3.5Z"></path><path d="M14.5 3.5V8h4.5M9 13h6M9 16.5h4"></path></svg></span>
+              <h3 style="margin:0;font-size:24px;font-weight:600;letter-spacing:-0.024em">Rapport non encore disponible</h3>
+              <p style="margin:0;font-size:15px;line-height:1.5;color:#5A5C63;max-width:290px">Votre premier rapport sera généré à la fin du mois. En attendant, continuez à enregistrer vos transactions pour que l'application puisse analyser votre situation financière.</p>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:8px;background:#FFF;border:1px solid #E2E2E7;border-radius:999px;padding:8px 14px">
+                <span style="width:8px;height:8px;border-radius:999px;background:#1DCF02;animation:swl-pulse 1.6s ease-in-out infinite"></span>
+                <span style="font-size:13px;font-weight:600;color:#5A5C63">Prêt le 30 juin</span>
+              </div>
+            </div>
+            <button type="button" style="flex:none;width:100%;height:52px;border-radius:999px;border:1px solid #D6D7DD;background:#FFF;color:#0A0A0C;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 2.5 4 6l3.5 3.5"></path></svg>Retour aux statistiques
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;align-items:baseline;gap:14px;border-top:1px solid #DCDDE3;padding-top:24px">
+      <span style="font-size:13px;font-weight:600;color:#6E7079">13</span>
+      <h2 style="margin:0;font-size:28px;letter-spacing:-0.026em;font-weight:600">Aides</h2>
+      <span style="font-size:15px;color:#6E7079">Page statique, texte validé repris tel quel</span>
+    </div>
+
+    <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start">
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Introduction et critère 1</span>
+        <div style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#0A1466;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;flex-direction:column">
+          <div style="position:absolute;inset:0;background:url('assets/nuit.jpg') center/cover no-repeat #0A1466"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,10,60,.5) 0%,rgba(6,10,60,.72) 100%)"></div>
+          <div style="position:relative;flex:none;color:#FFF">
+            <div style="height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;font-size:15px;font-weight:600;letter-spacing:-0.01em">
+              <span style="font-variant-numeric:tabular-nums">9:41</span>
+              <span style="display:flex;align-items:center;gap:6px;flex:none;white-space:nowrap"><span style="display:flex;align-items:flex-end;gap:2px;height:11px"><span style="width:3px;height:4px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:6px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:8px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:11px;border-radius:1px;background:#FFF"></span></span><span style="width:14px;height:11px;background:#FFF;clip-path:polygon(50% 100%,0% 32%,20% 14%,50% 5%,80% 14%,100% 32%)"></span><span style="display:flex;align-items:center;gap:1px"><span style="width:23px;height:11px;border-radius:3px;border:1px solid rgba(255,255,255,.55);padding:1px;display:flex"><span style="width:70%;background:#FFF;border-radius:2px"></span></span><span style="width:2px;height:4px;border-radius:0 1px 1px 0;background:rgba(255,255,255,.55)"></span></span></span>
+            </div>
+            <div style="height:56px;display:flex;align-items:center;gap:12px;padding:0 16px">
+              <button type="button" style="width:40px;height:40px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 5 8 12l6.5 7"></path></svg>
+              </button>
+              <span style="flex:1;font-size:19px;font-weight:700;letter-spacing:-0.02em">Aides</span>
+            </div>
+          </div>
+
+          <div style="position:relative;flex:1;border-radius:28px 28px 0 0;background:#EBEBEF;padding:20px 16px 16px;display:flex;flex-direction:column;gap:16px;overflow:hidden">
+            <div style="flex:none;display:flex;flex-direction:column;gap:8px">
+              <h3 style="margin:0;font-size:24px;font-weight:600;letter-spacing:-0.024em;line-height:1.2">Comment fonctionne votre Score Financier ?</h3>
+              <p style="margin:0;font-size:15px;line-height:1.5;color:#5A5C63">Votre score reflète la santé globale de vos finances. Il est calculé à partir de 4 indicateurs clés qui mesurent votre chemin vers l'indépendance financière.</p>
+            </div>
+
+            <div style="flex:none;background:#FFF;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:11px">
+              <div style="display:flex;align-items:center;gap:12px">
+                <span style="width:40px;height:40px;border-radius:12px;background:#00522E;display:flex;align-items:center;justify-content:center;flex:none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17l5-6 4 3 6-8"></path><path d="M15 6h4v4"></path></svg></span>
+                <span style="flex:1;font-size:17px;font-weight:600;letter-spacing:-0.012em">Liberté Financière (40 %)</span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:4px">
+                <span style="font-size:12px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#8A8C93">Qu'est-ce que c'est ?</span>
+                <span style="font-size:14px;line-height:1.5">La Liberté Financière mesure le rapport entre vos revenus passifs et vos dépenses totales. Plus ce ratio est élevé, plus vous êtes proche de pouvoir vivre sans travailler.</span>
+              </div>
+              <div style="border-radius:12px;background:#F4F4F6;padding:12px 14px;font-size:14px;font-weight:600;text-align:center;font-variant-numeric:tabular-nums">Revenus Passifs ÷ Dépenses Totales × 100</div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <span style="font-size:12px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#8A8C93">Exemples</span>
+                <span style="font-size:14px;line-height:1.5;color:#5A5C63">500 F de revenus passifs pour 2 000 F de dépenses : votre Liberté Financière est à 25 %.</span>
+                <span style="font-size:14px;line-height:1.5;color:#5A5C63">2 000 F de revenus passifs pour 2 000 F de dépenses : vous êtes à 100 % — vous pouvez vivre sans travailler.</span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:4px;border-top:1px solid #EDEDF1;padding-top:12px">
+                <span style="font-size:12px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#152BC7">Pour l'améliorer</span>
+                <span style="font-size:14px;line-height:1.5">Développez des revenus passifs : loyers, dividendes, intérêts bancaires, royalties. Réduisez vos dépenses non essentielles — chaque franc économisé augmente votre ratio.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Critères 2 et 3</span>
+        <div style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#EBEBEF;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;flex-direction:column;padding:16px;gap:12px">
+          <div style="flex:none;background:#FFF;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;align-items:center;gap:12px">
+              <span style="width:40px;height:40px;border-radius:12px;background:#152BC7;display:flex;align-items:center;justify-content:center;flex:none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16M7 20V9l5-4 5 4v11M10.5 20v-5h3v5"></path></svg></span>
+              <span style="flex:1;font-size:17px;font-weight:600;letter-spacing:-0.012em">Taux d'Investissement (25 %)</span>
+            </div>
+            <span style="font-size:14px;line-height:1.5">Le Taux d'Investissement mesure la part de vos dépenses qui construisent votre patrimoine plutôt que de simplement disparaître.</span>
+            <div style="border-radius:12px;background:#F4F4F6;padding:12px 14px;font-size:14px;font-weight:600;text-align:center">Montant investi ÷ Dépenses totales × 100</div>
+            <span style="font-size:14px;line-height:1.5;color:#5A5C63">3 000 F de consommation et 1 000 F investis : votre taux est à 25 %. Si vous n'investissez rien, il est à 0 % — votre argent disparaît.</span>
+            <div style="display:flex;flex-direction:column;gap:4px;border-top:1px solid #EDEDF1;padding-top:12px">
+              <span style="font-size:12px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#152BC7">Pour l'améliorer</span>
+              <span style="font-size:14px;line-height:1.5">Privilégiez les dépenses qui gardent de la valeur : formation, outils professionnels, équipements durables.</span>
+            </div>
+          </div>
+
+          <div style="flex:none;background:#FFF;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;align-items:center;gap:12px">
+              <span style="width:40px;height:40px;border-radius:12px;background:#1DA55E;display:flex;align-items:center;justify-content:center;flex:none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a6 6 0 0 1 6-6h5a5 5 0 0 1 5 5v5a2 2 0 0 1-2 2h-2M4 12v6h6"></path><circle cx="16" cy="11" r="1"></circle></svg></span>
+              <span style="flex:1;font-size:17px;font-weight:600;letter-spacing:-0.012em">Taux d'Épargne (25 %)</span>
+            </div>
+            <span style="font-size:14px;line-height:1.5">Le Taux d'Épargne mesure la part de vos revenus que vous mettez de côté chaque mois, au lieu de tout dépenser.</span>
+            <div style="border-radius:12px;background:#F4F4F6;padding:12px 14px;font-size:14px;font-weight:600;text-align:center">(Revenus − Dépenses) ÷ Revenus × 100</div>
+            <span style="font-size:14px;line-height:1.5;color:#5A5C63">3 000 F gagnés et 2 500 F dépensés : vous épargnez 500 F, soit 16 %. Tout dépenser, c'est vivre au jour le jour.</span>
+            <div style="display:flex;flex-direction:column;gap:4px;border-top:1px solid #EDEDF1;padding-top:12px">
+              <span style="font-size:12px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#152BC7">Pour l'améliorer</span>
+              <span style="font-size:14px;line-height:1.5">Fixez-vous un objectif mensuel, même petit — 10 % est excellent pour débuter. Mettez de côté avant de dépenser.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Critère 4, paliers et retour</span>
+        <div style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#EBEBEF;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;flex-direction:column;padding:16px;gap:12px">
+          <div style="flex:none;background:#FFF;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;align-items:center;gap:12px">
+              <span style="width:40px;height:40px;border-radius:12px;background:#0A1466;display:flex;align-items:center;justify-content:center;flex:none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v-7M12 13 7 8M12 13l5-5"></path><circle cx="12" cy="21" r="1"></circle><circle cx="6" cy="7" r="2"></circle><circle cx="18" cy="7" r="2"></circle></svg></span>
+              <span style="flex:1;font-size:17px;font-weight:600;letter-spacing:-0.012em">Diversification des Revenus (10 %)</span>
+            </div>
+            <span style="font-size:14px;line-height:1.5">La Diversification mesure le nombre de sources de revenus actives et distinctes que vous avez. Plus vous avez de sources, plus votre situation est stable.</span>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;align-items:center;gap:10px">
+                <span style="width:26px;height:26px;border-radius:8px;background:rgba(168,0,16,.1);color:#A80010;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none">1</span>
+                <span style="font-size:13px;line-height:1.4;color:#5A5C63">Une seule source : si vous perdez ce job, tout s'effondre.</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px">
+                <span style="width:26px;height:26px;border-radius:8px;background:#F4F4F6;color:#5A5C63;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none">2</span>
+                <span style="font-size:13px;line-height:1.4;color:#5A5C63">Deux sources : vous avez un filet de sécurité.</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px">
+                <span style="width:26px;height:26px;border-radius:8px;background:rgba(0,107,60,.1);color:#006B3C;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none">3</span>
+                <span style="font-size:13px;line-height:1.4;color:#5A5C63">Trois sources ou plus : vous êtes résilient.</span>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px;border-top:1px solid #EDEDF1;padding-top:12px">
+              <span style="font-size:12px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#152BC7">Pour l'améliorer</span>
+              <span style="font-size:14px;line-height:1.5">Développez une deuxième source : freelance, petit commerce, investissement. Visez 2 à 3 sources pour une vraie stabilité.</span>
+            </div>
+          </div>
+
+          <span style="font-size:13px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#6E7079;flex:none">Comment interpréter votre score</span>
+          <div style="flex:none;background:#FFF;border-radius:20px;padding:4px 16px;display:flex;flex-direction:column">
+            <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid #EDEDF1">
+              <span style="width:58px;flex:none;font-size:13px;font-weight:700;color:#A80010;font-variant-numeric:tabular-nums">0–40</span>
+              <div style="flex:1;display:flex;flex-direction:column">
+                <span style="font-size:14px;font-weight:600">Faible</span>
+                <span style="font-size:13px;line-height:1.4;color:#6E7079">Concentrez-vous sur l'épargne et la réduction des dépenses.</span>
+              </div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid #EDEDF1">
+              <span style="width:58px;flex:none;font-size:13px;font-weight:700;color:#5A5C63;font-variant-numeric:tabular-nums">41–60</span>
+              <div style="flex:1;display:flex;flex-direction:column">
+                <span style="font-size:14px;font-weight:600">Moyen</span>
+                <span style="font-size:13px;line-height:1.4;color:#6E7079">Vous êtes sur la bonne voie. Continuez à investir et diversifier.</span>
+              </div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid #EDEDF1">
+              <span style="width:58px;flex:none;font-size:13px;font-weight:700;color:#1DA55E;font-variant-numeric:tabular-nums">61–80</span>
+              <div style="flex:1;display:flex;flex-direction:column">
+                <span style="font-size:14px;font-weight:600">Bon</span>
+                <span style="font-size:13px;line-height:1.4;color:#6E7079">Visez l'indépendance avec les revenus passifs.</span>
+              </div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0">
+              <span style="width:58px;flex:none;font-size:13px;font-weight:700;color:#006B3C;font-variant-numeric:tabular-nums">81–100</span>
+              <div style="flex:1;display:flex;flex-direction:column">
+                <span style="font-size:14px;font-weight:600">Excellent</span>
+                <span style="font-size:13px;line-height:1.4;color:#6E7079">Vous êtes très proche de l'indépendance financière.</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="flex:1"></div>
+
+          <button type="button" style="flex:none;width:100%;height:52px;border-radius:999px;border:1px solid #D6D7DD;background:#FFF;color:#152BC7;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 2.5 4 6l3.5 3.5"></path></svg>Retour au rapport
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</section>
+
+</x-dc>
+</body>
+</html>

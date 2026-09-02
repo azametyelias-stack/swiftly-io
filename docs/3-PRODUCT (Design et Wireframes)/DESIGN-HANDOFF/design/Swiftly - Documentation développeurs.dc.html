@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="page">
+<style>
+  html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  body {
+    margin: 0; background: #F4F4F6; color: #0A0A0C;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 17px; line-height: 1.45; text-wrap: pretty;
+  }
+  a { color: #152BC7; text-decoration: none; }
+  a:hover { color: #0A1466; }
+</style>
+</helmet>
+
+<div style="max-width:1180px;margin:0 auto;padding:0 32px 120px">
+
+  <header style="display:flex;flex-direction:column;gap:36px;padding:88px 0 56px">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:32px;flex-wrap:wrap">
+      <div style="display:flex;flex-direction:column;gap:18px;max-width:660px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:26px;height:26px;border-radius:7px;background:url('assets/nuit.jpg') center/cover no-repeat #0A1466;flex:none"></div>
+          <span style="font-family:Georgia,'Times New Roman',serif;font-size:24px;letter-spacing:-0.01em">Swiftly.io</span>
+        </div>
+        <h1 style="margin:0;font-size:52px;line-height:1.02;letter-spacing:-0.035em;font-weight:600">Documentation système pour les développeurs</h1>
+        <p style="margin:0;font-size:19px;line-height:1.5;color:#5A5C63">Ce document est le contrat d'implémentation de Swiftly.io. Il traduit les dix lots de maquettes validées en jetons nommés, composants avec états, gabarits d'écran et règles de navigation. Chaque valeur y est opposable : si le code diffère de ce document, c'est le code qui a tort.</p>
+      </div>
+      <div style="display:grid;gap:14px;min-width:220px">
+        <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Étape</span><span style="font-size:15px;font-weight:500">5 sur 5 — dernière</span></div>
+        <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Source visuelle</span><span style="font-size:15px;font-weight:500">Lots 1 à 10, validés</span></div>
+        <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Cible</span><span style="font-size:15px;font-weight:500">iOS · Android · Web</span></div>
+        <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Base 375 pt</span><span style="font-size:15px;font-weight:500">iPhone 375 × 812</span></div>
+      </div>
+    </div>
+
+    <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:18px;padding:24px 26px;display:flex;flex-direction:column;gap:14px">
+      <span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Ce qui fait référence, et ce qui n'en fait pas</span>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px">
+        <div style="display:flex;flex-direction:column;gap:8px;border-left:3px solid #006B3C;padding-left:16px">
+          <span style="font-size:15px;font-weight:600">Font foi — les dix lots</span>
+          <span style="font-size:14px;line-height:1.5;color:#5A5C63">Lot 1 Onboarding, Lot 2 Core UI, Lot 3 Transactions, Lot 4 Statistiques, Lot 5 Transactions récurrentes, Lot 6 Projets, Lot 7 Comptes &amp; Notifications, Lot 8 Privacy, Lot 9 Paramètres utilisateur, Lot 10 États système. Plus le design system et la passe de cohérence pour les arbitrages de valeurs.</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;border-left:3px solid #C4C5CC;padding-left:16px">
+          <span style="font-size:15px;font-weight:600">Ne fait pas foi</span>
+          <span style="font-size:14px;line-height:1.5;color:#5A5C63">Le prototype cliquable de l'étape 4 et le fichier « Parking Projets &amp; Comptes ». Le prototype a été construit pour éprouver les règles de flux, avec un rendu simplifié ; il n'est pas une maquette. Le parking porte une géométrie de carte antérieure. Aucun des deux ne doit servir de gabarit visuel.</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section style="padding:56px 0;border-top:1px solid #E3E4E8">
+    <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:12px">
+      <span style="font-size:13px;font-weight:600;color:#8E9099">01</span>
+      <h2 style="margin:0;font-size:32px;letter-spacing:-0.026em;font-weight:600">Jetons de couleur</h2>
+    </div>
+    <p style="margin:0 0 20px;font-size:17px;line-height:1.5;color:#5A5C63;max-width:660px">Un seul jeu de noms, deux jeux de valeurs. Le nom est ce qui apparaît dans le code ; la valeur est résolue par le thème actif. Aucune valeur hexadécimale ne doit être écrite en dur dans un composant.</p>
+
+    <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:16px;padding:18px 22px;margin-bottom:32px;display:flex;flex-direction:column;gap:8px;max-width:820px">
+      <span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Deux arbitrages contre le design system</span>
+      <span style="font-size:14px;line-height:1.5;color:#5A5C63">Le fichier du design system porte encore <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace">#1B3BF5</span> comme bleu et <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace">#F4F4F6</span> comme fond de page. Les dix lots utilisent <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace">#152BC7</span> et <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace">#EBEBEF</span>. C'est le document de référence qui avait dérivé, comme pour le rouge traité à l'étape 2 : la table ci-dessous suit l'usage réel des écrans. Les valeurs sombres viennent de la table de correspondance de l'étape 3, qui remplace le bloc « Surfaces — sombre » du design system.</span>
+    </div>
+
+    <h3 style="margin:0 0 14px;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Table de correspondance clair / sombre</h3>
+    <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:18px;overflow:hidden;margin-bottom:36px">
+      <div style="display:flex;align-items:center;gap:12px;padding:13px 20px;background:#F4F4F6;border-bottom:1px solid #E3E4E8">
+        <span style="font-size:12px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:#6E7079;width:210px;flex:none">Jeton</span>
+        <span style="font-size:12px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:#6E7079;width:170px;flex:none">Clair</span>
+        <span style="font-size:12px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:#6E7079;width:170px;flex:none">Sombre</span>
+        <span style="font-size:12px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:#6E7079;flex:1">Emploi</span>
+      </div>
+      <sc-for list="{{ tokens }}" as="k" hint-placeholder-count="24">
+        <div style="display:flex;align-items:center;gap:12px;padding:11px 20px;border-bottom:1px solid #EDEDF1">
+          <span style="font-size:14px;font-weight:600;font-family:ui-monospace,'SF Mono',Menlo,monospace;width:210px;flex:none">{{ k.name }}</span>
+          <span style="width:170px;flex:none;display:flex;align-items:center;gap:9px">
+            <span style="width:26px;height:26px;border-radius:7px;flex:none;border:1px solid #E3E4E8;background:{{ k.light }}"></span>
+            <span style="font-size:13px;font-family:ui-monospace,'SF Mono',Menlo,monospace;color:#5A5C63">{{ k.light }}</span>
+          </span>
+          <span style="width:170px;flex:none;display:flex;align-items:center;gap:9px">
+            <span style="width:26px;height:26px;border-radius:7px;flex:none;border:1px solid #E3E4E8;background:{{ k.dark }}"></span>
+            <span style="font-size:13px;font-family:ui-monospace,'SF Mono',Menlo,monospace;color:#5A5C63">{{ k.dark }}</span>
+          </span>
+          <span style="font-size:14px;line-height:1.4;color:#5A5C63;flex:1">{{ k.use }}</span>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;margin-bottom:36px">
+      <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:18px;padding:22px 24px;display:flex;flex-direction:column;gap:12px">
+        <span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Les deux verts — règle mécanique</span>
+        <span style="font-size:14px;line-height:1.5;color:#5A5C63">Le choix ne dépend pas du sens mais du fond. Sur fond clair ou blanc : <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-weight:600">#006B3C</span>. Sur encre ou bleu nuit : <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-weight:600">#1DCF02</span>. Aucune autre valeur de vert n'existe dans le produit.</span>
+        <div style="display:flex;gap:10px">
+          <div style="flex:1;background:#FFF;border:1px solid #E2E2E7;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:700;color:#006B3C;font-variant-numeric:tabular-nums">+250 000 F</span><span style="font-size:12px;color:#8A8C93">sur clair</span></div>
+          <div style="flex:1;background:#0A0A0C;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:2px"><span style="font-size:15px;font-weight:700;color:#1DCF02;font-variant-numeric:tabular-nums">+250 000 F</span><span style="font-size:12px;color:#8A8C93">sur encre</span></div>
+        </div>
+      </div>
+      <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:18px;padding:22px 24px;display:flex;flex-direction:column;gap:12px">
+        <span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Retirés — ne pas réintroduire</span>
+        <div style="display:flex;flex-direction:column;gap:9px;font-size:14px">
+          <sc-for list="{{ retired }}" as="r" hint-placeholder-count="4">
+            <div style="display:flex;align-items:center;gap:12px;opacity:.62">
+              <span style="width:26px;height:26px;border-radius:7px;flex:none;background:{{ r.hex }}"></span>
+              <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-weight:600;width:78px;flex:none">{{ r.hex }}</span>
+              <span style="color:#5A5C63;flex:1">{{ r.why }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:18px;padding:22px 24px;display:flex;flex-direction:column;gap:12px">
+        <span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Catégories — teintes fixes</span>
+        <span style="font-size:14px;line-height:1.5;color:#5A5C63">La couleur est attachée à la catégorie, pas à sa position dans une liste. C'est ce qui rend les graphiques lisibles sans légende. Une nouvelle catégorie prend la teinte suivante et la garde.</span>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <sc-for list="{{ cats }}" as="c" hint-placeholder-count="5">
+            <div style="display:flex;align-items:center;gap:11px;font-size:14px">
+              <span style="width:14px;height:14px;border-radius:999px;flex:none;background:{{ c.hex }}"></span>
+              <span style="font-weight:600;flex:1">{{ c.name }}</span>
+              <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;color:#8A8C93;font-size:13px">{{ c.hex }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:#0E1020;border:1px solid #1E2136;border-radius:18px;padding:24px 26px;display:flex;flex-direction:column;gap:12px">
+      <span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#7A7D93">Règle propre au thème sombre</span>
+      <span style="font-size:15px;line-height:1.5;color:#F2F3F8;max-width:820px">La zone d'identité — en-tête du tableau de bord, écrans d'onboarding, cartes bancaires — conserve le dégradé nuit dans les deux thèmes. Elle n'est pas éclaircie en clair ni assombrie en sombre : c'est un plan fixe. Seul le corps de l'application bascule. Les montants posés sur cette zone utilisent donc toujours le vert d'encre, quel que soit le thème actif.</span>
+    </div>
+  </section>
+
+  <section style="padding:56px 0;border-top:1px solid #E3E4E8">
+    <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:12px">
+      <span style="font-size:13px;font-weight:600;color:#8E9099">02</span>
+      <h2 style="margin:0;font-size:32px;letter-spacing:-0.026em;font-weight:600">Typographie, espacement, géométrie</h2>
+    </div>
+    <p style="margin:0 0 32px;font-size:17px;line-height:1.5;color:#5A5C63;max-width:660px">L'échelle est courte volontairement : sept rôles de texte couvrent les dix lots. Tout montant porte <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace">font-variant-numeric: tabular-nums</span> sans exception — c'est ce qui empêche les colonnes de chiffres de danser à la mise à jour.</p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:18px;margin-bottom:24px">
+      <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:18px;overflow:hidden">
+        <div style="padding:13px 20px;background:#F4F4F6;border-bottom:1px solid #E3E4E8"><span style="font-size:12px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:#6E7079">Échelle de texte</span></div>
+        <sc-for list="{{ typeScale }}" as="s" hint-placeholder-count="7">
+          <div style="padding:12px 20px;border-bottom:1px solid #EDEDF1;display:flex;align-items:baseline;gap:12px">
+            <span style="font-size:14px;font-weight:600;width:130px;flex:none">{{ s.role }}</span>
+            <span style="font-size:13px;font-family:ui-monospace,'SF Mono',Menlo,monospace;color:#5A5C63;flex:1">{{ s.spec }}</span>
+            <span style="font-size:13px;color:#8A8C93;flex:none">{{ s.where }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:18px;overflow:hidden">
+        <div style="padding:13px 20px;background:#F4F4F6;border-bottom:1px solid #E3E4E8"><span style="font-size:12px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:#6E7079">Géométrie opposable</span></div>
+        <sc-for list="{{ geometry }}" as="g" hint-placeholder-count="12">
+          <div style="padding:11px 20px;border-bottom:1px solid #EDEDF1;display:flex;align-items:baseline;gap:12px">
+            <span style="font-size:14px;color:#5A5C63;flex:1">{{ g.label }}</span>
+            <span style="font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;flex:none">{{ g.value }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:18px;padding:22px 24px;display:flex;flex-direction:column;gap:12px">
+      <span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Format des montants</span>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px">
+        <sc-for list="{{ formats }}" as="f" hint-placeholder-count="5">
+          <div style="display:flex;flex-direction:column;gap:5px">
+            <span style="font-size:15px;font-weight:600">{{ f.title }}</span>
+            <span style="font-size:20px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-0.02em">{{ f.sample }}</span>
+            <span style="font-size:13px;line-height:1.45;color:#5A5C63">{{ f.rule }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding:56px 0;border-top:1px solid #E3E4E8">
+    <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:12px">
+      <span style="font-size:13px;font-weight:600;color:#8E9099">03</span>
+      <h2 style="margin:0;font-size:32px;letter-spacing:-0.026em;font-weight:600">Composants</h2>
+    </div>
+    <p style="margin:0 0 32px;font-size:17px;line-height:1.5;color:#5A5C63;max-width:660px">Quatorze composants couvrent l'intégralité des dix lots. Pour chacun : où le lire dans les maquettes, ses états, et les valeurs qui ne se négocient pas. Un écran qui semble demander un quinzième composant demande en réalité une variante d'un existant.</p>
+
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <sc-for list="{{ components }}" as="c" hint-placeholder-count="14">
+        <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:18px;padding:22px 24px;display:flex;gap:24px;flex-wrap:wrap">
+          <div style="width:260px;flex:none;display:flex;flex-direction:column;gap:6px">
+            <span style="font-size:18px;font-weight:600;letter-spacing:-0.016em">{{ c.name }}</span>
+            <span style="font-size:13px;color:#8A8C93">{{ c.source }}</span>
+          </div>
+          <div style="flex:1;min-width:260px;display:flex;flex-direction:column;gap:12px">
+            <span style="font-size:15px;line-height:1.5;color:#3A3C42">{{ c.desc }}</span>
+            <div style="display:flex;flex-wrap:wrap;gap:7px">
+              <sc-for list="{{ c.states }}" as="st" hint-placeholder-count="4">
+                <span style="font-size:12px;font-weight:600;letter-spacing:0.02em;color:#3A3C42;background:#EDEDF1;border-radius:6px;padding:5px 9px">{{ st }}</span>
+              </sc-for>
+            </div>
+          </div>
+          <div style="width:270px;flex:none;display:flex;flex-direction:column;gap:6px;border-left:1px solid #EDEDF1;padding-left:20px">
+            <sc-for list="{{ c.specs }}" as="sp" hint-placeholder-count="3">
+              <div style="display:flex;align-items:baseline;gap:10px;font-size:13px">
+                <span style="color:#8A8C93;flex:1">{{ sp.k }}</span>
+                <span style="font-weight:600;font-variant-numeric:tabular-nums;font-family:ui-monospace,'SF Mono',Menlo,monospace;flex:none">{{ sp.v }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="padding:56px 0;border-top:1px solid #E3E4E8">
+    <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:12px">
+      <span style="font-size:13px;font-weight:600;color:#8E9099">04</span>
+      <h2 style="margin:0;font-size:32px;letter-spacing:-0.026em;font-weight:600">Carte des écrans</h2>
+    </div>
+    <p style="margin:0 0 32px;font-size:17px;line-height:1.5;color:#5A5C63;max-width:660px">Chaque ligne relie un écran au lot où le lire, aux composants qui le construisent, et à l'état de la donnée qu'il attend du back-end. C'est la ligne à ouvrir avant d'écrire un écran.</p>
+
+    <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:18px;overflow:hidden">
+      <div style="display:flex;align-items:center;gap:14px;padding:13px 20px;background:#F4F4F6;border-bottom:1px solid #E3E4E8">
+        <span style="font-size:12px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:#6E7079;width:230px;flex:none">Écran</span>
+        <span style="font-size:12px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:#6E7079;width:150px;flex:none">Lot</span>
+        <span style="font-size:12px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:#6E7079;flex:1">Composants</span>
+        <span style="font-size:12px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:#6E7079;width:230px;flex:none">Donnée attendue</span>
+      </div>
+      <sc-for list="{{ screens }}" as="s" hint-placeholder-count="16">
+        <div style="display:flex;align-items:flex-start;gap:14px;padding:13px 20px;border-bottom:1px solid #EDEDF1">
+          <span style="font-size:15px;font-weight:600;width:230px;flex:none">{{ s.name }}</span>
+          <span style="font-size:13px;color:#8A8C93;width:150px;flex:none">{{ s.lot }}</span>
+          <span style="font-size:14px;line-height:1.45;color:#5A5C63;flex:1">{{ s.parts }}</span>
+          <span style="font-size:13px;line-height:1.45;color:#5A5C63;width:230px;flex:none;font-family:ui-monospace,'SF Mono',Menlo,monospace">{{ s.data }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="padding:56px 0;border-top:1px solid #E3E4E8">
+    <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:12px">
+      <span style="font-size:13px;font-weight:600;color:#8E9099">05</span>
+      <h2 style="margin:0;font-size:32px;letter-spacing:-0.026em;font-weight:600">Navigation et règles de flux</h2>
+    </div>
+    <p style="margin:0 0 32px;font-size:17px;line-height:1.5;color:#5A5C63;max-width:660px">Les écrans se rangent en deux niveaux. Le niveau racine s'atteint par le tiroir latéral et affiche l'icône de menu ; tout le reste est un sous-écran et affiche le chevron de retour. Cette distinction décide seule du bouton en haut à gauche.</p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;margin-bottom:24px">
+      <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:18px;padding:22px 24px;display:flex;flex-direction:column;gap:12px">
+        <span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Niveau racine — menu</span>
+        <span style="font-size:14px;line-height:1.5;color:#5A5C63">Tableau de bord, Transactions, Statistiques, Projets, Récurrences, Comptes, Paramètres. Sept entrées, atteignables depuis le tiroir, sans historique entre elles.</span>
+      </div>
+      <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:18px;padding:22px 24px;display:flex;flex-direction:column;gap:12px">
+        <span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Sous-écrans — retour</span>
+        <span style="font-size:14px;line-height:1.5;color:#5A5C63">Détail de projet, formulaires de création, formulaire de transaction, alertes, feuilles modales. Le retour remonte d'un cran dans le flux, jamais au tableau de bord par défaut.</span>
+      </div>
+      <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:18px;padding:22px 24px;display:flex;flex-direction:column;gap:12px">
+        <span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Continuité directionnelle</span>
+        <span style="font-size:14px;line-height:1.5;color:#5A5C63">Ce qui entre par la droite ressort par la droite ; ce qui monte du bas redescend par le bas. Les feuilles modales n'utilisent jamais de transition latérale, et un sous-écran n'apparaît jamais par le bas.</span>
+      </div>
+    </div>
+
+    <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:18px;overflow:hidden">
+      <div style="padding:13px 20px;background:#F4F4F6;border-bottom:1px solid #E3E4E8"><span style="font-size:12px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:#6E7079">Règles métier lisibles dans les maquettes</span></div>
+      <sc-for list="{{ rules }}" as="r" hint-placeholder-count="8">
+        <div style="padding:15px 20px;border-bottom:1px solid #EDEDF1;display:flex;gap:18px;flex-wrap:wrap">
+          <span style="font-size:15px;font-weight:600;width:230px;flex:none">{{ r.title }}</span>
+          <span style="font-size:14px;line-height:1.5;color:#5A5C63;flex:1;min-width:280px">{{ r.body }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="padding:56px 0;border-top:1px solid #E3E4E8">
+    <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:12px">
+      <span style="font-size:13px;font-weight:600;color:#8E9099">06</span>
+      <h2 style="margin:0;font-size:32px;letter-spacing:-0.026em;font-weight:600">Motion</h2>
+    </div>
+    <p style="margin:0 0 32px;font-size:17px;line-height:1.5;color:#5A5C63;max-width:660px">Quatre durées, deux courbes. Le retour visuel d'un appui arrive au contact, pas au relâchement : c'est la différence la plus perceptible entre une interface qui répond et une qui traîne.</p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:24px">
+      <sc-for list="{{ motion }}" as="m" hint-placeholder-count="6">
+        <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:16px;padding:20px 22px;display:flex;flex-direction:column;gap:8px">
+          <span style="font-size:15px;font-weight:600">{{ m.name }}</span>
+          <span style="font-size:22px;font-weight:600;letter-spacing:-0.02em;font-variant-numeric:tabular-nums">{{ m.dur }}</span>
+          <span style="font-size:12px;font-family:ui-monospace,'SF Mono',Menlo,monospace;color:#8A8C93">{{ m.curve }}</span>
+          <span style="font-size:13px;line-height:1.45;color:#5A5C63">{{ m.use }}</span>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:18px;padding:22px 24px;display:flex;flex-direction:column;gap:10px">
+      <span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">Mouvement réduit</span>
+      <span style="font-size:14px;line-height:1.5;color:#5A5C63;max-width:820px">Sous <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace">prefers-reduced-motion</span>, les translations et le tracé progressif de la courbe sont remplacés par un fondu de 120 ms. Les changements d'état — bascule d'interrupteur, sélection de catégorie — restent instantanés et visibles : ils portent de l'information, pas du décor.</span>
+    </div>
+  </section>
+
+  <section style="padding:56px 0;border-top:1px solid #E3E4E8">
+    <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:12px">
+      <span style="font-size:13px;font-weight:600;color:#8E9099">07</span>
+      <h2 style="margin:0;font-size:32px;letter-spacing:-0.026em;font-weight:600">États, vides, erreurs</h2>
+    </div>
+    <p style="margin:0 0 32px;font-size:17px;line-height:1.5;color:#5A5C63;max-width:660px">Le lot 10 fixe ces écrans. Règle générale : aucune liste ne s'affiche jamais vide sans texte, et aucun échec n'est signalé sans une action pour en sortir.</p>
+
+    <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:18px;overflow:hidden">
+      <div style="display:flex;align-items:center;gap:14px;padding:13px 20px;background:#F4F4F6;border-bottom:1px solid #E3E4E8">
+        <span style="font-size:12px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:#6E7079;width:200px;flex:none">Situation</span>
+        <span style="font-size:12px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:#6E7079;flex:1">Traitement</span>
+        <span style="font-size:12px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:#6E7079;width:200px;flex:none">Action offerte</span>
+      </div>
+      <sc-for list="{{ states }}" as="s" hint-placeholder-count="7">
+        <div style="display:flex;align-items:flex-start;gap:14px;padding:14px 20px;border-bottom:1px solid #EDEDF1">
+          <span style="font-size:15px;font-weight:600;width:200px;flex:none">{{ s.name }}</span>
+          <span style="font-size:14px;line-height:1.45;color:#5A5C63;flex:1">{{ s.treat }}</span>
+          <span style="font-size:14px;color:#3A3C42;width:200px;flex:none">{{ s.action }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="padding:56px 0;border-top:1px solid #E3E4E8">
+    <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:12px">
+      <span style="font-size:13px;font-weight:600;color:#8E9099">08</span>
+      <h2 style="margin:0;font-size:32px;letter-spacing:-0.026em;font-weight:600">Accessibilité</h2>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:24px">
+      <sc-for list="{{ a11y }}" as="a" hint-placeholder-count="6">
+        <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:16px;padding:20px 22px;display:flex;flex-direction:column;gap:7px">
+          <span style="font-size:15px;font-weight:600">{{ a.name }}</span>
+          <span style="font-size:14px;line-height:1.5;color:#5A5C63">{{ a.body }}</span>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:18px;padding:22px 24px;display:flex;flex-direction:column;gap:10px">
+      <span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8E9099">La couleur ne porte jamais seule</span>
+      <span style="font-size:14px;line-height:1.5;color:#5A5C63;max-width:820px">Un montant entrant est vert <em>et</em> précédé d'un plus. Une catégorie a sa teinte <em>et</em> son libellé. Une récurrence suspendue a son interrupteur éteint <em>et</em> la mention « suspendue » dans sa ligne de détail. Retirer toute la couleur d'un écran ne doit rien lui faire perdre d'essentiel.</span>
+    </div>
+  </section>
+
+  <section style="padding:56px 0;border-top:1px solid #E3E4E8">
+    <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:12px">
+      <span style="font-size:13px;font-weight:600;color:#8E9099">09</span>
+      <h2 style="margin:0;font-size:32px;letter-spacing:-0.026em;font-weight:600">Ce qui n'est pas décidé</h2>
+    </div>
+    <p style="margin:0 0 28px;font-size:17px;line-height:1.5;color:#5A5C63;max-width:660px">Ces points ne figurent dans aucun lot validé. Ils demandent une décision produit avant d'être écrits, et non une interprétation au moment du développement.</p>
+
+    <div style="background:#FFF;border:1px solid #E3E4E8;border-radius:18px;overflow:hidden">
+      <sc-for list="{{ open }}" as="o" hint-placeholder-count="6">
+        <div style="padding:15px 20px;border-bottom:1px solid #EDEDF1;display:flex;gap:18px;flex-wrap:wrap;align-items:baseline">
+          <span style="font-size:15px;font-weight:600;width:240px;flex:none">{{ o.title }}</span>
+          <span style="font-size:14px;line-height:1.5;color:#5A5C63;flex:1;min-width:280px">{{ o.body }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1244}}">
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      tokens: [
+        { name:'surface/page', light:'#EBEBEF', dark:'#121318', use:'Fond de l\u2019application — jamais de noir pur' },
+        { name:'surface/card', light:'#FFFFFF', dark:'#1C1D23', use:'Cartes de liste, blocs de contenu' },
+        { name:'surface/elev', light:'#FFFFFF', dark:'#25262E', use:'Feuilles modales, tiroir — l\u2019élévation se dit en clarté' },
+        { name:'surface/field', light:'#ECECEF', dark:'#1C1D23', use:'Champs de saisie, pavé numérique' },
+        { name:'surface/divider', light:'#E3E4E8', dark:'#2C2E36', use:'Bordures de carte, séparateurs de section' },
+        { name:'surface/hairline', light:'#EDEDF1', dark:'#2C2E36', use:'Filets intérieurs, badge neutre' },
+        { name:'surface/rail', light:'#E2E2E7', dark:'#383A44', use:'Rails de progression, bordure de champ' },
+        { name:'surface/control-off', light:'#D2D3D9', dark:'#383A44', use:'Interrupteur éteint, bouton secondaire' },
+        { name:'text/primary', light:'#0A0A0C', dark:'#F2F2F5', use:'Montants, titres, libellés de ligne' },
+        { name:'text/secondary', light:'#5A5C63', dark:'#A6A8B4', use:'Descriptions, libellés de champ' },
+        { name:'text/tertiary', light:'#8A8C93', dark:'#7E808C', use:'Horodatages, mentions optionnelles' },
+        { name:'text/quaternary', light:'#C4C5CC', dark:'#5E606C', use:'Chevrons, traits discontinus' },
+        { name:'action/primary', light:'#0A0A0C', dark:'#F2F2F5', use:'Bouton principal — inversion complète' },
+        { name:'action/on-primary', light:'#FFFFFF', dark:'#0A0A0C', use:'Texte du bouton principal' },
+        { name:'brand/deep', light:'#0A1466', dark:'#0A1466', use:'Base du dégradé nuit — invariant' },
+        { name:'brand/accent', light:'#152BC7', dark:'#7C8CFF', use:'Liens, interrupteurs, information' },
+        { name:'semantic/in', light:'#006B3C', dark:'#1DCF02', use:'Revenus, objectifs atteints' },
+        { name:'semantic/in-bg', light:'#E6F4EC', dark:'#1C1D23', use:'Fond de badge « revenu »' },
+        { name:'semantic/out', light:'#A80010', dark:'#FF6166', use:'Dépenses, alertes, destructif' },
+        { name:'semantic/out-bg', light:'#FBEAEA', dark:'#1C1D23', use:'Fond de badge « dépense »' },
+        { name:'semantic/warn', light:'#F5A524', dark:'#F5A524', use:'Barres de budget, seuil dépassé' },
+        { name:'semantic/warn-text', light:'#8A5A00', dark:'#F5A524', use:'Pourcentage en alerte' },
+        { name:'ink/surface', light:'#0A0A0C', dark:'#0A0A0C', use:'Zone d\u2019identité, toast — invariant' },
+        { name:'ink/on-surface', light:'#FFFFFF', dark:'#FFFFFF', use:'Texte sur encre — invariant' }
+      ],
+      retired: [
+        { hex:'#12B76A', why:'Troisième vert, sans emploi propre' },
+        { hex:'#0A5C2E', why:'Quatrième vert, texte de confirmation' },
+        { hex:'#E5352B', why:'Rouge du design system, jamais utilisé dans les lots' },
+        { hex:'#EDEDF1', why:'Interdit comme rail — reste un filet' },
+        { hex:'#1B3BF5', why:'Bleu du design system — les lots utilisent #152BC7' },
+        { hex:'#F4F4F6', why:'Fond des planches de documentation, pas un jeton produit' }
+      ],
+      cats: [
+        { name:'Loisirs', hex:'#152BC7' },
+        { name:'Alimentation', hex:'#29ABE2' },
+        { name:'Transport', hex:'#A3121A' },
+        { name:'Salaire', hex:'#006B3C' },
+        { name:'Loyer', hex:'#F5A524' }
+      ],
+      typeScale: [
+        { role:'Solde', spec:'34 / 1.02 · 700 · −0.03em', where:'Tableau de bord' },
+        { role:'Montant saisi', spec:'44 / 1.05 · 700 · −0.035em', where:'Pavé numérique' },
+        { role:'Titre d\u2019écran', spec:'19 / 1.2 · 700 · −0.02em', where:'Barre de navigation' },
+        { role:'Titre de section', spec:'17 / 1.3 · 700 · −0.012em', where:'Carte de liste' },
+        { role:'Corps', spec:'15 / 1.45 · 400–600', where:'Descriptions, rangées' },
+        { role:'Secondaire', spec:'13 / 1.45 · 400–600', where:'Sous-titres, montants annexes' },
+        { role:'Étiquette', spec:'11 / 1.2 · 700 · 0.04em · caps', where:'Badges, en-têtes' }
+      ],
+      geometry: [
+        { label:'Carte de liste — radius', value:'20' },
+        { label:'Carte de liste — padding', value:'16' },
+        { label:'Bloc de contenu — radius', value:'18' },
+        { label:'Feuille modale — radius haut', value:'24' },
+        { label:'Zone de contenu — radius haut', value:'28' },
+        { label:'Icône de carte', value:'48 · radius 14' },
+        { label:'Icône ↔ texte', value:'16' },
+        { label:'Entre cartes', value:'12' },
+        { label:'Marge d\u2019écran', value:'16' },
+        { label:'Trait SVG', value:'1,7 px' },
+        { label:'Rail de progression', value:'8 · radius 999' },
+        { label:'Sélecteur · bouton', value:'48 · 52' },
+        { label:'Bouton principal', value:'56 · radius 999' },
+        { label:'Rangée de paramètre', value:'56' },
+        { label:'Interrupteur', value:'50 × 30 · pastille 24' },
+        { label:'Cible tactile minimale', value:'44' }
+      ],
+      formats: [
+        { title:'Séparateur de milliers', sample:'250 000 F', rule:'Espace fine insécable U+2009. Jamais de virgule, jamais de point.' },
+        { title:'Entrant', sample:'+67 000 F', rule:'Signe plus explicite, semantic/in.' },
+        { title:'Sortant', sample:'\u221232 200 F', rule:'Signe moins typographique U+2212, semantic/out.' },
+        { title:'Solde neutre', sample:'343 100 F', rule:'Sans signe. Le moins n\u2019apparaît que si le solde est négatif.' },
+        { title:'Masqué — mode privacy', sample:'\u2022\u2022 \u2022\u2022\u2022', rule:'Deux puces, espace, trois puces. Longueur fixe quel que soit le montant.' },
+        { title:'Devise', sample:'F · \u20ac · $', rule:'Suffixe séparé par une espace normale, jamais collé au chiffre.' }
+      ],
+      components: [
+        { name:'Barre de navigation', source:'Lot 2 — toutes les vues', desc:'Titre centré, bouton circulaire de 40 à gauche, cloche à droite avec pastille d\u2019alerte. Le bouton gauche est le menu au niveau racine, le chevron de retour ailleurs.',
+          states:['Racine','Sous-écran','Alertes non lues','Sans alerte'],
+          specs:[{k:'Hauteur',v:'56'},{k:'Bouton',v:'40 · radius 999'},{k:'Pastille',v:'8 · semantic/out'}] },
+        { name:'Carte de solde', source:'Lot 2 — tableau de bord', desc:'Solde, delta signé contre la veille, sélecteur de compte et \u0153il de masquage. Posée sur le dégradé nuit, donc toujours en vert d\u2019encre.',
+          states:['Positif','Négatif','Masqué','Compte alternatif'],
+          specs:[{k:'Solde',v:'34 · 700'},{k:'Delta',v:'13 · 600'},{k:'Fond',v:'nuit — invariant'}] },
+        { name:'Courbe de solde', source:'Lot 2, Lot 4', desc:'Aire dégradée sous une ligne de 2,6 px, point terminal à double cercle. Trois lignes de repère discontinues, une ligne de base pleine, trois graduations horaires.',
+          states:['Tracé initial','Mise à jour','Sans donnée'],
+          specs:[{k:'Hauteur',v:'150'},{k:'Ligne',v:'2,6 px'},{k:'Point',v:'r 5 + halo r 10'}] },
+        { name:'Carte de liste', source:'Lot 3, Lot 5, Lot 6, Lot 7', desc:'Le composant le plus réutilisé du produit. Icône carrée, titre, sous-titre, badge optionnel, valeur alignée à droite. Variante à barre de progression pour les budgets et les projets.',
+          states:['Simple','Avec badge','Avec progression','Pressée','Suspendue'],
+          specs:[{k:'Radius · padding',v:'20 · 16'},{k:'Icône',v:'48 · radius 14'},{k:'Gouttière',v:'16'}] },
+        { name:'Badge de type', source:'Lot 3', desc:'Étiquette en capitales indiquant dépense ou revenu. Couleur et fond appariés par le jeu semantic.',
+          states:['Dépense','Revenu','Neutre'],
+          specs:[{k:'Texte',v:'11 · 700 · caps'},{k:'Radius',v:'6'},{k:'Padding',v:'3 / 7'}] },
+        { name:'Bouton principal', source:'Lot 1, Lot 2, Lot 6', desc:'Deux traitements : verre poli sur fond nuit — dégradé blanc à cinq arrêts et double ombre interne — et encre plate sur fond clair. Le pressé descend à 0,975 en 160 ms.',
+          states:['Actif','Pressé','Désactivé','Sur nuit','Sur clair'],
+          specs:[{k:'Hauteur',v:'56'},{k:'Radius',v:'999'},{k:'Pressé',v:'scale 0.975'}] },
+        { name:'Pilule de filtre', source:'Lot 3, Lot 4', desc:'Rangée horizontale de sélecteurs exclusifs. La pilule active prend l\u2019encre pleine, les inactives la carte bordée.',
+          states:['Active','Inactive','Pressée'],
+          specs:[{k:'Hauteur',v:'36'},{k:'Radius',v:'999'},{k:'Padding',v:'0 / 14'}] },
+        { name:'Pavé numérique', source:'Lot 3 — saisie de montant', desc:'Grille de trois colonnes, douze touches, la touche 000 et le retour arrière en dernière rangée. Le montant se met à jour au contact, avec le solde projeté sous le chiffre.',
+          states:['Vide','En saisie','Longueur maximale','Retour arrière'],
+          specs:[{k:'Touche',v:'radius 16 · 22 px'},{k:'Gouttière',v:'8'},{k:'Maximum',v:'9 chiffres'}] },
+        { name:'Interrupteur', source:'Lot 5, Lot 8, Lot 9', desc:'Pastille blanche sur piste colorée. Allumé prend semantic/in, éteint surface/control-off. La transition porte sur la position de la pastille uniquement.',
+          states:['Allumé','Éteint','En transition'],
+          specs:[{k:'Piste',v:'50 × 30'},{k:'Pastille',v:'24'},{k:'Course',v:'3 → 23'}] },
+        { name:'Rangée de paramètre', source:'Lot 9', desc:'Libellé, note explicative sous le libellé, contrôle à droite — interrupteur, valeur textuelle ou chevron. Les rangées s\u2019empilent dans un bloc unique séparé par des filets.',
+          states:['Avec interrupteur','Avec valeur','Navigante','Dernière de bloc'],
+          specs:[{k:'Hauteur',v:'56'},{k:'Filet',v:'surface/hairline'},{k:'Chevron',v:'16 · text/quaternary'}] },
+        { name:'Barre de progression', source:'Lot 4, Lot 6', desc:'Rail plein de 8 px, remplissage aux extrémités arrondies. La couleur suit le seuil : vert sous 75 %, ambre de 75 à 99 %, rouge au-delà de 100 % pour un budget.',
+          states:['Sous seuil','En alerte','Dépassée','À zéro','Complète'],
+          specs:[{k:'Hauteur',v:'8'},{k:'Rail',v:'surface/rail'},{k:'Seuils',v:'75 % · 100 %'}] },
+        { name:'Feuille modale', source:'Lot 7, Lot 9', desc:'Monte du bas sur un voile sombre, coins hauts à 24. Sert au choix de devise, au choix de compte et aux confirmations. Le voile ferme au tap.',
+          states:['Ouverte','Fermeture','Voile tapé'],
+          specs:[{k:'Radius haut',v:'24'},{k:'Voile',v:'rgba(4,6,30,.5)'},{k:'Entrée',v:'280 ms'}] },
+        { name:'Tiroir latéral', source:'Lot 2 — menu', desc:'Panneau de 300 entrant par la gauche, huit entrées de navigation, bascule de thème en pied. L\u2019entrée active porte le fond de carte.',
+          states:['Ouvert','Entrée active','Fermeture'],
+          specs:[{k:'Largeur',v:'300'},{k:'Entrée',v:'48 · radius 14'},{k:'Animation',v:'260 ms'}] },
+        { name:'Toast', source:'Lot 10', desc:'Bandeau ancré à 24 du bas, coche verte et texte court. Confirme une écriture réussie. Se retire seul après 2,6 s, jamais bloquant.',
+          states:['Succès','Information','Sortie'],
+          specs:[{k:'Radius',v:'16'},{k:'Fond',v:'ink/surface'},{k:'Durée',v:'2 600 ms'}] }
+      ],
+      screens: [
+        { name:'Splash et bienvenue', lot:'Lot 1', parts:'Dégradé nuit, logotype, bouton verre poli', data:'—' },
+        { name:'Inscription — nom', lot:'Lot 1', parts:'Champ sur nuit, indicateur de progression', data:'user.name' },
+        { name:'Inscription — solde', lot:'Lot 1', parts:'Champ de montant, présélections', data:'account.base' },
+        { name:'Inscription — devise', lot:'Lot 1', parts:'Sélecteurs à coche', data:'user.currency' },
+        { name:'Vérification OTP', lot:'Lot 1', parts:'Cases de code, bandeau de succès', data:'auth.otp' },
+        { name:'Tableau de bord', lot:'Lot 2', parts:'Barre de navigation, carte de solde, courbe, bandeau d\u2019objectif, trois dernières lignes', data:'balance, tx[0..2], goal' },
+        { name:'Liste de transactions', lot:'Lot 3', parts:'Pilules de filtre, cartes de liste, badge de type', data:'tx[], filter' },
+        { name:'Saisie de montant', lot:'Lot 3', parts:'Bascule dépense/revenu, pavé, solde projeté', data:'draft.amount, draft.kind' },
+        { name:'Choix de catégorie', lot:'Lot 3', parts:'Liste à coche, teintes de catégorie', data:'categories[]' },
+        { name:'Note et validation', lot:'Lot 3', parts:'Récapitulatif, champ de note, bascule récurrence', data:'draft.*' },
+        { name:'Statistiques', lot:'Lot 4', parts:'Total du mois, barres par catégorie', data:'aggregates.byCategory' },
+        { name:'Récurrences', lot:'Lot 5', parts:'Cartes de liste, interrupteurs, suppression', data:'recurring[]' },
+        { name:'Nouvelle récurrence', lot:'Lot 5', parts:'Champs, pilules de fréquence', data:'recurring.draft' },
+        { name:'Projets', lot:'Lot 6', parts:'Cartes à progression, bouton d\u2019ajout', data:'projects[]' },
+        { name:'Détail de projet', lot:'Lot 6', parts:'Progression, affectations, suppression', data:'project.saved' },
+        { name:'Comptes', lot:'Lot 7', parts:'Cartes de compte, sélection active', data:'accounts[]' },
+        { name:'Notifications', lot:'Lot 7', parts:'Cartes à pastille de non-lu', data:'alerts[]' },
+        { name:'Mode privacy', lot:'Lot 8', parts:'Montants masqués sur tous les écrans', data:'settings.privacy' },
+        { name:'Paramètres', lot:'Lot 9', parts:'En-tête de profil, rangées, déconnexion', data:'user, settings' },
+        { name:'États système', lot:'Lot 10', parts:'Chargement, vide, erreur, hors ligne, toasts', data:'—' }
+      ],
+      rules: [
+        { title:'Un seul solde', body:'Solde disponible = base du compte + revenus \u2212 dépenses \u2212 montants affectés aux projets. Aucun écran ne recalcule autrement, et aucun écran n\u2019affiche un solde qui ne vient pas de ce calcul.' },
+        { title:'Affecter à un projet', body:'Retire le montant du solde disponible sans créer de transaction. Si le solde est inférieur au montant, l\u2019action est refusée avec le message « Solde insuffisant » — jamais un solde négatif.' },
+        { title:'Suspendre ou supprimer', body:'L\u2019interrupteur d\u2019une récurrence la suspend sans perdre son historique ; la corbeille la supprime définitivement. Les deux gestes sont distincts et ne partagent pas de confirmation.' },
+        { title:'Récurrence depuis une transaction', body:'La bascule du troisième temps du formulaire crée l\u2019entrée dans la liste des récurrences en plus de la transaction. Fréquence mensuelle par défaut.' },
+        { title:'Mode privacy', body:'Un seul indicateur traverse toute l\u2019application. Aucun écran n\u2019a de masquage local, et le mode survit au changement d\u2019écran comme au changement de thème.' },
+        { title:'Changement de devise', body:'Change le symbole affiché, pas la valeur stockée. Aucune conversion n\u2019est appliquée : les maquettes ne décrivent pas de taux.' },
+        { title:'Catégorie et type', body:'Une catégorie appartient à un type. Basculer de dépense à revenu vide la catégorie choisie plutôt que de conserver un couple invalide.' },
+        { title:'Validation minimale', body:'Nom : deux caractères. Montant : strictement supérieur à zéro. Cible de projet : renseignée. Le bouton de continuation reste visible mais grisé, et l\u2019appui explique ce qui manque.' }
+      ],
+      motion: [
+        { name:'Réponse au contact', dur:'120 ms', curve:'ease-out', use:'Enfoncement d\u2019une touche du pavé, sélection d\u2019une pilule.' },
+        { name:'Bascule', dur:'180 ms', curve:'cubic-bezier(.23,1,.32,1)', use:'Pastille d\u2019interrupteur, changement de coche.' },
+        { name:'Pression de bouton', dur:'160 ms', curve:'cubic-bezier(.23,1,.32,1)', use:'Descente à 0,975 du bouton principal.' },
+        { name:'Feuille modale', dur:'280 ms', curve:'cubic-bezier(.32,.72,0,1)', use:'Montée depuis le bas, voile en fondu de 200 ms.' },
+        { name:'Tiroir latéral', dur:'260 ms', curve:'cubic-bezier(.32,.72,0,1)', use:'Entrée par la gauche.' },
+        { name:'Tracé de courbe', dur:'1 200 ms', curve:'cubic-bezier(.32,.72,0,1)', use:'Dessin progressif de la ligne de solde à l\u2019ouverture.' }
+      ],
+      states: [
+        { name:'Chargement', treat:'Squelettes aux dimensions réelles du contenu attendu, pulsation d\u2019opacité de 1 à 0,45. Jamais de rotateur centré.', action:'Aucune' },
+        { name:'Liste vide', treat:'Titre court et une phrase expliquant ce qui remplira la liste. Centré, sans illustration.', action:'Bouton de création' },
+        { name:'Filtre sans résultat', treat:'Distinct de la liste vide : la liste contient des éléments, le filtre n\u2019en retient aucun.', action:'Retour à « Tout »' },
+        { name:'Erreur réseau', treat:'Bandeau non bloquant en haut de la zone de contenu, semantic/out. Les données en cache restent visibles.', action:'Réessayer' },
+        { name:'Hors ligne', treat:'Bandeau persistant. Les écritures sont mises en file et signalées comme en attente.', action:'Aucune — automatique' },
+        { name:'Écriture refusée', treat:'Toast en encre avec la raison. L\u2019écran reste en place et les valeurs saisies sont conservées.', action:'Corriger sur place' },
+        { name:'Écriture réussie', treat:'Toast de confirmation et retour à l\u2019écran d\u2019origine dans le même geste.', action:'Aucune' }
+      ],
+      a11y: [
+        { name:'Contraste', body:'Toutes les paires texte-fond des deux thèmes passent AA. Les deux verts existent précisément pour tenir ce seuil sur leur fond respectif.' },
+        { name:'Cibles tactiles', body:'44 px minimum dans toutes les directions. Les boutons de 40 de la barre de navigation portent une zone d\u2019appui étendue.' },
+        { name:'Dynamic Type', body:'L\u2019échelle suit la taille système jusqu\u2019à 200 %. Les cartes de liste passent en deux lignes plutôt que de tronquer le libellé.' },
+        { name:'Focus clavier', body:'Anneau de 2 px en brand/accent avec 2 px de retrait, sur le Web et sur les claviers externes iPadOS.' },
+        { name:'Lecteur d\u2019écran', body:'Les montants sont annoncés en entier avec leur devise et leur sens : « plus 67 000 francs CFA, revenu ». Les puces du mode privacy sont annoncées « montant masqué ».' },
+        { name:'Mouvement réduit', body:'Translations et tracé progressif remplacés par un fondu de 120 ms. Les changements d\u2019état restent instantanés.' }
+      ],
+      open: [
+        { title:'Conversion de devise', body:'Le changement de devise modifie le symbole sans convertir. Aucun taux, aucune source de taux, aucun arrondi n\u2019est décrit dans les lots.' },
+        { title:'Prélèvement des récurrences', body:'Les maquettes montrent la liste et ses états, pas le moment d\u2019exécution — à l\u2019ouverture de l\u2019application, à date fixe, ou côté serveur.' },
+        { title:'Récurrence en retard', body:'Aucun écran ne montre une récurrence dont l\u2019échéance est passée sans prélèvement.' },
+        { title:'Multi-comptes et transactions', body:'Le sélecteur de compte existe, mais aucun lot ne montre le rattachement d\u2019une transaction à un compte autre que l\u2019actif.' },
+        { title:'Transfert entre comptes', body:'Ni écran ni geste. Ce n\u2019est ni une dépense ni un revenu, donc hors du modèle actuel.' },
+        { title:'Modification et historique', body:'Les lots couvrent la création et la suppression. Modifier une transaction existante, et ce qu\u2019il advient des soldes passés, reste à décider.' },
+        { title:'Seuils de budget', body:'Les seuils 75 % et 100 % sont lus dans les maquettes du lot 4. Leur configurabilité par l\u2019utilisateur n\u2019est pas décrite.' },
+        { title:'Suppression de compte', body:'La déconnexion est maquettée, la suppression définitive du compte et l\u2019export des données ne le sont pas.' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

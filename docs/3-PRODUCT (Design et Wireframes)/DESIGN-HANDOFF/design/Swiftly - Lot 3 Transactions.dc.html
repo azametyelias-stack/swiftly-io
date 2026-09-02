@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<style>
+  html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  body {
+    margin: 0; background: #F4F4F6; color: #0A0A0C;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 17px; line-height: 1.45; text-wrap: pretty;
+  }
+  a { color: #1B3BF5; text-decoration: none; }
+  a:hover { color: #0A1466; }
+  @keyframes swl-pulse { 0%,100% { opacity: .5 } 50% { opacity: .85 } }
+</style>
+</helmet>
+
+<section style="padding:56px 48px 96px;display:flex;flex-direction:column;gap:40px">
+
+  <div id="1a" style="display:flex;flex-direction:column;gap:24px;max-width:820px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#FFF;background:#0A0A0C;border-radius:6px;padding:5px 9px">1a</span>
+      <span style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#6E7079">Lot 3 — Transactions · écrans 06 à 10</span>
+    </div>
+    <h1 style="margin:0;font-size:44px;line-height:1.04;letter-spacing:-0.035em;font-weight:600">Une seule feuille, trois formulaires</h1>
+    <p style="margin:0;font-size:19px;line-height:1.5;color:#5A5C63;max-width:680px">Dépense, revenu et transfert ne sont pas trois écrans : c'est un même gabarit de feuille modale, une même rangée de champs, une même paire de boutons. Ce qui change d'un flux à l'autre, ce sont les libellés, les catégories et le nombre d'étapes. L'historique et le détail réutilisent la ligne de transaction décidée au lot 2.</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(236px,1fr));gap:12px;max-width:1180px">
+    <div style="background:#FFF;border:1px solid #DCDDE3;border-radius:16px;padding:20px 22px;display:flex;flex-direction:column;gap:6px">
+      <span style="font-size:13px;font-weight:600;color:#1B3BF5">Feuille 28, champ 14</span>
+      <span style="font-size:15px;line-height:1.4;color:#5A5C63">La feuille modale reprend le rayon de la feuille du dashboard (28). Tout contrôle de saisie est à 14, tout bouton à 999. Trois rayons pour tout le lot.</span>
+    </div>
+    <div style="background:#FFF;border:1px solid #DCDDE3;border-radius:16px;padding:20px 22px;display:flex;flex-direction:column;gap:6px">
+      <span style="font-size:13px;font-weight:600;color:#1B3BF5">Un champ = 3 hauteurs</span>
+      <span style="font-size:15px;line-height:1.4;color:#5A5C63">Sélecteur 52, choix 48, montant 64. Le montant est le seul champ qui grossit, parce que c'est la seule valeur que l'utilisateur relit avant de valider.</span>
+    </div>
+    <div style="background:#FFF;border:1px solid #DCDDE3;border-radius:16px;padding:20px 22px;display:flex;flex-direction:column;gap:6px">
+      <span style="font-size:13px;font-weight:600;color:#1B3BF5">Sélection = bleu plein</span>
+      <span style="font-size:15px;line-height:1.4;color:#5A5C63">Un état sélectionné, une seule expression : fond #152BC7, liseré clair, halo bleu. Jamais une bordure seule, jamais une coche en plus.</span>
+    </div>
+    <div style="background:#FFF;border:1px solid #DCDDE3;border-radius:16px;padding:20px 22px;display:flex;flex-direction:column;gap:6px">
+      <span style="font-size:13px;font-weight:600;color:#1B3BF5">Progression en bas</span>
+      <span style="font-size:15px;line-height:1.4;color:#5A5C63">Points d'étape juste au-dessus des boutons : la position et l'action se lisent d'un même coup d'œil, au pouce.</span>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;align-items:baseline;gap:14px;border-top:1px solid #DCDDE3;padding-top:24px">
+      <span style="font-size:13px;font-weight:600;color:#6E7079">06</span>
+      <h2 style="margin:0;font-size:28px;letter-spacing:-0.026em;font-weight:600">Historiques</h2>
+      <span style="font-size:15px;color:#6E7079">Groupement par période, filtre et tri, suppression par swipe</span>
+    </div>
+
+    <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start">
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Défaut — liste groupée</span>
+        <div style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#0A1466;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;flex-direction:column">
+          <div style="position:absolute;inset:0;background:url('assets/nuit.jpg') center/cover no-repeat #0A1466"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,10,60,.5) 0%,rgba(6,10,60,.7) 100%)"></div>
+
+          <div style="position:relative;flex:none;color:#FFF">
+            <div style="height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;font-size:15px;font-weight:600;letter-spacing:-0.01em">
+              <span style="font-variant-numeric:tabular-nums">9:41</span>
+              <span style="display:flex;align-items:center;gap:6px;flex:none;white-space:nowrap"><span style="display:flex;align-items:flex-end;gap:2px;height:11px"><span style="width:3px;height:4px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:6px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:8px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:11px;border-radius:1px;background:#FFF"></span></span><span style="width:14px;height:11px;background:#FFF;clip-path:polygon(50% 100%,0% 32%,20% 14%,50% 5%,80% 14%,100% 32%)"></span><span style="display:flex;align-items:center;gap:1px"><span style="width:23px;height:11px;border-radius:3px;border:1px solid rgba(255,255,255,.55);padding:1px;display:flex"><span style="width:70%;background:#FFF;border-radius:2px"></span></span><span style="width:2px;height:4px;border-radius:0 1px 1px 0;background:rgba(255,255,255,.55)"></span></span></span>
+            </div>
+            <div style="height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px">
+              <button type="button" style="width:40px;height:40px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none" style-active="background:rgba(255,255,255,.24)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 5 8 12l6.5 7"></path></svg>
+              </button>
+              <span style="font-size:19px;font-weight:700;letter-spacing:-0.02em">Historiques</span>
+              <button type="button" style="width:40px;height:40px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none" style-active="background:rgba(255,255,255,.24)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"></path></svg>
+              </button>
+            </div>
+          </div>
+
+          <div style="position:relative;flex:1;border-radius:28px 28px 0 0;background:#EBEBEF;padding:16px 16px 96px;display:flex;flex-direction:column;gap:12px;overflow:hidden">
+            <div style="display:flex;gap:12px;flex:none">
+              <div style="flex:1;height:48px;border-radius:14px;background:#FFF;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-size:15px;font-weight:600;letter-spacing:-0.006em">
+                Tout
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#0A0A0C" stroke-width="1.8" stroke-linecap="round"><path d="M2.5 4.5 6 8l3.5-3.5"></path></svg>
+              </div>
+              <div style="flex:1;height:48px;border-radius:14px;background:#FFF;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-size:15px;font-weight:600;letter-spacing:-0.006em">
+                Récent
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#0A0A0C" stroke-width="1.8" stroke-linecap="round"><path d="M2.5 4.5 6 8l3.5-3.5"></path></svg>
+              </div>
+            </div>
+
+            <span style="font-size:15px;font-weight:700;letter-spacing:-0.008em;flex:none">Aujourd'hui</span>
+
+            <div style="flex:none;background:#FFF;border-radius:20px;padding:8px 16px;display:flex;flex-direction:column">
+              <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #EDEDF1">
+                <span style="width:44px;height:44px;border-radius:14px;background:#0A0A0C;display:flex;align-items:center;justify-content:center;flex:none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 7.5l9 9M16.5 9v7.5H9"></path></svg></span>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+                  <span style="font-size:15px;font-weight:600;letter-spacing:-0.008em">Alimentation</span>
+                  <span style="font-size:13px;color:#6E7079">Aujourd'hui, 9 h 37</span>
+                  <span style="font-size:13px;color:#6E7079;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Spaghetti rouge</span>
+                </div>
+                <div style="flex:none;display:flex;flex-direction:column;align-items:flex-end">
+                  <span style="font-size:15px;font-weight:700;color:#A80010;font-variant-numeric:tabular-nums">−1 500 F</span>
+                  <span style="font-size:11px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#8A8C93">Dépense</span>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #EDEDF1">
+                <span style="width:44px;height:44px;border-radius:14px;background:#0A0A0C;display:flex;align-items:center;justify-content:center;flex:none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 7.5l9 9M16.5 9v7.5H9"></path></svg></span>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+                  <span style="font-size:15px;font-weight:600;letter-spacing:-0.008em">Transport</span>
+                  <span style="font-size:13px;color:#6E7079">Aujourd'hui, 8 h 04</span>
+                  <span style="font-size:13px;color:#6E7079;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Zémidjan</span>
+                </div>
+                <div style="flex:none;display:flex;flex-direction:column;align-items:flex-end">
+                  <span style="font-size:15px;font-weight:700;color:#A80010;font-variant-numeric:tabular-nums">−600 F</span>
+                  <span style="font-size:11px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#8A8C93">Dépense</span>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;padding:10px 0">
+                <span style="width:44px;height:44px;border-radius:14px;background:#0A0A0C;display:flex;align-items:center;justify-content:center;flex:none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 16.5l-9-9M7.5 15V7.5H15"></path></svg></span>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+                  <span style="font-size:15px;font-weight:600;letter-spacing:-0.008em">Main d'œuvre</span>
+                  <span style="font-size:13px;color:#6E7079">Aujourd'hui, 6 h 37</span>
+                  <span style="font-size:13px;color:#6E7079;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Création d'affiche pour…</span>
+                </div>
+                <div style="flex:none;display:flex;flex-direction:column;align-items:flex-end">
+                  <span style="font-size:15px;font-weight:700;color:#006B3C;font-variant-numeric:tabular-nums">+7 000 F</span>
+                  <span style="font-size:11px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#8A8C93">Revenu</span>
+                </div>
+              </div>
+            </div>
+
+            <span style="font-size:15px;font-weight:700;letter-spacing:-0.008em;flex:none">Hier</span>
+
+            <div style="flex:none;background:#FFF;border-radius:20px;padding:8px 16px;display:flex;flex-direction:column">
+              <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #EDEDF1">
+                <span style="width:44px;height:44px;border-radius:14px;background:#0A0A0C;display:flex;align-items:center;justify-content:center;flex:none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 7.5l9 9M16.5 9v7.5H9"></path></svg></span>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+                  <span style="font-size:15px;font-weight:600;letter-spacing:-0.008em">Alimentation</span>
+                  <span style="font-size:13px;color:#6E7079">Hier, 19 h 07</span>
+                  <span style="font-size:13px;color:#6E7079;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Couscous</span>
+                </div>
+                <div style="flex:none;display:flex;flex-direction:column;align-items:flex-end">
+                  <span style="font-size:15px;font-weight:700;color:#A80010;font-variant-numeric:tabular-nums">−500 F</span>
+                  <span style="font-size:11px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#8A8C93">Dépense</span>
+                </div>
+              </div>
+              
+              <div style="display:flex;align-items:center;gap:12px;padding:10px 0">
+                <span style="width:44px;height:44px;border-radius:14px;background:#0A0A0C;display:flex;align-items:center;justify-content:center;flex:none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 9h13l-3.2-3.2M19.5 15h-13l3.2 3.2"></path></svg></span>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+                  <span style="font-size:15px;font-weight:600;letter-spacing:-0.008em">Crédit internet</span>
+                  <span style="font-size:13px;color:#6E7079">Hier, 8 h 04</span>
+                  <span style="font-size:13px;color:#6E7079;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Cash → Mobile</span>
+                </div>
+                <div style="flex:none;display:flex;flex-direction:column;align-items:flex-end">
+                  <span style="font-size:15px;font-weight:700;color:#0A0A0C;font-variant-numeric:tabular-nums">1 000 F</span>
+                  <span style="font-size:11px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#8A8C93">Transfert</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="position:absolute;left:0;right:0;bottom:0;padding:12px 16px 20px;background:linear-gradient(180deg,rgba(235,235,239,0) 0%,#EBEBEF 42%)">
+            <button type="button" style="width:100%;border:0;height:56px;border-radius:999px;cursor:pointer;color:#FFF;font-family:inherit;font-size:17px;font-weight:600;letter-spacing:-0.008em;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(180deg,#33343C 0%,#16171D 46%,#05060A 58%,#20212A 100%);box-shadow:inset 0 1.5px 1px rgba(255,255,255,.4),inset 0 -8px 12px -6px rgba(255,255,255,.16),0 3px 8px rgba(4,6,30,.26),0 12px 26px -8px rgba(4,6,30,.46);transition:transform 160ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.975)">
+              <span style="font-size:20px;font-weight:400;line-height:1">+</span>Nouvelle transaction
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Vide — aucune transaction</span>
+        <div style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#0A1466;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;flex-direction:column">
+          <div style="position:absolute;inset:0;background:url('assets/nuit.jpg') center/cover no-repeat #0A1466"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,10,60,.5) 0%,rgba(6,10,60,.7) 100%)"></div>
+
+          <div style="position:relative;flex:none;color:#FFF">
+            <div style="height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;font-size:15px;font-weight:600;letter-spacing:-0.01em">
+              <span style="font-variant-numeric:tabular-nums">9:41</span>
+              <span style="display:flex;align-items:center;gap:6px;flex:none;white-space:nowrap"><span style="display:flex;align-items:flex-end;gap:2px;height:11px"><span style="width:3px;height:4px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:6px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:8px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:11px;border-radius:1px;background:#FFF"></span></span><span style="width:14px;height:11px;background:#FFF;clip-path:polygon(50% 100%,0% 32%,20% 14%,50% 5%,80% 14%,100% 32%)"></span><span style="display:flex;align-items:center;gap:1px"><span style="width:23px;height:11px;border-radius:3px;border:1px solid rgba(255,255,255,.55);padding:1px;display:flex"><span style="width:70%;background:#FFF;border-radius:2px"></span></span><span style="width:2px;height:4px;border-radius:0 1px 1px 0;background:rgba(255,255,255,.55)"></span></span></span>
+            </div>
+            <div style="height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px">
+              <button type="button" style="width:40px;height:40px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 5 8 12l6.5 7"></path></svg>
+              </button>
+              <span style="font-size:19px;font-weight:700;letter-spacing:-0.02em">Historiques</span>
+              <button type="button" style="width:40px;height:40px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"></path></svg>
+              </button>
+            </div>
+          </div>
+
+          <div style="position:relative;flex:1;border-radius:28px 28px 0 0;background:#EBEBEF;padding:16px;display:flex;flex-direction:column;gap:16px">
+            <div style="display:flex;gap:12px;flex:none;opacity:.5">
+              <div style="flex:1;height:48px;border-radius:14px;background:#FFF;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-size:15px;font-weight:600;color:#8A8C93">Tout<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#8A8C93" stroke-width="1.8" stroke-linecap="round"><path d="M2.5 4.5 6 8l3.5-3.5"></path></svg></div>
+              <div style="flex:1;height:48px;border-radius:14px;background:#FFF;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-size:15px;font-weight:600;color:#8A8C93">Récent<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#8A8C93" stroke-width="1.8" stroke-linecap="round"><path d="M2.5 4.5 6 8l3.5-3.5"></path></svg></div>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:12px;padding:0 8px 40px">
+              <span style="width:64px;height:64px;border-radius:20px;background:#FFF;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:center;margin-bottom:4px"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8A8C93" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h10M4 17h6"></path></svg></span>
+              <h3 style="margin:0;font-size:26px;font-weight:600;letter-spacing:-0.026em">Aucune transaction</h3>
+              <p style="margin:0;font-size:15px;line-height:1.5;color:#5A5C63;max-width:280px">Commencez à tracker. Enregistrez vos dépenses, revenus et transferts pour visualiser où va votre argent et progresser vers l'indépendance financière.</p>
+            </div>
+            <button type="button" style="flex:none;width:100%;border:0;height:56px;border-radius:999px;cursor:pointer;color:#FFF;font-family:inherit;font-size:17px;font-weight:600;letter-spacing:-0.008em;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(180deg,#33343C 0%,#16171D 46%,#05060A 58%,#20212A 100%);box-shadow:inset 0 1.5px 1px rgba(255,255,255,.4),inset 0 -8px 12px -6px rgba(255,255,255,.16),0 3px 8px rgba(4,6,30,.26),0 12px 26px -8px rgba(4,6,30,.46);transition:transform 160ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.975)">
+              <span style="font-size:20px;font-weight:400;line-height:1">+</span>Nouvelle transaction
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Swipe gauche — confirmation de suppression</span>
+        <div style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#0A1466;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;flex-direction:column">
+          <div style="position:absolute;inset:0;background:url('assets/nuit.jpg') center/cover no-repeat #0A1466"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,10,60,.5) 0%,rgba(6,10,60,.7) 100%)"></div>
+
+          <div style="position:relative;flex:none;color:#FFF">
+            <div style="height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;font-size:15px;font-weight:600;letter-spacing:-0.01em">
+              <span style="font-variant-numeric:tabular-nums">9:41</span>
+              <span style="display:flex;align-items:center;gap:6px;flex:none;white-space:nowrap"><span style="display:flex;align-items:flex-end;gap:2px;height:11px"><span style="width:3px;height:4px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:6px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:8px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:11px;border-radius:1px;background:#FFF"></span></span><span style="width:14px;height:11px;background:#FFF;clip-path:polygon(50% 100%,0% 32%,20% 14%,50% 5%,80% 14%,100% 32%)"></span><span style="display:flex;align-items:center;gap:1px"><span style="width:23px;height:11px;border-radius:3px;border:1px solid rgba(255,255,255,.55);padding:1px;display:flex"><span style="width:70%;background:#FFF;border-radius:2px"></span></span><span style="width:2px;height:4px;border-radius:0 1px 1px 0;background:rgba(255,255,255,.55)"></span></span></span>
+            </div>
+            <div style="height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px">
+              <button type="button" style="width:40px;height:40px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 5 8 12l6.5 7"></path></svg>
+              </button>
+              <span style="font-size:19px;font-weight:700;letter-spacing:-0.02em">Historiques</span>
+              <button type="button" style="width:40px;height:40px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"></path></svg>
+              </button>
+            </div>
+          </div>
+
+          <div style="position:relative;flex:1;border-radius:28px 28px 0 0;background:#EBEBEF;padding:16px;display:flex;flex-direction:column;gap:12px;overflow:hidden">
+            <span style="font-size:15px;font-weight:700;letter-spacing:-0.008em;flex:none">Aujourd'hui</span>
+            <div style="flex:none;border-radius:20px;background:#A80010;display:flex;align-items:stretch;overflow:hidden;position:relative">
+              <div style="flex:1;background:#FFF;padding:8px 16px;display:flex;flex-direction:column;transform:translateX(-88px);box-shadow:6px 0 18px rgba(10,10,12,.14)">
+                <div style="display:flex;align-items:center;gap:12px;padding:12px 0">
+                  <span style="width:44px;height:44px;border-radius:14px;background:#0A0A0C;display:flex;align-items:center;justify-content:center;flex:none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 7.5l9 9M16.5 9v7.5H9"></path></svg></span>
+                  <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+                    <span style="font-size:15px;font-weight:600;letter-spacing:-0.008em">Alimentation</span>
+                    <span style="font-size:13px;color:#6E7079">Aujourd'hui, 9 h 37</span>
+                    <span style="font-size:13px;color:#6E7079;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Spaghetti rouge</span>
+                  </div>
+                  <div style="flex:none;display:flex;flex-direction:column;align-items:flex-end">
+                    <span style="font-size:15px;font-weight:700;color:#A80010;font-variant-numeric:tabular-nums">−1 500 F</span>
+                    <span style="font-size:11px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#8A8C93">Dépense</span>
+                  </div>
+                </div>
+              </div>
+              <div style="position:absolute;top:0;right:0;bottom:0;width:88px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:#FFF">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14M9 7V5h6v2M7 7l1 12h8l1-12"></path></svg>
+                <span style="font-size:12px;font-weight:600;letter-spacing:0.02em">Supprimer</span>
+              </div>
+            </div>
+            <div style="flex:none;background:#FFF;border-radius:20px;padding:8px 16px;opacity:.55">
+              <div style="display:flex;align-items:center;gap:12px;padding:12px 0">
+                <span style="width:44px;height:44px;border-radius:14px;background:#0A0A0C;display:flex;align-items:center;justify-content:center;flex:none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 7.5l9 9M16.5 9v7.5H9"></path></svg></span>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+                  <span style="font-size:15px;font-weight:600;letter-spacing:-0.008em">Transport</span>
+                  <span style="font-size:13px;color:#6E7079">Aujourd'hui, 8 h 04</span>
+                </div>
+                <span style="font-size:15px;font-weight:700;color:#A80010;font-variant-numeric:tabular-nums">−600 F</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="position:absolute;inset:0;background:rgba(4,7,40,.55);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)"></div>
+          <div style="position:absolute;left:16px;right:16px;bottom:20px;background:#EBEBEF;border-radius:28px;padding:24px;display:flex;flex-direction:column;gap:20px;box-shadow:0 30px 60px rgba(2,4,24,.5)">
+            <div style="display:flex;flex-direction:column;gap:6px;text-align:center">
+              <h3 style="margin:0;font-size:20px;font-weight:600;letter-spacing:-0.018em">Supprimer cette transaction ?</h3>
+              <p style="margin:0;font-size:14px;line-height:1.45;color:#5A5C63">Alimentation, −1 500 F. Cette action est définitive.</p>
+            </div>
+            <div style="display:flex;gap:12px">
+              <button type="button" style="flex:1;height:52px;border-radius:999px;border:1px solid #D6D7DD;background:#FFF;color:#0A0A0C;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer">Non</button>
+              <button type="button" style="flex:1;height:52px;border-radius:999px;border:0;background:#A80010;color:#FFF;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 8px 20px -6px rgba(168,0,16,.6)">Oui, supprimer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;align-items:baseline;gap:14px;border-top:1px solid #DCDDE3;padding-top:24px">
+      <span style="font-size:13px;font-weight:600;color:#6E7079">07</span>
+      <h2 style="margin:0;font-size:28px;letter-spacing:-0.026em;font-weight:600">Détails transaction</h2>
+      <span style="font-size:15px;color:#6E7079">Lecture seule, montant en tête, modification et suppression</span>
+    </div>
+
+    <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start">
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Défaut — dépense</span>
+        <div style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#0A1466;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;flex-direction:column">
+          <div style="position:absolute;inset:0;background:url('assets/nuit.jpg') center/cover no-repeat #0A1466"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,10,60,.5) 0%,rgba(6,10,60,.72) 100%)"></div>
+
+          <div style="position:relative;flex:none;color:#FFF">
+            <div style="height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;font-size:15px;font-weight:600;letter-spacing:-0.01em">
+              <span style="font-variant-numeric:tabular-nums">9:41</span>
+              <span style="display:flex;align-items:center;gap:6px;flex:none;white-space:nowrap"><span style="display:flex;align-items:flex-end;gap:2px;height:11px"><span style="width:3px;height:4px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:6px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:8px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:11px;border-radius:1px;background:#FFF"></span></span><span style="width:14px;height:11px;background:#FFF;clip-path:polygon(50% 100%,0% 32%,20% 14%,50% 5%,80% 14%,100% 32%)"></span><span style="display:flex;align-items:center;gap:1px"><span style="width:23px;height:11px;border-radius:3px;border:1px solid rgba(255,255,255,.55);padding:1px;display:flex"><span style="width:70%;background:#FFF;border-radius:2px"></span></span><span style="width:2px;height:4px;border-radius:0 1px 1px 0;background:rgba(255,255,255,.55)"></span></span></span>
+            </div>
+            <div style="height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px">
+              <button type="button" style="width:40px;height:40px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 5 8 12l6.5 7"></path></svg>
+              </button>
+              <span style="font-size:19px;font-weight:700;letter-spacing:-0.02em">Détails</span>
+              <button type="button" style="width:40px;height:40px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;padding:0;flex:none">
+                <span style="width:3.5px;height:3.5px;border-radius:999px;background:#FFF"></span>
+                <span style="width:3.5px;height:3.5px;border-radius:999px;background:#FFF"></span>
+                <span style="width:3.5px;height:3.5px;border-radius:999px;background:#FFF"></span>
+              </button>
+            </div>
+            <div style="padding:8px 16px 28px;display:flex;flex-direction:column;align-items:center;gap:10px">
+              <span style="font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:rgba(255,255,255,.6)">Dépense</span>
+              <span style="font-size:38px;font-weight:700;letter-spacing:-0.032em;font-variant-numeric:tabular-nums;line-height:1">−1 500 F</span>
+              <span style="font-size:14px;color:rgba(255,255,255,.72)">Alimentation · Aujourd'hui, 9 h 37</span>
+            </div>
+          </div>
+
+          <div style="position:relative;flex:1;border-radius:28px 28px 0 0;background:#EBEBEF;padding:16px;display:flex;flex-direction:column;gap:12px">
+            <div style="background:#FFF;border-radius:20px;padding:4px 16px;display:flex;flex-direction:column">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:6px 0;border-bottom:1px solid #EDEDF1">
+                <span style="font-size:14px;color:#6E7079;white-space:nowrap">Type</span>
+                <span style="font-size:15px;font-weight:600">Dépense</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:6px 0;border-bottom:1px solid #EDEDF1">
+                <span style="font-size:14px;color:#6E7079;white-space:nowrap">Catégorie</span>
+                <span style="font-size:15px;font-weight:600">Alimentation</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:6px 0;border-bottom:1px solid #EDEDF1">
+                <span style="font-size:14px;color:#6E7079;white-space:nowrap">Nature</span>
+                <span style="font-size:15px;font-weight:600">Consommation</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:6px 0;border-bottom:1px solid #EDEDF1">
+                <span style="font-size:14px;color:#6E7079;white-space:nowrap">Lié à</span>
+                <span style="font-size:15px;font-weight:600">Moi</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:6px 0;border-bottom:1px solid #EDEDF1">
+                <span style="font-size:14px;color:#6E7079;white-space:nowrap">Compte source</span>
+                <span style="font-size:15px;font-weight:600">Cash</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:6px 0;border-bottom:1px solid #EDEDF1">
+                <span style="font-size:14px;color:#6E7079;white-space:nowrap">Date et heure</span>
+                <span style="font-size:15px;font-weight:600;font-variant-numeric:tabular-nums">27 août 2026, 9 h 37</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:6px 0;border-bottom:1px solid #EDEDF1">
+                <span style="font-size:14px;color:#6E7079;white-space:nowrap">Récurrence</span>
+                <span style="font-size:15px;font-weight:600">Une fois</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:6px 0">
+                <span style="font-size:14px;color:#6E7079;white-space:nowrap">Statut</span>
+                <span style="font-size:13px;font-weight:600;letter-spacing:0.02em;color:#006B3C;background:rgba(0,107,60,.1);border-radius:999px;padding:4px 10px">Effectué</span>
+              </div>
+            </div>
+
+            <div style="background:#FFF;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:6px">
+              <span style="font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#8A8C93">Note</span>
+              <span style="font-size:15px;line-height:1.45">Spaghetti rouge, déjeuner au bureau.</span>
+            </div>
+
+            <div style="flex:1"></div>
+
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <button type="button" style="width:100%;border:0;height:56px;border-radius:999px;cursor:pointer;color:#FFF;font-family:inherit;font-size:17px;font-weight:600;letter-spacing:-0.008em;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(180deg,#33343C 0%,#16171D 46%,#05060A 58%,#20212A 100%);box-shadow:inset 0 1.5px 1px rgba(255,255,255,.4),inset 0 -8px 12px -6px rgba(255,255,255,.16),0 3px 8px rgba(4,6,30,.26),0 12px 26px -8px rgba(4,6,30,.46);transition:transform 160ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.975)">Modifier</button>
+              <button type="button" style="width:100%;height:52px;border-radius:999px;border:0;background:transparent;color:#A80010;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer">Supprimer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Chargement — squelette</span>
+        <div style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#0A1466;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;flex-direction:column">
+          <div style="position:absolute;inset:0;background:url('assets/nuit.jpg') center/cover no-repeat #0A1466"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,10,60,.5) 0%,rgba(6,10,60,.72) 100%)"></div>
+
+          <div style="position:relative;flex:none;color:#FFF">
+            <div style="height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;font-size:15px;font-weight:600;letter-spacing:-0.01em">
+              <span style="font-variant-numeric:tabular-nums">9:41</span>
+              <span style="display:flex;align-items:center;gap:6px;flex:none;white-space:nowrap"><span style="display:flex;align-items:flex-end;gap:2px;height:11px"><span style="width:3px;height:4px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:6px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:8px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:11px;border-radius:1px;background:#FFF"></span></span><span style="width:14px;height:11px;background:#FFF;clip-path:polygon(50% 100%,0% 32%,20% 14%,50% 5%,80% 14%,100% 32%)"></span><span style="display:flex;align-items:center;gap:1px"><span style="width:23px;height:11px;border-radius:3px;border:1px solid rgba(255,255,255,.55);padding:1px;display:flex"><span style="width:70%;background:#FFF;border-radius:2px"></span></span><span style="width:2px;height:4px;border-radius:0 1px 1px 0;background:rgba(255,255,255,.55)"></span></span></span>
+            </div>
+            <div style="height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px">
+              <button type="button" style="width:40px;height:40px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 5 8 12l6.5 7"></path></svg>
+              </button>
+              <span style="font-size:19px;font-weight:700;letter-spacing:-0.02em">Détails</span>
+              <span style="width:40px"></span>
+            </div>
+            <div style="padding:8px 16px 28px;display:flex;flex-direction:column;align-items:center;gap:12px">
+              <span style="width:84px;height:12px;border-radius:999px;background:rgba(255,255,255,.24);animation:swl-pulse 1.4s ease-in-out infinite"></span>
+              <span style="width:196px;height:38px;border-radius:12px;background:rgba(255,255,255,.28);animation:swl-pulse 1.4s ease-in-out infinite"></span>
+              <span style="width:150px;height:12px;border-radius:999px;background:rgba(255,255,255,.2);animation:swl-pulse 1.4s ease-in-out infinite"></span>
+            </div>
+          </div>
+
+          <div style="position:relative;flex:1;border-radius:28px 28px 0 0;background:#EBEBEF;padding:16px;display:flex;flex-direction:column;gap:12px">
+            <div style="background:#FFF;border-radius:20px;padding:4px 16px;display:flex;flex-direction:column">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid #EDEDF1"><span style="width:70px;height:11px;border-radius:999px;background:#E4E4E9;animation:swl-pulse 1.4s ease-in-out infinite"></span><span style="width:96px;height:11px;border-radius:999px;background:#EDEDF1;animation:swl-pulse 1.4s ease-in-out infinite"></span></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid #EDEDF1"><span style="width:84px;height:11px;border-radius:999px;background:#E4E4E9;animation:swl-pulse 1.4s ease-in-out infinite"></span><span style="width:112px;height:11px;border-radius:999px;background:#EDEDF1;animation:swl-pulse 1.4s ease-in-out infinite"></span></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid #EDEDF1"><span style="width:62px;height:11px;border-radius:999px;background:#E4E4E9;animation:swl-pulse 1.4s ease-in-out infinite"></span><span style="width:88px;height:11px;border-radius:999px;background:#EDEDF1;animation:swl-pulse 1.4s ease-in-out infinite"></span></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid #EDEDF1"><span style="width:76px;height:11px;border-radius:999px;background:#E4E4E9;animation:swl-pulse 1.4s ease-in-out infinite"></span><span style="width:104px;height:11px;border-radius:999px;background:#EDEDF1;animation:swl-pulse 1.4s ease-in-out infinite"></span></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 0"><span style="width:68px;height:11px;border-radius:999px;background:#E4E4E9;animation:swl-pulse 1.4s ease-in-out infinite"></span><span style="width:80px;height:11px;border-radius:999px;background:#EDEDF1;animation:swl-pulse 1.4s ease-in-out infinite"></span></div>
+            </div>
+            <div style="background:#FFF;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px">
+              <span style="width:44px;height:10px;border-radius:999px;background:#E4E4E9;animation:swl-pulse 1.4s ease-in-out infinite"></span>
+              <span style="width:100%;height:11px;border-radius:999px;background:#EDEDF1;animation:swl-pulse 1.4s ease-in-out infinite"></span>
+              <span style="width:62%;height:11px;border-radius:999px;background:#EDEDF1;animation:swl-pulse 1.4s ease-in-out infinite"></span>
+            </div>
+            <div style="flex:1"></div>
+            <div style="width:100%;height:56px;border-radius:999px;background:#DEDEE4;animation:swl-pulse 1.4s ease-in-out infinite"></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Erreur — chargement impossible</span>
+        <div style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#0A1466;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;flex-direction:column">
+          <div style="position:absolute;inset:0;background:url('assets/nuit.jpg') center/cover no-repeat #0A1466"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(52,6,16,.55) 0%,rgba(10,8,44,.78) 100%)"></div>
+
+          <div style="position:relative;flex:none;color:#FFF">
+            <div style="height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;font-size:15px;font-weight:600;letter-spacing:-0.01em">
+              <span style="font-variant-numeric:tabular-nums">9:41</span>
+              <span style="display:flex;align-items:center;gap:6px;flex:none;white-space:nowrap"><span style="display:flex;align-items:flex-end;gap:2px;height:11px"><span style="width:3px;height:4px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:6px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:8px;border-radius:1px;background:#FFF"></span><span style="width:3px;height:11px;border-radius:1px;background:#FFF"></span></span><span style="width:14px;height:11px;background:#FFF;clip-path:polygon(50% 100%,0% 32%,20% 14%,50% 5%,80% 14%,100% 32%)"></span><span style="display:flex;align-items:center;gap:1px"><span style="width:23px;height:11px;border-radius:3px;border:1px solid rgba(255,255,255,.55);padding:1px;display:flex"><span style="width:70%;background:#FFF;border-radius:2px"></span></span><span style="width:2px;height:4px;border-radius:0 1px 1px 0;background:rgba(255,255,255,.55)"></span></span></span>
+            </div>
+            <div style="height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px">
+              <button type="button" style="width:40px;height:40px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 5 8 12l6.5 7"></path></svg>
+              </button>
+              <span style="font-size:19px;font-weight:700;letter-spacing:-0.02em">Détails</span>
+              <span style="width:40px"></span>
+            </div>
+          </div>
+
+          <div style="position:relative;flex:1;border-radius:28px 28px 0 0;background:#EBEBEF;padding:16px;display:flex;flex-direction:column;gap:16px">
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:12px;padding:0 8px 40px">
+              <span style="width:64px;height:64px;border-radius:20px;background:rgba(168,0,16,.08);display:flex;align-items:center;justify-content:center;margin-bottom:4px"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#A80010" stroke-width="1.7" stroke-linecap="round"><path d="M12 7.5v6M12 16.5v.5"></path><circle cx="12" cy="12" r="9"></circle></svg></span>
+              <h3 style="margin:0;font-size:22px;font-weight:600;letter-spacing:-0.02em">Impossible de charger la transaction</h3>
+              <p style="margin:0;font-size:15px;line-height:1.5;color:#5A5C63;max-width:280px">Vérifiez votre connexion. Les données locales datent de 9 h 12.</p>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <button type="button" style="width:100%;border:0;height:56px;border-radius:999px;cursor:pointer;color:#FFF;font-family:inherit;font-size:17px;font-weight:600;letter-spacing:-0.008em;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#33343C 0%,#16171D 46%,#05060A 58%,#20212A 100%);box-shadow:inset 0 1.5px 1px rgba(255,255,255,.4),inset 0 -8px 12px -6px rgba(255,255,255,.16),0 3px 8px rgba(4,6,30,.26),0 12px 26px -8px rgba(4,6,30,.46)">Réessayer</button>
+              <button type="button" style="width:100%;height:52px;border-radius:999px;border:0;background:transparent;color:#5A5C63;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer">Retour à l'historique</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;align-items:baseline;gap:14px;border-top:1px solid #DCDDE3;padding-top:24px">
+      <span style="font-size:13px;font-weight:600;color:#6E7079">08</span>
+      <h2 style="margin:0;font-size:28px;letter-spacing:-0.026em;font-weight:600">Créer / modifier une dépense</h2>
+      <span style="font-size:15px;color:#6E7079">Choix du type, puis quatre étapes</span>
+    </div>
+
+    <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start">
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Choix du type — commun aux écrans 08, 09 et 10</span>
+        <div style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#0A1466;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;align-items:center;justify-content:center;padding:16px">
+          <div style="position:absolute;inset:0;background:url('assets/nuit.jpg') center/cover no-repeat;filter:blur(16px) saturate(1.05);transform:scale(1.14)"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,7,40,.7) 0%,rgba(4,7,40,.86) 100%)"></div>
+          <div style="position:relative;width:100%;background:#EBEBEF;border-radius:28px;padding:32px 24px;display:flex;flex-direction:column;gap:24px;box-shadow:0 30px 60px rgba(2,4,24,.5)">
+            <h3 style="margin:0;font-size:22px;font-weight:600;letter-spacing:-0.02em;text-align:center">Que voulez-vous enregistrer ?</h3>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <button type="button" style="width:100%;border:0;height:56px;border-radius:999px;cursor:pointer;color:#FFF;font-family:inherit;font-size:17px;font-weight:600;letter-spacing:-0.008em;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#33343C 0%,#16171D 46%,#05060A 58%,#20212A 100%);box-shadow:inset 0 1.5px 1px rgba(255,255,255,.4),inset 0 -8px 12px -6px rgba(255,255,255,.16),0 3px 8px rgba(4,6,30,.26),0 12px 26px -8px rgba(4,6,30,.46);transition:transform 160ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.975)">Dépense</button>
+              <button type="button" style="width:100%;border:0;height:56px;border-radius:999px;cursor:pointer;color:#FFF;font-family:inherit;font-size:17px;font-weight:600;letter-spacing:-0.008em;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#33343C 0%,#16171D 46%,#05060A 58%,#20212A 100%);box-shadow:inset 0 1.5px 1px rgba(255,255,255,.4),inset 0 -8px 12px -6px rgba(255,255,255,.16),0 3px 8px rgba(4,6,30,.26),0 12px 26px -8px rgba(4,6,30,.46);transition:transform 160ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.975)">Revenu</button>
+              <button type="button" style="width:100%;border:0;height:56px;border-radius:999px;cursor:pointer;color:#FFF;font-family:inherit;font-size:17px;font-weight:600;letter-spacing:-0.008em;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#33343C 0%,#16171D 46%,#05060A 58%,#20212A 100%);box-shadow:inset 0 1.5px 1px rgba(255,255,255,.4),inset 0 -8px 12px -6px rgba(255,255,255,.16),0 3px 8px rgba(4,6,30,.26),0 12px 26px -8px rgba(4,6,30,.46);transition:transform 160ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.975)">Transfert</button>
+            </div>
+            <button type="button" style="border:0;background:transparent;color:#5A5C63;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;padding:0">Annuler</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Étape 1 — date, montant, compte source</span>
+        <div style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#0A1466;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;align-items:center;justify-content:center;padding:16px">
+          <div style="position:absolute;inset:0;background:url('assets/nuit.jpg') center/cover no-repeat;filter:blur(16px) saturate(1.05);transform:scale(1.14)"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,7,40,.7) 0%,rgba(4,7,40,.86) 100%)"></div>
+          <div style="position:relative;width:100%;background:#EBEBEF;border-radius:28px;padding:24px;display:flex;flex-direction:column;gap:20px;box-shadow:0 30px 60px rgba(2,4,24,.5)">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <span style="font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#8A8C93">Nouvelle dépense</span>
+              <span style="font-size:12px;font-weight:600;color:#8A8C93;font-variant-numeric:tabular-nums">1 / 3</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <span style="font-size:13px;font-weight:600;letter-spacing:0.01em">Date</span>
+              <div style="height:52px;border-radius:14px;background:#FFF;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:15px;font-weight:500">
+                Aujourd'hui
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#0A0A0C" stroke-width="1.8" stroke-linecap="round"><path d="M2.5 4.5 6 8l3.5-3.5"></path></svg>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <span style="font-size:13px;font-weight:600;letter-spacing:0.01em">Montant</span>
+              <div style="height:64px;border-radius:14px;background:#FFF;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;letter-spacing:-0.01em;font-variant-numeric:tabular-nums">15 000 F</div>
+            </div>
+            <div style="height:1px;background:#D6D7DD"></div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <span style="font-size:13px;font-weight:600;letter-spacing:0.01em">Compte source</span>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div style="height:48px;border-radius:14px;background:#152BC7;color:#FFF;border:1px solid rgba(120,146,255,.9);box-shadow:0 0 0 3px rgba(21,43,199,.16),inset 0 1px 0 rgba(255,255,255,.28);display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:600">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="2.5" y="6.5" width="19" height="11" rx="2.5"></rect><circle cx="12" cy="12" r="2.4"></circle></svg>
+                  Cash
+                </div>
+                <div style="height:48px;border-radius:14px;background:#FFF;color:#8A8C93;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:600">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="7" y="3" width="10" height="18" rx="2.5"></rect><path d="M10.5 18h3"></path></svg>
+                  Mobile
+                </div>
+                <div style="height:48px;border-radius:14px;background:#FFF;color:#8A8C93;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:600">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 10h16M5.5 10v8M18.5 10v8M12 10v8M3 18h18M12 3.5 20 9H4l8-5.5"></path></svg>
+                  Banque
+                </div>
+                <div style="height:48px;border-radius:14px;background:#FFF;color:#0A0A0C;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:center;gap:6px;font-size:14px;font-weight:600">
+                  <span style="font-size:17px;font-weight:400;line-height:1">+</span>Nouveau
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:center;gap:6px;padding-top:4px">
+              <span style="width:24px;height:6px;border-radius:999px;background:#0A0A0C"></span>
+              <span style="width:6px;height:6px;border-radius:999px;background:#C3C4CB"></span>
+              <span style="width:6px;height:6px;border-radius:999px;background:#C3C4CB"></span>
+            </div>
+            <div style="display:flex;gap:12px">
+              <button type="button" style="flex:1;height:52px;border-radius:999px;border:1px solid #D6D7DD;background:#FFF;color:#8A8C93;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 2.5 4 6l3.5 3.5"></path></svg>Retour
+              </button>
+              <button type="button" style="flex:1;height:52px;border-radius:999px;border:0;cursor:pointer;color:#FFF;font-family:inherit;font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(180deg,#33343C 0%,#16171D 46%,#05060A 58%,#20212A 100%);box-shadow:inset 0 1.5px 1px rgba(255,255,255,.4),inset 0 -8px 12px -6px rgba(255,255,255,.16),0 3px 8px rgba(4,6,30,.26),0 12px 26px -8px rgba(4,6,30,.46);transition:transform 160ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.975)">
+                Suivant<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 2.5 8 6l-3.5 3.5"></path></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Étape 2 — catégorie et « lié à »</span>
+        <div style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#0A1466;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;align-items:center;justify-content:center;padding:16px">
+          <div style="position:absolute;inset:0;background:url('assets/nuit.jpg') center/cover no-repeat;filter:blur(16px) saturate(1.05);transform:scale(1.14)"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,7,40,.7) 0%,rgba(4,7,40,.86) 100%)"></div>
+          <div style="position:relative;width:100%;background:#EBEBEF;border-radius:28px;padding:24px;display:flex;flex-direction:column;gap:20px;box-shadow:0 30px 60px rgba(2,4,24,.5)">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <span style="font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#8A8C93">Nouvelle dépense</span>
+              <span style="font-size:12px;font-weight:600;color:#8A8C93;font-variant-numeric:tabular-nums">2 / 3</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <span style="font-size:13px;font-weight:600;letter-spacing:0.01em">Catégorie</span>
+              <div style="height:52px;border-radius:14px;background:#FFF;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:15px;font-weight:500">
+                Alimentation
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#0A0A0C" stroke-width="1.8" stroke-linecap="round"><path d="M2.5 4.5 6 8l3.5-3.5"></path></svg>
+              </div>
+            </div>
+            <div style="height:1px;background:#D6D7DD"></div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <span style="font-size:13px;font-weight:600;letter-spacing:0.01em">Lié à</span>
+                <span style="font-size:12px;color:#8A8C93">Optionnel</span>
+              </div>
+              <div style="height:52px;border-radius:14px;background:#FFF;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:15px;font-weight:500">
+                Moi
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#0A0A0C" stroke-width="1.8" stroke-linecap="round"><path d="M2.5 4.5 6 8l3.5-3.5"></path></svg>
+              </div>
+              <div style="display:flex;gap:12px;padding-top:4px">
+                <div style="flex:1;height:44px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:600;color:#152BC7">
+                  Personnes
+                  <span style="width:18px;height:18px;border-radius:999px;border:1.5px solid #152BC7;display:flex;align-items:center;justify-content:center"><span style="width:9px;height:9px;border-radius:999px;background:#152BC7"></span></span>
+                </div>
+                <div style="flex:1;height:44px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:600;color:#8A8C93">
+                  Projet
+                  <span style="width:18px;height:18px;border-radius:999px;border:1.5px solid #C3C4CB"></span>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:center;gap:6px;padding-top:4px">
+              <span style="width:6px;height:6px;border-radius:999px;background:#C3C4CB"></span>
+              <span style="width:24px;height:6px;border-radius:999px;background:#0A0A0C"></span>
+              <span style="width:6px;height:6px;border-radius:999px;background:#C3C4CB"></span>
+            </div>
+            <div style="display:flex;gap:12px">
+              <button type="button" style="flex:1;height:52px;border-radius:999px;border:1px solid #D6D7DD;background:#FFF;color:#0A0A0C;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 2.5 4 6l3.5 3.5"></path></svg>Retour
+              </button>
+              <button type="button" style="flex:1;height:52px;border-radius:999px;border:0;cursor:pointer;color:#FFF;font-family:inherit;font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(180deg,#33343C 0%,#16171D 46%,#05060A 58%,#20212A 100%);box-shadow:inset 0 1.5px 1px rgba(255,255,255,.4),inset 0 -8px 12px -6px rgba(255,255,255,.16),0 3px 8px rgba(4,6,30,.26),0 12px 26px -8px rgba(4,6,30,.46);transition:transform 160ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.975)">
+                Suivant<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 2.5 8 6l-3.5 3.5"></path></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Étape 3 — note, récurrence, statut</span>
+        <div style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#0A1466;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;align-items:center;justify-content:center;padding:16px">
+          <div style="position:absolute;inset:0;background:url('assets/nuit.jpg') center/cover no-repeat;filter:blur(16px) saturate(1.05);transform:scale(1.14)"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,7,40,.7) 0%,rgba(4,7,40,.86) 100%)"></div>
+          <div style="position:relative;width:100%;background:#EBEBEF;border-radius:28px;padding:24px;display:flex;flex-direction:column;gap:20px;box-shadow:0 30px 60px rgba(2,4,24,.5)">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <span style="font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#8A8C93">Nouvelle dépense</span>
+              <span style="font-size:12px;font-weight:600;color:#8A8C93;font-variant-numeric:tabular-nums">3 / 3</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <span style="font-size:13px;font-weight:600;letter-spacing:0.01em">Notes</span>
+              <div style="height:96px;border-radius:14px;background:#FFF;border:1px solid #E2E2E7;padding:14px 16px;font-size:15px;color:#A0A2A9">Ajouter une note</div>
+            </div>
+            <div style="height:1px;background:#D6D7DD"></div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <span style="font-size:13px;font-weight:600;letter-spacing:0.01em">Récurrence</span>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div style="height:48px;border-radius:14px;background:#152BC7;color:#FFF;border:1px solid rgba(120,146,255,.9);box-shadow:0 0 0 3px rgba(21,43,199,.16),inset 0 1px 0 rgba(255,255,255,.28);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600">Une fois</div>
+                <div style="height:48px;border-radius:14px;background:#FFF;color:#8A8C93;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600">Quotidien</div>
+                <div style="height:48px;border-radius:14px;background:#FFF;color:#8A8C93;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600">Mensuel</div>
+              </div>
+            </div>
+            <div style="height:1px;background:#D6D7DD"></div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <span style="font-size:13px;font-weight:600;letter-spacing:0.01em">Statut</span>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div style="height:48px;border-radius:14px;background:#152BC7;color:#FFF;border:1px solid rgba(120,146,255,.9);box-shadow:0 0 0 3px rgba(21,43,199,.16),inset 0 1px 0 rgba(255,255,255,.28);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600">Effectué</div>
+                <div style="height:48px;border-radius:14px;background:#FFF;color:#8A8C93;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600">Planifié</div>
+                <div style="height:48px;border-radius:14px;background:#FFF;color:#8A8C93;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600">Remboursé</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:center;gap:6px;padding-top:4px">
+              <span style="width:6px;height:6px;border-radius:999px;background:#C3C4CB"></span>
+              <span style="width:6px;height:6px;border-radius:999px;background:#C3C4CB"></span>
+              <span style="width:24px;height:6px;border-radius:999px;background:#0A0A0C"></span>
+            </div>
+            <div style="display:flex;gap:12px">
+              <button type="button" style="flex:1;height:52px;border-radius:999px;border:1px solid #D6D7DD;background:#FFF;color:#0A0A0C;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer">Annuler</button>
+              <button type="button" style="flex:1;height:52px;border-radius:999px;border:0;cursor:pointer;color:#FFF;font-family:inherit;font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#33343C 0%,#16171D 46%,#05060A 58%,#20212A 100%);box-shadow:inset 0 1.5px 1px rgba(255,255,255,.4),inset 0 -8px 12px -6px rgba(255,255,255,.16),0 3px 8px rgba(4,6,30,.26),0 12px 26px -8px rgba(4,6,30,.46);transition:transform 160ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.975)">Enregistrer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Succès — résumé et template</span>
+        <div style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#0A1466;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;align-items:center;justify-content:center;padding:16px">
+          <div style="position:absolute;inset:0;background:url('assets/nuit.jpg') center/cover no-repeat;filter:blur(16px) saturate(1.05);transform:scale(1.14)"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,7,40,.7) 0%,rgba(4,7,40,.86) 100%)"></div>
+          <div style="position:relative;width:100%;background:#EBEBEF;border-radius:28px;padding:32px 24px;display:flex;flex-direction:column;gap:24px;box-shadow:0 30px 60px rgba(2,4,24,.5)">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center">
+              <span style="width:52px;height:52px;border-radius:999px;background:#006B3C;display:flex;align-items:center;justify-content:center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 12.5 10 17l8.5-9"></path></svg></span>
+              <h3 style="margin:0;font-size:22px;font-weight:600;letter-spacing:-0.02em">Votre dépense est enregistrée</h3>
+            </div>
+            <div style="background:#FFF;border-radius:20px;padding:4px 16px;display:flex;flex-direction:column">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid #EDEDF1">
+                <span style="font-size:14px;color:#6E7079">Montant</span>
+                <span style="font-size:15px;font-weight:700;color:#A80010;font-variant-numeric:tabular-nums">−15 000 F</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid #EDEDF1">
+                <span style="font-size:14px;color:#6E7079">Catégorie</span>
+                <span style="font-size:15px;font-weight:600">Alimentation</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0">
+                <span style="font-size:14px;color:#6E7079">Date</span>
+                <span style="font-size:15px;font-weight:600;font-variant-numeric:tabular-nums">27 août 2026</span>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+              <button type="button" style="width:100%;border:0;height:56px;border-radius:999px;cursor:pointer;color:#FFF;font-family:inherit;font-size:17px;font-weight:600;letter-spacing:-0.008em;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#33343C 0%,#16171D 46%,#05060A 58%,#20212A 100%);box-shadow:inset 0 1.5px 1px rgba(255,255,255,.4),inset 0 -8px 12px -6px rgba(255,255,255,.16),0 3px 8px rgba(4,6,30,.26),0 12px 26px -8px rgba(4,6,30,.46);transition:transform 160ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.975)">Terminer</button>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+                <span style="font-size:14px;color:#5A5C63">Enregistrer comme</span>
+                <a href="#1a" style="font-size:16px;font-weight:600;color:#152BC7">Template</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;align-items:baseline;gap:14px;border-top:1px solid #DCDDE3;padding-top:24px">
+      <span style="font-size:13px;font-weight:600;color:#6E7079">09</span>
+      <h2 style="margin:0;font-size:28px;letter-spacing:-0.026em;font-weight:600">Créer / modifier un revenu</h2>
+      <span style="font-size:15px;color:#6E7079">Même gabarit, compte destination, « lié à » obligatoire</span>
+    </div>
+
+    <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start">
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Étape 1 — date, montant, compte destination</span>
+        <div style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#0A1466;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;align-items:center;justify-content:center;padding:16px">
+          <div style="position:absolute;inset:0;background:url('assets/nuit.jpg') center/cover no-repeat;filter:blur(16px) saturate(1.05);transform:scale(1.14)"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,7,40,.7) 0%,rgba(4,7,40,.86) 100%)"></div>
+          <div style="position:relative;width:100%;background:#EBEBEF;border-radius:28px;padding:24px;display:flex;flex-direction:column;gap:20px;box-shadow:0 30px 60px rgba(2,4,24,.5)">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <span style="font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#8A8C93">Nouveau revenu</span>
+              <span style="font-size:12px;font-weight:600;color:#8A8C93;font-variant-numeric:tabular-nums">1 / 3</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <span style="font-size:13px;font-weight:600;letter-spacing:0.01em">Date</span>
+              <div style="height:52px;border-radius:14px;background:#FFF;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:15px;font-weight:500">
+                Aujourd'hui
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#0A0A0C" stroke-width="1.8" stroke-linecap="round"><path d="M2.5 4.5 6 8l3.5-3.5"></path></svg>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <span style="font-size:13px;font-weight:600;letter-spacing:0.01em">Montant</span>
+              <div style="height:64px;border-radius:14px;background:#FFF;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;letter-spacing:-0.01em;color:#006B3C;font-variant-numeric:tabular-nums">+90 000 F</div>
+            </div>
+            <div style="height:1px;background:#D6D7DD"></div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <span style="font-size:13px;font-weight:600;letter-spacing:0.01em">Compte destination</span>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div style="height:48px;border-radius:14px;background:#FFF;color:#8A8C93;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:600">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="2.5" y="6.5" width="19" height="11" rx="2.5"></rect><circle cx="12" cy="12" r="2.4"></circle></svg>
+                  Cash
+                </div>
+                <div style="height:48px;border-radius:14px;background:#152BC7;color:#FFF;border:1px solid rgba(120,146,255,.9);box-shadow:0 0 0 3px rgba(21,43,199,.16),inset 0 1px 0 rgba(255,255,255,.28);display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:600">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="7" y="3" width="10" height="18" rx="2.5"></rect><path d="M10.5 18h3"></path></svg>
+                  Mobile
+                </div>
+                <div style="height:48px;border-radius:14px;background:#FFF;color:#8A8C93;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:600">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 10h16M5.5 10v8M18.5 10v8M12 10v8M3 18h18M12 3.5 20 9H4l8-5.5"></path></svg>
+                  Banque
+                </div>
+                <div style="height:48px;border-radius:14px;background:#FFF;color:#0A0A0C;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:center;gap:6px;font-size:14px;font-weight:600">
+                  <span style="font-size:17px;font-weight:400;line-height:1">+</span>Nouveau
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:center;gap:6px;padding-top:4px">
+              <span style="width:24px;height:6px;border-radius:999px;background:#0A0A0C"></span>
+              <span style="width:6px;height:6px;border-radius:999px;background:#C3C4CB"></span>
+              <span style="width:6px;height:6px;border-radius:999px;background:#C3C4CB"></span>
+            </div>
+            <div style="display:flex;gap:12px">
+              <button type="button" style="flex:1;height:52px;border-radius:999px;border:1px solid #D6D7DD;background:#FFF;color:#8A8C93;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 2.5 4 6l3.5 3.5"></path></svg>Retour
+              </button>
+              <button type="button" style="flex:1;height:52px;border-radius:999px;border:0;cursor:pointer;color:#FFF;font-family:inherit;font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(180deg,#33343C 0%,#16171D 46%,#05060A 58%,#20212A 100%);box-shadow:inset 0 1.5px 1px rgba(255,255,255,.4),inset 0 -8px 12px -6px rgba(255,255,255,.16),0 3px 8px rgba(4,6,30,.26),0 12px 26px -8px rgba(4,6,30,.46);transition:transform 160ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.975)">
+                Suivant<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 2.5 8 6l-3.5 3.5"></path></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Étape 2 — erreur de validation sur « lié à »</span>
+        <div style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#0A1466;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;align-items:center;justify-content:center;padding:16px">
+          <div style="position:absolute;inset:0;background:url('assets/nuit.jpg') center/cover no-repeat;filter:blur(16px) saturate(1.05);transform:scale(1.14)"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,7,40,.7) 0%,rgba(4,7,40,.86) 100%)"></div>
+          <div style="position:relative;width:100%;background:#EBEBEF;border-radius:28px;padding:24px;display:flex;flex-direction:column;gap:20px;box-shadow:0 30px 60px rgba(2,4,24,.5)">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <span style="font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#8A8C93">Nouveau revenu</span>
+              <span style="font-size:12px;font-weight:600;color:#8A8C93;font-variant-numeric:tabular-nums">2 / 3</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <span style="font-size:13px;font-weight:600;letter-spacing:0.01em">Catégorie</span>
+              <div style="height:52px;border-radius:14px;background:#FFF;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:15px;font-weight:500">
+                Salaire
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#0A0A0C" stroke-width="1.8" stroke-linecap="round"><path d="M2.5 4.5 6 8l3.5-3.5"></path></svg>
+              </div>
+            </div>
+            <div style="height:1px;background:#D6D7DD"></div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <span style="font-size:13px;font-weight:600;letter-spacing:0.01em">Lié à</span>
+                <span style="font-size:12px;font-weight:600;color:#A80010">Requis</span>
+              </div>
+              <div style="height:52px;border-radius:14px;background:#FFF;border:1.5px solid #A80010;box-shadow:0 0 0 3px rgba(168,0,16,.12);display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:15px;font-weight:500;color:#A0A2A9">
+                Sélectionner une source
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#A80010" stroke-width="1.8" stroke-linecap="round"><path d="M2.5 4.5 6 8l3.5-3.5"></path></svg>
+              </div>
+              <span style="font-size:13px;color:#A80010">La source du revenu détermine votre score. Choisissez une personne ou un projet.</span>
+              <div style="display:flex;gap:12px;padding-top:4px">
+                <div style="flex:1;height:44px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:600;color:#152BC7">
+                  Personnes
+                  <span style="width:18px;height:18px;border-radius:999px;border:1.5px solid #152BC7;display:flex;align-items:center;justify-content:center"><span style="width:9px;height:9px;border-radius:999px;background:#152BC7"></span></span>
+                </div>
+                <div style="flex:1;height:44px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:600;color:#8A8C93">
+                  Projet
+                  <span style="width:18px;height:18px;border-radius:999px;border:1.5px solid #C3C4CB"></span>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:center;gap:6px;padding-top:4px">
+              <span style="width:6px;height:6px;border-radius:999px;background:#C3C4CB"></span>
+              <span style="width:24px;height:6px;border-radius:999px;background:#0A0A0C"></span>
+              <span style="width:6px;height:6px;border-radius:999px;background:#C3C4CB"></span>
+            </div>
+            <div style="display:flex;gap:12px">
+              <button type="button" style="flex:1;height:52px;border-radius:999px;border:1px solid #D6D7DD;background:#FFF;color:#0A0A0C;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 2.5 4 6l3.5 3.5"></path></svg>Retour
+              </button>
+              <button type="button" style="flex:1;height:52px;border-radius:999px;border:0;background:#C9CACF;color:#FFF;font-family:inherit;font-size:15px;font-weight:600;cursor:not-allowed;display:flex;align-items:center;justify-content:center;gap:8px">
+                Suivant<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 2.5 8 6l-3.5 3.5"></path></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Étape 3 — note, récurrence, statut « reçu »</span>
+        <div style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#0A1466;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;align-items:center;justify-content:center;padding:16px">
+          <div style="position:absolute;inset:0;background:url('assets/nuit.jpg') center/cover no-repeat;filter:blur(16px) saturate(1.05);transform:scale(1.14)"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,7,40,.7) 0%,rgba(4,7,40,.86) 100%)"></div>
+          <div style="position:relative;width:100%;background:#EBEBEF;border-radius:28px;padding:24px;display:flex;flex-direction:column;gap:20px;box-shadow:0 30px 60px rgba(2,4,24,.5)">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <span style="font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#8A8C93">Nouveau revenu</span>
+              <span style="font-size:12px;font-weight:600;color:#8A8C93;font-variant-numeric:tabular-nums">3 / 3</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <span style="font-size:13px;font-weight:600;letter-spacing:0.01em">Notes</span>
+              <div style="height:96px;border-radius:14px;background:#FFF;border:1px solid #E2E2E7;padding:14px 16px;font-size:15px;line-height:1.45">Salaire août, entreprise A.</div>
+            </div>
+            <div style="height:1px;background:#D6D7DD"></div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <span style="font-size:13px;font-weight:600;letter-spacing:0.01em">Récurrence</span>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div style="height:48px;border-radius:14px;background:#FFF;color:#8A8C93;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600">Une fois</div>
+                <div style="height:48px;border-radius:14px;background:#FFF;color:#8A8C93;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600">Quotidien</div>
+                <div style="height:48px;border-radius:14px;background:#152BC7;color:#FFF;border:1px solid rgba(120,146,255,.9);box-shadow:0 0 0 3px rgba(21,43,199,.16),inset 0 1px 0 rgba(255,255,255,.28);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600">Mensuel</div>
+              </div>
+            </div>
+            <div style="height:1px;background:#D6D7DD"></div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <span style="font-size:13px;font-weight:600;letter-spacing:0.01em">Statut</span>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div style="height:48px;border-radius:14px;background:#152BC7;color:#FFF;border:1px solid rgba(120,146,255,.9);box-shadow:0 0 0 3px rgba(21,43,199,.16),inset 0 1px 0 rgba(255,255,255,.28);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600">Effectué</div>
+                <div style="height:48px;border-radius:14px;background:#FFF;color:#8A8C93;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600">Planifié</div>
+                <div style="height:48px;border-radius:14px;background:#FFF;color:#8A8C93;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600">Reçu</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:center;gap:6px;padding-top:4px">
+              <span style="width:6px;height:6px;border-radius:999px;background:#C3C4CB"></span>
+              <span style="width:6px;height:6px;border-radius:999px;background:#C3C4CB"></span>
+              <span style="width:24px;height:6px;border-radius:999px;background:#0A0A0C"></span>
+            </div>
+            <div style="display:flex;gap:12px">
+              <button type="button" style="flex:1;height:52px;border-radius:999px;border:1px solid #D6D7DD;background:#FFF;color:#0A0A0C;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer">Annuler</button>
+              <button type="button" style="flex:1;height:52px;border-radius:999px;border:0;cursor:pointer;color:#FFF;font-family:inherit;font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#33343C 0%,#16171D 46%,#05060A 58%,#20212A 100%);box-shadow:inset 0 1.5px 1px rgba(255,255,255,.4),inset 0 -8px 12px -6px rgba(255,255,255,.16),0 3px 8px rgba(4,6,30,.26),0 12px 26px -8px rgba(4,6,30,.46);transition:transform 160ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.975)">Enregistrer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Succès — revenu enregistré</span>
+        <div style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#0A1466;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;align-items:center;justify-content:center;padding:16px">
+          <div style="position:absolute;inset:0;background:url('assets/nuit.jpg') center/cover no-repeat;filter:blur(16px) saturate(1.05);transform:scale(1.14)"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,7,40,.7) 0%,rgba(4,7,40,.86) 100%)"></div>
+          <div style="position:relative;width:100%;background:#EBEBEF;border-radius:28px;padding:32px 24px;display:flex;flex-direction:column;gap:24px;box-shadow:0 30px 60px rgba(2,4,24,.5)">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center">
+              <span style="width:52px;height:52px;border-radius:999px;background:#006B3C;display:flex;align-items:center;justify-content:center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 12.5 10 17l8.5-9"></path></svg></span>
+              <h3 style="margin:0;font-size:22px;font-weight:600;letter-spacing:-0.02em">Votre revenu est enregistré</h3>
+            </div>
+            <div style="background:#FFF;border-radius:20px;padding:4px 16px;display:flex;flex-direction:column">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid #EDEDF1">
+                <span style="font-size:14px;color:#6E7079">Montant</span>
+                <span style="font-size:15px;font-weight:700;color:#006B3C;font-variant-numeric:tabular-nums">+90 000 F</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid #EDEDF1">
+                <span style="font-size:14px;color:#6E7079">Catégorie</span>
+                <span style="font-size:15px;font-weight:600">Salaire</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid #EDEDF1">
+                <span style="font-size:14px;color:#6E7079">Lié à</span>
+                <span style="font-size:15px;font-weight:600">Entreprise A</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0">
+                <span style="font-size:14px;color:#6E7079">Nature</span>
+                <span style="font-size:13px;font-weight:600;color:#152BC7;background:rgba(21,43,199,.1);border-radius:999px;padding:4px 10px">Revenu actif</span>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+              <button type="button" style="width:100%;border:0;height:56px;border-radius:999px;cursor:pointer;color:#FFF;font-family:inherit;font-size:17px;font-weight:600;letter-spacing:-0.008em;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#33343C 0%,#16171D 46%,#05060A 58%,#20212A 100%);box-shadow:inset 0 1.5px 1px rgba(255,255,255,.4),inset 0 -8px 12px -6px rgba(255,255,255,.16),0 3px 8px rgba(4,6,30,.26),0 12px 26px -8px rgba(4,6,30,.46);transition:transform 160ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.975)">Terminer</button>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+                <span style="font-size:14px;color:#5A5C63">Enregistrer comme</span>
+                <a href="#1a" style="font-size:16px;font-weight:600;color:#152BC7">Template</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;align-items:baseline;gap:14px;border-top:1px solid #DCDDE3;padding-top:24px">
+      <span style="font-size:13px;font-weight:600;color:#6E7079">10</span>
+      <h2 style="margin:0;font-size:28px;letter-spacing:-0.026em;font-weight:600">Créer / modifier un transfert</h2>
+      <span style="font-size:15px;color:#6E7079">Deux étapes de saisie, aucune catégorie, aucun score</span>
+    </div>
+
+    <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start">
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Étape 1 — date, montant, compte source</span>
+        <div style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#0A1466;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;align-items:center;justify-content:center;padding:16px">
+          <div style="position:absolute;inset:0;background:url('assets/nuit.jpg') center/cover no-repeat;filter:blur(16px) saturate(1.05);transform:scale(1.14)"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,7,40,.7) 0%,rgba(4,7,40,.86) 100%)"></div>
+          <div style="position:relative;width:100%;background:#EBEBEF;border-radius:28px;padding:24px;display:flex;flex-direction:column;gap:20px;box-shadow:0 30px 60px rgba(2,4,24,.5)">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <span style="font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#8A8C93">Nouveau transfert</span>
+              <span style="font-size:12px;font-weight:600;color:#8A8C93;font-variant-numeric:tabular-nums">1 / 3</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <span style="font-size:13px;font-weight:600;letter-spacing:0.01em">Date</span>
+              <div style="height:52px;border-radius:14px;background:#FFF;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:15px;font-weight:500">
+                Aujourd'hui
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#0A0A0C" stroke-width="1.8" stroke-linecap="round"><path d="M2.5 4.5 6 8l3.5-3.5"></path></svg>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <span style="font-size:13px;font-weight:600;letter-spacing:0.01em">Montant</span>
+              <div style="height:64px;border-radius:14px;background:#FFF;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;letter-spacing:-0.01em;font-variant-numeric:tabular-nums">10 000 F</div>
+            </div>
+            <div style="height:1px;background:#D6D7DD"></div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <span style="font-size:13px;font-weight:600;letter-spacing:0.01em">Compte source</span>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div style="height:48px;border-radius:14px;background:#152BC7;color:#FFF;border:1px solid rgba(120,146,255,.9);box-shadow:0 0 0 3px rgba(21,43,199,.16),inset 0 1px 0 rgba(255,255,255,.28);display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:600">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="2.5" y="6.5" width="19" height="11" rx="2.5"></rect><circle cx="12" cy="12" r="2.4"></circle></svg>
+                  Cash
+                </div>
+                <div style="height:48px;border-radius:14px;background:#FFF;color:#8A8C93;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:600">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="7" y="3" width="10" height="18" rx="2.5"></rect><path d="M10.5 18h3"></path></svg>
+                  Mobile
+                </div>
+                <div style="height:48px;border-radius:14px;background:#FFF;color:#8A8C93;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:600">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 10h16M5.5 10v8M18.5 10v8M12 10v8M3 18h18M12 3.5 20 9H4l8-5.5"></path></svg>
+                  Banque
+                </div>
+                <div style="height:48px;border-radius:14px;background:#FFF;color:#0A0A0C;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:center;gap:6px;font-size:14px;font-weight:600">
+                  <span style="font-size:17px;font-weight:400;line-height:1">+</span>Nouveau
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:center;gap:6px;padding-top:4px">
+              <span style="width:24px;height:6px;border-radius:999px;background:#0A0A0C"></span>
+              <span style="width:6px;height:6px;border-radius:999px;background:#C3C4CB"></span>
+              <span style="width:6px;height:6px;border-radius:999px;background:#C3C4CB"></span>
+            </div>
+            <div style="display:flex;gap:12px">
+              <button type="button" style="flex:1;height:52px;border-radius:999px;border:1px solid #D6D7DD;background:#FFF;color:#8A8C93;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 2.5 4 6l3.5 3.5"></path></svg>Retour
+              </button>
+              <button type="button" style="flex:1;height:52px;border-radius:999px;border:0;cursor:pointer;color:#FFF;font-family:inherit;font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(180deg,#33343C 0%,#16171D 46%,#05060A 58%,#20212A 100%);box-shadow:inset 0 1.5px 1px rgba(255,255,255,.4),inset 0 -8px 12px -6px rgba(255,255,255,.16),0 3px 8px rgba(4,6,30,.26),0 12px 26px -8px rgba(4,6,30,.46);transition:transform 160ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.975)">
+                Suivant<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 2.5 8 6l-3.5 3.5"></path></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Étape 2 — compte destination, même compte refusé</span>
+        <div style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#0A1466;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;align-items:center;justify-content:center;padding:16px">
+          <div style="position:absolute;inset:0;background:url('assets/nuit.jpg') center/cover no-repeat;filter:blur(16px) saturate(1.05);transform:scale(1.14)"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,7,40,.7) 0%,rgba(4,7,40,.86) 100%)"></div>
+          <div style="position:relative;width:100%;background:#EBEBEF;border-radius:28px;padding:24px;display:flex;flex-direction:column;gap:20px;box-shadow:0 30px 60px rgba(2,4,24,.5)">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <span style="font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#8A8C93">Nouveau transfert</span>
+              <span style="font-size:12px;font-weight:600;color:#8A8C93;font-variant-numeric:tabular-nums">2 / 3</span>
+            </div>
+            <div style="background:#FFF;border-radius:20px;padding:14px 16px;display:flex;align-items:center;gap:12px">
+              <span style="width:40px;height:40px;border-radius:12px;background:#0A0A0C;display:flex;align-items:center;justify-content:center;flex:none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="1.8" stroke-linecap="round"><path d="M4.5 9h13l-3.2-3.2M19.5 15h-13l3.2 3.2"></path></svg></span>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+                <span style="font-size:13px;color:#6E7079">Depuis</span>
+                <span style="font-size:15px;font-weight:600">Cash · 10 000 F</span>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <span style="font-size:13px;font-weight:600;letter-spacing:0.01em">Compte destination</span>
+              <div style="height:52px;border-radius:14px;background:#FFF;border:1px solid #E2E2E7;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:15px;color:#A0A2A9">
+                Sélectionner un compte
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#0A0A0C" stroke-width="1.8" stroke-linecap="round"><path d="M2.5 4.5 6 8l3.5-3.5"></path></svg>
+              </div>
+              <div style="background:#FFF;border-radius:14px;border:1px solid #E2E2E7;overflow:hidden;display:flex;flex-direction:column">
+                <div style="height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:15px;color:#A0A2A9;background:#F7F7F9;border-bottom:1px solid #EDEDF1">
+                  Cash
+                  <span style="font-size:12px;font-weight:600;color:#A80010">Compte source</span>
+                </div>
+                <div style="height:48px;display:flex;align-items:center;padding:0 16px;font-size:15px;font-weight:500;border-bottom:1px solid #EDEDF1">Mobile</div>
+                <div style="height:48px;display:flex;align-items:center;padding:0 16px;font-size:15px;font-weight:500">Banque</div>
+              </div>
+              <span style="font-size:13px;color:#A80010">Sélectionnez un compte différent du compte source.</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:center;gap:6px;padding-top:4px">
+              <span style="width:6px;height:6px;border-radius:999px;background:#C3C4CB"></span>
+              <span style="width:24px;height:6px;border-radius:999px;background:#0A0A0C"></span>
+              <span style="width:6px;height:6px;border-radius:999px;background:#C3C4CB"></span>
+            </div>
+            <div style="display:flex;gap:12px">
+              <button type="button" style="flex:1;height:52px;border-radius:999px;border:1px solid #D6D7DD;background:#FFF;color:#0A0A0C;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 2.5 4 6l3.5 3.5"></path></svg>Retour
+              </button>
+              <button type="button" style="flex:1;height:52px;border-radius:999px;border:0;background:#C9CACF;color:#FFF;font-family:inherit;font-size:15px;font-weight:600;cursor:not-allowed;display:flex;align-items:center;justify-content:center;gap:8px">
+                Suivant<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 2.5 8 6l-3.5 3.5"></path></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Étape 3 — note et enregistrement</span>
+        <div style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#0A1466;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;align-items:center;justify-content:center;padding:16px">
+          <div style="position:absolute;inset:0;background:url('assets/nuit.jpg') center/cover no-repeat;filter:blur(16px) saturate(1.05);transform:scale(1.14)"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,7,40,.7) 0%,rgba(4,7,40,.86) 100%)"></div>
+          <div style="position:relative;width:100%;background:#EBEBEF;border-radius:28px;padding:24px;display:flex;flex-direction:column;gap:20px;box-shadow:0 30px 60px rgba(2,4,24,.5)">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <span style="font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#8A8C93">Nouveau transfert</span>
+              <span style="font-size:12px;font-weight:600;color:#8A8C93;font-variant-numeric:tabular-nums">3 / 3</span>
+            </div>
+            <div style="background:#FFF;border-radius:20px;padding:16px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+              <div style="display:flex;flex-direction:column">
+                <span style="font-size:13px;color:#6E7079">Cash</span>
+                <span style="font-size:15px;font-weight:600">−10 000 F</span>
+              </div>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8A8C93" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M14.5 7.5 19 12l-4.5 4.5"></path></svg>
+              <div style="display:flex;flex-direction:column;align-items:flex-end">
+                <span style="font-size:13px;color:#6E7079">Banque</span>
+                <span style="font-size:15px;font-weight:600">+10 000 F</span>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <span style="font-size:13px;font-weight:600;letter-spacing:0.01em">Notes</span>
+                <span style="font-size:12px;color:#8A8C93">Optionnel</span>
+              </div>
+              <div style="height:96px;border-radius:14px;background:#FFF;border:1px solid #E2E2E7;padding:14px 16px;font-size:15px;color:#A0A2A9">Ajouter une note</div>
+            </div>
+            <div style="background:rgba(21,43,199,.07);border-radius:14px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#152BC7" stroke-width="1.8" stroke-linecap="round" style="flex:none;margin-top:1px"><circle cx="12" cy="12" r="9"></circle><path d="M12 10.5v6M12 7.5v.5"></path></svg>
+              <span style="font-size:13px;line-height:1.45;color:#33356B">Un transfert n'affecte pas votre score d'indépendance financière : l'argent change de compte, pas de camp.</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:center;gap:6px;padding-top:4px">
+              <span style="width:6px;height:6px;border-radius:999px;background:#C3C4CB"></span>
+              <span style="width:6px;height:6px;border-radius:999px;background:#C3C4CB"></span>
+              <span style="width:24px;height:6px;border-radius:999px;background:#0A0A0C"></span>
+            </div>
+            <div style="display:flex;gap:12px">
+              <button type="button" style="flex:1;height:52px;border-radius:999px;border:1px solid #D6D7DD;background:#FFF;color:#0A0A0C;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer">Annuler</button>
+              <button type="button" style="flex:1;height:52px;border-radius:999px;border:0;cursor:pointer;color:#FFF;font-family:inherit;font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#33343C 0%,#16171D 46%,#05060A 58%,#20212A 100%);box-shadow:inset 0 1.5px 1px rgba(255,255,255,.4),inset 0 -8px 12px -6px rgba(255,255,255,.16),0 3px 8px rgba(4,6,30,.26),0 12px 26px -8px rgba(4,6,30,.46);transition:transform 160ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.975)">Enregistrer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;width:375px">
+        <span style="font-size:13px;font-weight:600;color:#5A5C63">Succès — transfert enregistré</span>
+        <div style="width:375px;height:812px;border-radius:40px;overflow:hidden;position:relative;background:#0A1466;box-shadow:0 2px 8px rgba(10,10,12,.1),0 24px 60px rgba(10,10,12,.16);display:flex;align-items:center;justify-content:center;padding:16px">
+          <div style="position:absolute;inset:0;background:url('assets/nuit.jpg') center/cover no-repeat;filter:blur(16px) saturate(1.05);transform:scale(1.14)"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,7,40,.7) 0%,rgba(4,7,40,.86) 100%)"></div>
+          <div style="position:relative;width:100%;background:#EBEBEF;border-radius:28px;padding:32px 24px;display:flex;flex-direction:column;gap:24px;box-shadow:0 30px 60px rgba(2,4,24,.5)">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center">
+              <span style="width:52px;height:52px;border-radius:999px;background:#006B3C;display:flex;align-items:center;justify-content:center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 12.5 10 17l8.5-9"></path></svg></span>
+              <h3 style="margin:0;font-size:22px;font-weight:600;letter-spacing:-0.02em">Votre transfert est enregistré</h3>
+            </div>
+            <div style="background:#FFF;border-radius:20px;padding:4px 16px;display:flex;flex-direction:column">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid #EDEDF1">
+                <span style="font-size:14px;color:#6E7079">Montant</span>
+                <span style="font-size:15px;font-weight:700;font-variant-numeric:tabular-nums">10 000 F</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid #EDEDF1">
+                <span style="font-size:14px;color:#6E7079">Comptes</span>
+                <span style="font-size:15px;font-weight:600">Cash → Banque</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0">
+                <span style="font-size:14px;color:#6E7079">Date</span>
+                <span style="font-size:15px;font-weight:600;font-variant-numeric:tabular-nums">27 août 2026</span>
+              </div>
+            </div>
+            <button type="button" style="width:100%;border:0;height:56px;border-radius:999px;cursor:pointer;color:#FFF;font-family:inherit;font-size:17px;font-weight:600;letter-spacing:-0.008em;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#33343C 0%,#16171D 46%,#05060A 58%,#20212A 100%);box-shadow:inset 0 1.5px 1px rgba(255,255,255,.4),inset 0 -8px 12px -6px rgba(255,255,255,.16),0 3px 8px rgba(4,6,30,.26),0 12px 26px -8px rgba(4,6,30,.46);transition:transform 160ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.975)">Terminer</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</section>
+
+</x-dc>
+</body>
+</html>
