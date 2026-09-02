@@ -104,6 +104,22 @@ export function inviteExpiresAt(from: Date = new Date()): Date {
   return new Date(from.getTime() + TTL_MS);
 }
 
+/**
+ * Domain for the synthetic e-mails Supabase Auth needs to create an invite user
+ * (SCREEN-2). These inboxes do not exist — the invite code IS the identity, and
+ * Phase 2 replaces the whole mechanism. Never MX this subdomain.
+ */
+export const INVITE_EMAIL_DOMAIN = "invite.swiftly.io";
+
+/**
+ * Non-deliverable e-mail for the auth user behind an invitation. Deterministic
+ * from the invitation row id, so a retried redeem maps to the same user instead
+ * of creating a duplicate.
+ */
+export function syntheticInviteEmail(invitationId: string): string {
+  return `invite-${invitationId}@${INVITE_EMAIL_DOMAIN}`;
+}
+
 export type InviteCodeRecord = {
   /** `code_hash` column — HMAC-SHA256 hex of the normalized code. */
   codeHash: string;

@@ -1,69 +1,73 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
+import { AuthButton } from "@/components/auth/AuthButton";
+import { useSession } from "@/components/auth/SessionProvider";
+import { useMessages } from "@/lib/i18n/useMessages";
+
+/**
+ * SCREEN-1 — Landing. Full-bleed night hero, content bottom-aligned, one button.
+ * 100 % static (screen doc § 3): no data, no API. "Démarrer" navigates to the
+ * invite-code screen; repeat taps during the transition are ignored (§ 5).
+ *
+ * Already-signed-in visitors skip straight to the app (SCREEN-2 § 5 — don't
+ * re-show onboarding once a session exists).
+ */
+export default function LandingPage() {
+  const m = useMessages();
+  const router = useRouter();
+  const { status } = useSession();
+  const [leaving, setLeaving] = useState(false);
+
+  useEffect(() => {
+    if (status === "authenticated") router.replace("/dashboard");
+  }, [status, router]);
+
+  const start = () => {
+    if (leaving) return;
+    setLeaving(true);
+    router.push("/connexion");
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
+    <main className="relative flex min-h-dvh flex-col justify-end overflow-hidden bg-brand-deep text-ink-on-surface">
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: "url(/brand/nuit.jpg)" }}
+      />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(5,6,15,0.15) 0%, rgba(5,6,15,0) 22%, rgba(5,6,15,0.72) 58%, #05060F 82%)",
+        }}
+      />
+
+      <div
+        className="relative flex flex-col gap-8 px-6 pt-24"
+        style={{ paddingBottom: "max(3rem, env(safe-area-inset-bottom))" }}
+      >
+        <div className="flex flex-col gap-4">
+          <span className="font-logo text-[26px] tracking-[-0.015em]">
+            {m.landing.logo}
+          </span>
+          <h1 className="flex flex-col text-[34px] font-semibold uppercase leading-[1.06] tracking-[0.005em]">
+            <span>{m.landing.titleLine1}</span>
+            <span className="text-brand-on-night">{m.landing.titleLine2}</span>
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="max-w-[300px] text-[17px] leading-[1.45] text-ink-on-surface/70">
+            {m.landing.tagline}
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+
+        <AuthButton onClick={start} loading={leaving} loadingLabel={m.landing.start}>
+          {m.landing.start}
+        </AuthButton>
+      </div>
+    </main>
   );
 }

@@ -6,6 +6,7 @@ import {
   budgetCreateSchema,
   categoryCreateSchema,
   isoDate,
+  profileCreateSchema,
   profileUpdateSchema,
   projectCreateSchema,
   templateCreateSchema,
@@ -198,6 +199,20 @@ test("categoryCreateSchema: colour must be a 6-digit hex", () => {
     categoryCreateSchema.safeParse({ name: "Santé", kind: "expense", color: "red" }).success,
     false,
   );
+});
+
+test("profileCreateSchema: name required, trimmed, min 2, no extra keys (SCREEN-3)", () => {
+  assert.equal(profileCreateSchema.safeParse({ name: "Elias" }).success, true);
+  assert.equal(profileCreateSchema.safeParse({ name: "  Elias  " }).success, true);
+  assert.equal(profileCreateSchema.safeParse({ name: " " }).success, false);
+  assert.equal(profileCreateSchema.safeParse({ name: "A" }).success, false);
+  assert.equal(profileCreateSchema.safeParse({}).success, false);
+  assert.equal(
+    profileCreateSchema.safeParse({ name: "Elias", user_id: "x" }).success,
+    false,
+  );
+  const trimmed = profileCreateSchema.safeParse({ name: "  Elias  " });
+  assert.equal(trimmed.success && trimmed.data.name, "Elias");
 });
 
 test("profileUpdateSchema: email cannot be set, name needs 2 chars", () => {

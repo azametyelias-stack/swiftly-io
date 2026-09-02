@@ -202,11 +202,14 @@ verification, then OAuth Google/Apple). The invite code is not maintained
 alongside real auth — it is removed. Nothing here should grow features on the
 assumption it lives past the MVP.
 
-**What exists now:** the dependency-free primitives in `invite-codes.ts` +
-`schemas.ts` + their tests, and the SQL template `supabase/invitation-codes.sql`.
-**What's a later lot:** the auth screens (SCREEN-2/3), the `public.users` profile
-table, and the two route handlers below — they need `public.invitation_codes`
-and a Supabase session-issuing step that don't exist yet.
+**What exists now (Lot 1, 2026-09-02):** the primitives in `invite-codes.ts` +
+`schemas.ts`, `supabase/migrations/0003_invitation_codes.sql`, `POST
+/api/auth/verify-code` (redeem → magic-link session handoff via
+`invite-session.ts`) and `POST /api/auth/profile` (SCREEN-3 + Compte Principal,
+D5). Session issuing = **OTP / magic-link exchange** (Elias, 2026-09-02):
+`admin.createUser` (synthetic e-mail) → `admin.generateLink` → the browser runs
+`verifyOtp({ type: "magiclink", token_hash })`. **Still missing before prod:**
+Point 3 rate-limiting (`lib/auth/rate-limit.ts` is a no-op placeholder).
 
 ### Code format — 6 digits (SCREEN-2), with a hard rate-limit dependency
 
@@ -314,7 +317,7 @@ export async function POST(request: Request): Promise<Response> {
       return fail(AUTH_INVALID_CODE, AUTH_MESSAGES.invalidInviteCode, 400);
     }
 
-    // Atomic claim — see supabase/invitation-codes.sql. 0 rows ⇒ unknown/used/expired.
+    // Atomic claim — see supabase/migrations/0003_invitation_codes.sql. 0 rows ⇒ unknown/used/expired.
     const { data: claimed, error } = await db
       .from("invitation_codes")
       .update({ used_at: new Date().toISOString() /* used_by set after user creation */ })

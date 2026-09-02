@@ -293,6 +293,16 @@ export const projectAllocateSchema = z
   .object({ amount, direction: z.enum(["add", "withdraw"]).default("add") })
   .strict();
 
+// ── user profile ───────────────────────────────────────────────────────────
+
+/**
+ * POST /api/auth/profile (SCREEN-3) — completes the row after the invite code is
+ * redeemed. `name` is REQUIRED here (unlike the settings update below, where
+ * every field is optional). The screen doc calls the field "username"; we store
+ * it as `users.name`.
+ */
+export const profileCreateSchema = z.object({ name: personName }).strict();
+
 // ── user profile (SCREEN-22 settings) — email is not editable ───────────────
 export const profileUpdateSchema = z
   .object({
@@ -314,4 +324,5 @@ export type TemplateCreateInput = z.infer<typeof templateCreateSchema>;
 export type BudgetCreateInput = z.infer<typeof budgetCreateSchema>;
 export type ProjectCreateInput = z.infer<typeof projectCreateSchema>;
 export type ProjectAllocateInput = z.infer<typeof projectAllocateSchema>;
+export type ProfileCreateInput = z.infer<typeof profileCreateSchema>;
 export type ProfileUpdateInput = z.infer<typeof profileUpdateSchema>;

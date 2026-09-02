@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { SessionProvider } from "@/components/auth/SessionProvider";
 import { ConsentProvider } from "@/components/privacy/ConsentProvider";
 import { ConsentBanner } from "@/components/privacy/ConsentBanner";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
@@ -16,11 +17,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="fr" className="h-full scroll-smooth antialiased">
       <body className="min-h-full flex flex-col">
-        <ConsentProvider>
-          {children}
-          <GoogleAnalytics />
-          <ConsentBanner />
-        </ConsentProvider>
+        <SessionProvider>
+          <ConsentProvider>
+            {children}
+            <GoogleAnalytics />
+            <ConsentBanner />
+          </ConsentProvider>
+        </SessionProvider>
       </body>
     </html>
   );

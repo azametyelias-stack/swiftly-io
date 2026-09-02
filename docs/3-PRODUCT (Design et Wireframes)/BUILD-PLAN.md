@@ -102,14 +102,21 @@ Construits au fil des lots mais **spec unique** (§03 de la doc). Le lot indiqu�
 
 Ordre = `SWIFTLY-CARTE-PRODUIT`. **Validation en fin de lot** par Elias avant le suivant.
 
-### LOT 1 — Onboarding & Auth · écrans 01-03
-- **Écrans** : 01 Landing · 02 Connexion Code (6 chiffres) · 03 Connexion Username.
-- **Visuel** : `Lot 1 Onboarding.dc.html`. Bande d'identité (nuit) + feuille claire + 1 champ + 1 bouton.
-- **Back** : `POST /api/auth/verify-code` (existe : `lib/auth/invite-codes`), `POST /api/auth/profile` (username). Création du **Compte Principal à 0 F** au succès du profil (D5).
-- **Tables** : `users`, `accounts` (1 ligne).
-- **Composants** : Bouton principal, champ sur nuit, cases OTP-like (6 digits, auto-focus, paste, backspace), indicateur d'étape.
-- **États** : code invalide/expiré/déjà utilisé/erreur serveur (messages différenciés `02` §5) ; username vide/espaces.
-- **Go/No-Go** : login OK sans bug, redirection Dashboard, session persiste au refresh.
+### LOT 1 — Onboarding & Auth · écrans 01-03 — 🟡 CODÉ (2026-09-02), en attente validation Elias
+- **Écrans** : 01 Landing (`app/page.tsx`) · 02 Connexion Code (`app/(auth)/connexion`) · 03 Connexion Nom (`app/(auth)/connexion/nom`).
+- **Visuel** : `Lot 1 Onboarding.dc.html`. Bande d'identité (nuit) + feuille claire (radius 28, remontée 24) + 1 champ + 1 bouton pilule 56 (bleu `--brand-accent`, même bouton sur les 3 écrans).
+- **Back** :
+  - `supabase/migrations/0003_invitation_codes.sql` — table `invitation_codes` (RLS deny-all, hash HMAC-peppé), remplace le template.
+  - `POST /api/auth/verify-code` — claim atomique → `lib/auth/invite-session.ts` (createUser e-mail synthétique + `generateLink` magic-link) → le client fait `verifyOtp({ type:"magiclink", token_hash })`. **Décision Elias 2026-09-02 : échange OTP/magic-link, pas de mot de passe.**
+  - `POST /api/auth/profile` (`withAuth` + Zod `profileCreateSchema`) — upsert `users.name` + **Compte Principal à 0 F** (D5, idempotent).
+  - ⚠️ `lib/auth/rate-limit.ts` = placeholder no-op — **Point 3 (rate-limit) obligatoire avant prod**, pas bloquant pour le Go/No-Go beta.
+- **Contract-first** (décision Elias 2026-09-02) : env Supabase fictif → routes dégradent (503 `AUTH_UNAVAILABLE`). Validation end-to-end quand un vrai projet Supabase + les migrations sont branchés.
+- **i18n** : couche légère `lib/i18n/` (fr + en, parité verrouillée par tsc + `tests/i18n`), hook `useMessages()` — zéro texte en dur dans les écrans.
+- **Message d'erreur code** : collapsé sur un seul générique (Point 16 + le dc.html) tant que Point 3 n'est pas là — les messages différenciés `02` §5 reviendront après.
+- **Tables** : `users`, `accounts` (1 ligne), `invitation_codes`.
+- **Composants** : `components/auth/{AuthScreen,AuthButton,CodeInput}` + `lib/auth/code-input.ts` (pur, testé). Le `PrimaryButton` canonique noir = Lot 2.
+- **Tests** : `tests/auth/code-input.test.ts`, `tests/auth/invite-email.test.ts`, `tests/i18n/messages.test.ts`, `profileCreateSchema` (185 verts).
+- **Go/No-Go** : login OK sans bug, redirection Dashboard, session persiste au refresh. — ⏳ à vérifier avec Supabase branché.
 
 ### LOT 2 — Core UI & Dashboard · écrans 04-05
 - **Écrans** : 04 Dashboard · 05 Menu.
@@ -192,4 +199,4 @@ L1 Semgrep : à chaque push, tous les lots.   L2 Zod : à chaque route, tous les
 LOT 6 peut démarrer en parallèle dès la fin du LOT 1.   Revue L3 finale + scan complet à Day 29.
 ```
 
-**Prochaine action** : LOT 1 — Onboarding & Auth (écrans 01-03). Débloque tout le reste + remplit la session Supabase que le shell P4 attend.
+**Prochaine action** : Elias valide le LOT 1 (revue visuelle + brancher un projet Supabase pour le test end-to-end), puis LOT 2 — Core UI & Dashboard (écrans 04-05).

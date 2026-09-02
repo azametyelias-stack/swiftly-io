@@ -17,13 +17,13 @@ _SQL Editor_ → paste the contents of each file in `migrations/` in order and r
 | --- | --- |
 | `0001_privacy_consent.sql` | `consent_logs` (append-only audit trail) + `privacy_settings` (current state) for the GDPR/CCPA consent system. |
 | `0002_core_schema.sql` | Core app schema (`users`, `accounts`, `categories`, `people`, `transactions`, `templates`, `budgets`, `projects`, `alerts`, `reports`) + RLS + system-category seed + `public.account_balance()` (derived balance, no `balance` column). See `docs/3-PRODUCT (Design et Wireframes)/BUILD-PLAN.md` § P1. |
+| `0003_invitation_codes.sql` | `public.invitation_codes` (closed-beta sign-in, SECURITY MASTERPLAN Point 19). HMAC-peppered hash at rest, RLS deny-all (server-write-only via service role). Redeemed by `POST /api/auth/verify-code` (Lot 1, SCREEN-2). Phase 2 drops this table. |
 
 Not a migration:
 
 | File | Purpose |
 | --- | --- |
 | `rls-core-tables.sql` | **Superseded by `0002_core_schema.sql`** (which writes the same policies inline). Kept for reference only. |
-| `invitation-codes.sql` | **Template** — `public.invitation_codes` (closed-beta sign-up, SECURITY MASTERPLAN Point 19). Hash-at-rest, server-write-only. Apply with the auth-screens lot (Lot 1). Not run by `supabase db push`. |
 
 ## Backups & disaster recovery (SECURITY MASTERPLAN — Point 20)
 

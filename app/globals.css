@@ -46,6 +46,10 @@
   --action-on-primary: #ffffff; /* text on the primary button */
   --brand-deep: #0a1466; /* night-gradient base — invariant */
   --brand-accent: #152bc7; /* links, switches, information */
+  --brand-on-night: #5b7cff; /* accent word on the night band — AA on #05060F (Lot 1) */
+
+  /* Focus ring for text fields / code cells (SCREEN-2). */
+  --ring-brand: 0 0 0 3px color-mix(in srgb, var(--brand-accent) 20%, transparent);
 
   /* — Semantic — */
   --semantic-in: #006b3c; /* income, goals reached (on light) */
@@ -183,6 +187,7 @@
   --color-action-on-primary: var(--action-on-primary);
   --color-brand-deep: var(--brand-deep);
   --color-brand-accent: var(--brand-accent);
+  --color-brand-on-night: var(--brand-on-night);
 
   --color-semantic-in: var(--semantic-in);
   --color-semantic-in-bg: var(--semantic-in-bg);
