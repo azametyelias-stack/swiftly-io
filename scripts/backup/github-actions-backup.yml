@@ -1,0 +1,63 @@
+# TEMPLATE — daily encrypted DB backup (SECURITY MASTERPLAN Point 20, Phase 2).
+#
+# This file is intentionally NOT in .github/workflows/ — it does nothing until
+# you move it there AND add the secrets below. Do that only if this project is on
+# the Supabase Free plan (no managed backups) or you want a second, off-Supabase
+# copy. See scripts/backup/README.md.
+#
+#   mv scripts/backup/github-actions-backup.yml .github/workflows/backup.yml
+#
+# Required repo secrets (Settings → Secrets and variables → Actions):
+#   SUPABASE_DB_URL  BACKUP_ENCRYPTION_KEY  BACKUP_S3_BUCKET
+#   AWS_ACCESS_KEY_ID  AWS_SECRET_ACCESS_KEY  AWS_DEFAULT_REGION
+name: DB backup
+
+on:
+  schedule:
+    - cron: "0 3 * * *" # 03:00 UTC daily
+  workflow_dispatch: {} # allow a manual run
+
+concurrency:
+  group: db-backup
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install postgresql-client 16
+        run: |
+          sudo sh -c 'echo "deb https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+          curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/pgdg.gpg
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends postgresql-client-16
+
+      - name: Run encrypted backup
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          BACKUP_ENCRYPTION_KEY: ${{ secrets.BACKUP_ENCRYPTION_KEY }}
+          BACKUP_S3_BUCKET: ${{ secrets.BACKUP_S3_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+        run: |
+          chmod +x scripts/backup/supabase-backup.sh
+          ./scripts/backup/supabase-backup.sh
+
+      # Optional: fail the run (and notify) if no object landed in S3 today.
+      - name: Verify today's object exists
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+          BACKUP_S3_BUCKET: ${{ secrets.BACKUP_S3_BUCKET }}
+        run: |
+          today="$(date -u +%Y/%m/%d)"
+          count="$(aws s3 ls "s3://${BACKUP_S3_BUCKET}/db/${today}/" | wc -l)"
+          test "$count" -ge 1 || { echo "no backup object for ${today}"; exit 1; }

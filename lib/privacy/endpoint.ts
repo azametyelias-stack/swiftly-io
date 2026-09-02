@@ -3,7 +3,9 @@ import "server-only";
 import { cookies, headers } from "next/headers";
 import type { z } from "zod";
 
+import { isProduction } from "@/lib/env/public";
 import { ok, fail } from "@/lib/http/respond";
+import { log } from "@/lib/log/logger";
 import { recordConsent } from "@/lib/privacy/audit";
 import {
   CONSENT_COOKIE,
@@ -63,7 +65,7 @@ export async function handleConsentPost(
     jar.set(SUBJECT_COOKIE, subjectId, {
       httpOnly: true,
       sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
+      secure: isProduction,
       path: "/",
       maxAge: CONSENT_MAX_AGE,
     });
@@ -81,7 +83,7 @@ export async function handleConsentPost(
       },
     ));
   } catch (err) {
-    console.error("[privacy] handleConsentPost:", err);
+    log.error("privacy.consent_post_failed", { action, err });
     return fail("SERVER_ERROR", "Impossible d'enregistrer le consentement.", 500);
   }
 
@@ -96,7 +98,7 @@ export async function handleConsentPost(
   jar.set(CONSENT_COOKIE, JSON.stringify(stored), {
     httpOnly: false,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure: isProduction,
     path: "/",
     maxAge: CONSENT_MAX_AGE,
   });

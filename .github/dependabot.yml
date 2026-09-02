@@ -1,0 +1,41 @@
+# Dependabot — SECURITY MASTERPLAN Point 18 (Dependencies Updated).
+# Weekly PRs for out-of-date npm packages and GitHub Actions, plus immediate
+# PRs whenever GitHub's advisory database flags a vulnerable dependency
+# (security updates are always on and ignore the schedule).
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 10
+    versioning-strategy: increase-if-necessary
+    labels:
+      - dependencies
+    groups:
+      # One PR for the low-risk stuff so the queue stays small.
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
+    ignore:
+      # Next.js and its ESLint config move in lockstep and can carry breaking
+      # changes even across minors (see AGENTS.md) — take majors deliberately,
+      # by hand, not via an auto-PR.
+      - dependency-name: next
+        update-types: [version-update:semver-major]
+      - dependency-name: eslint-config-next
+        update-types: [version-update:semver-major]
+      - dependency-name: react
+        update-types: [version-update:semver-major]
+      - dependency-name: react-dom
+        update-types: [version-update:semver-major]
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    labels:
+      - dependencies

@@ -4,9 +4,10 @@ import Script from "next/script";
 import { useEffect, useState } from "react";
 
 import { useConsent } from "@/components/privacy/ConsentProvider";
+import { publicEnv } from "@/lib/env/public";
 import { CONSENT_EVENT, type ConsentCategories } from "@/lib/privacy/consent";
 
-const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
+const GA_ID = publicEnv.gaId;
 
 type GtagArgs =
   | ["js", Date]

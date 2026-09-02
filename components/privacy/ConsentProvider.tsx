@@ -23,6 +23,7 @@ import {
   type ConsentCategories,
   type StoredConsent,
 } from "@/lib/privacy/consent";
+import { log } from "@/lib/log/logger";
 
 interface ConsentContextValue {
   /** Current category state (defaults until a decision is made). */
@@ -116,7 +117,7 @@ export function ConsentProvider({ children }: { children: ReactNode }) {
         body: JSON.stringify({ categories, action }),
         keepalive: true,
       }).catch((err) => {
-        console.warn("[privacy] consent POST failed (kept locally):", err);
+        log.warn("privacy.consent_post_failed_client", { action, err });
       });
     },
     [],

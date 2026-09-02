@@ -1,6 +1,7 @@
 import "server-only";
 
 import { getServiceClient } from "@/lib/supabase/server";
+import { log } from "@/lib/log/logger";
 import {
   buildConsentRow,
   withEssential,
@@ -36,7 +37,7 @@ export async function recordConsent(
   try {
     const { error: logError } = await supabase.from("consent_logs").insert(row);
     if (logError) {
-      console.error("[privacy] consent_logs insert failed:", logError.message);
+      log.error("privacy.consent_logs_insert_failed", { reason: logError.message });
       return { persisted: false };
     }
 
@@ -56,17 +57,14 @@ export async function recordConsent(
         { onConflict: "subject_id" },
       );
     if (settingsError) {
-      console.error(
-        "[privacy] privacy_settings upsert failed:",
-        settingsError.message,
-      );
+      log.error("privacy.privacy_settings_upsert_failed", { reason: settingsError.message });
       // The audit row is in — that's the legally important part.
       return { persisted: true };
     }
 
     return { persisted: true };
   } catch (err) {
-    console.error("[privacy] recordConsent unexpected error:", err);
+    log.error("privacy.record_consent_error", { err });
     return { persisted: false };
   }
 }
