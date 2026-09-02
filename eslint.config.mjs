@@ -54,6 +54,9 @@ const eslintConfig = defineConfig([
     "ecc/**",
     // Test files run via `node --test`, not linted with the app rules.
     "tests/**",
+    // Documentation only — incl. the Claude Design handoff (support.js is
+    // third-party design-tool output, "à ignorer" per DESIGN-HANDOFF/README.md).
+    "docs/**",
   ]),
 ]);
 
