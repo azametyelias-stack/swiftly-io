@@ -33,6 +33,13 @@
 
 Ordre imposé. Chaque étape se termine par `npm test` au vert.
 
+### P0 — Défense en profondeur, LAYER 1 (Semgrep) — ✅ FAIT (2026-09-02)
+`semgrep.yml` (règles maison Points 6/7/10/11/14/19) + `.semgrepignore` + job `sast`
+dans `ci.yml` (règles maison + `p/typescript` `p/react` `p/nextjs` `p/owasp-top-ten`
+`p/secrets`, bloque sur ERROR). Local : `npm run scan`. Lock : `tests/security/semgrep.test.ts`.
+Les 3 couches et leur calendrier : `docs/2-ARCHITECTURE (…)/SECURITY-3-LAYERS.md`.
+LAYER 2 (Zod) = P2. LAYER 3 (revue logique métier) = fin de Lot 3, fin de Lot 5, Day 29.
+
 ### P1 — Schéma DB applicatif  (= PROMPT #PAYMENT, volet schéma)
 Migration `supabase/migrations/0002_core_schema.sql`. Tables (colonnes détaillées à dériver des `NN-*.md`) :
 
@@ -119,6 +126,7 @@ Ordre = `SWIFTLY-CARTE-PRODUIT`. **Validation en fin de lot** par Elias avant le
 - **Composants** : Pavé numérique, Badge de type, Pilule de filtre, Carte de liste.
 - **États** : lot 10 — vide (« Aucune transaction »), filtre sans résultat (≠ vide), erreur de chargement, écriture refusée (toast encre, valeurs conservées), succès (toast + retour).
 - **Go/No-Go** : créer les 3 types, apparition dans Historiques, solde + courbe à jour, Score recalculé.
+- **🔎 LAYER 3 — 1re revue logique métier** (`SECURITY-3-LAYERS.md`) : le cœur financier est là. Vérifier — un user ne peut ni lire ni écrire les tx/comptes d'un autre (RLS + `assertOwnership`) ; `amount`/`source`/`destination` jamais issus du body sans revalidation ; le recalcul du solde dérivé (D3) est atomique et cohérent à l'édition/suppression ; pas de race sur des écritures concurrentes ; solde négatif = avertissement, jamais un blocage silencieux (D4). Support : `npx ecc-agentshield scan --opus`.
 
 ### LOT 4 — Statistiques & Rapports · écrans 11-13
 - **Écrans** : 11 Statistiques · 12 Rapport · 13 Aides.
@@ -139,6 +147,7 @@ Ordre = `SWIFTLY-CARTE-PRODUIT`. **Validation en fin de lot** par Elias avant le
 - **17 Comptes** : cartes de compte (icône type, nom, solde dérivé, frais mensuels), tap = détails, « Voir les historiques » = Historique filtré compte, long-press modifier/supprimer (**pas** sur Compte Principal), formulaire créer/modifier (champs conditionnels selon type), soft-delete.
 - **Tables** : `templates`, `budgets`, `projects`, `accounts` (+ frais mensuels → job fin de mois créant une tx « Frais bancaires »).
 - **Dépend de** : Lot 2 + Lot 3.
+- **🔎 LAYER 3 — 2e revue logique métier** : affectation projet qui bouge le solde **sans** transaction (D4) — pas de double comptage, refus si insuffisant ; exécution des règles de récurrence (D2) — pas de double prélèvement, échéance ratée gérée ; job de frais mensuels idempotent (une seule tx par mois).
 
 ### LOT 6 — Alertes & Paramètres · écrans 18-22
 - **Écrans** : 18 Alertes & Notifications · 19 Consentement · 20 Privacy Page · 21 Privacy Settings · 22 Paramètres.
@@ -159,20 +168,23 @@ Ordre = `SWIFTLY-CARTE-PRODUIT`. **Validation en fin de lot** par Elias avant le
 - **Devise** : `XOF` / `F` partout, format `lib/format/money.ts`.
 - **Thème sombre** : chaque jeton a sa valeur sombre ; la zone d'identité (nuit) ne bascule jamais.
 - **A11y** : cibles 44, contraste AA (les 2 verts), Dynamic Type jusqu'à 200 %, focus 2 px `brand/accent`, montants annoncés en entier au lecteur d'écran, la couleur ne porte jamais seule.
-- **Sécurité** : chaque route via `withAuth` + `assertOwnership` ; jamais de `user_id` depuis le body ; validation Zod en entrée ; erreurs via `toErrorResponse`.
-- **Après chaque écran** : `graphify update .` + `npm test`.
+- **Sécurité — les 3 couches tournent en continu** (`SECURITY-3-LAYERS.md`) : **L1** Semgrep à chaque push (job `sast`) ; **L2** `parseJsonBody` + schéma Zod en tête de **chaque** route (body + query + params, `.strict()`), `user_id` toujours depuis `withAuth`, jamais le body ; **L3** revue logique métier fin de Lot 3 et fin de Lot 5. Aussi : chaque route via `withAuth` + `assertOwnership` ; erreurs via `toErrorResponse` (rien d'interne sur le fil).
+- **Après chaque écran** : `graphify update .` + `npm test` (+ `npm run scan` si des règles maison sont touchées).
 
 ---
 
 ## 4. Séquence
 
 ```
-P1 schéma DB ─ P2 Zod ─ P3 design system ─ P4 nav shell ─ P5 (au fil de l'eau)
+P0 Semgrep(L1) ─ P1 schéma DB ─ P2 Zod(L2) ─ P3 design system ─ P4 nav shell ─ P5 (au fil de l'eau)
+   ✅ fait          ✅ fait        ✅ fait
         │
         ▼
 LOT 1 ──▶ [valid.] ──▶ LOT 2 ──▶ [valid.] ──▶ LOT 3 ──▶ [valid.] ──▶ LOT 4 ──▶ [valid.] ──▶ LOT 5 ──▶ [valid.] ──▶ LOT 6 ──▶ [valid.]
-                                                                          (D6)                      (D2)
-LOT 6 peut démarrer en parallèle dès la fin du LOT 1.
+                                              🔎 L3 #1         (D6)                🔎 L3 #2
+                                                                                  (D2)
+L1 Semgrep : à chaque push, tous les lots.   L2 Zod : à chaque route, tous les lots.
+LOT 6 peut démarrer en parallèle dès la fin du LOT 1.   Revue L3 finale + scan complet à Day 29.
 ```
 
-**Prochaine action** : P1 — migration `0002_core_schema.sql` + seed catégories + RLS + fonction solde dérivé.
+**Prochaine action** : P3 — design system dans `app/globals.css` + `lib/format/money.ts`.

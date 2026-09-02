@@ -1,0 +1,28 @@
+# Paths Semgrep skips. Same spirit as .gitignore / .graphifyignore.
+
+# Dependencies & build output
+node_modules/
+.next/
+out/
+build/
+coverage/
+
+# Nested tooling repo — not part of the Swiftly.io codebase
+ecc/
+
+# Generated / tooling artefacts
+graphify-out/
+tsconfig.tsbuildinfo
+*.tsbuildinfo
+
+# Docs & the Claude Design handoff (support.js is third-party design-tool
+# output — full of eval / innerHTML by design; "à ignorer" per the handoff)
+docs/
+STRUCTURE COMPLÈTE DES DOCUMENTS/
+
+# Day-0 bootstrap scripts (not shipped)
+*.bat
+*.ps1
+
+# Static assets
+public/

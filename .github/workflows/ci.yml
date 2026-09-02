@@ -1,7 +1,11 @@
-# Continuous integration — SECURITY MASTERPLAN Point 18 (Dependencies Updated).
-# Runs on every push to main and every pull request. The `audit` job fails the
-# build on a known runtime vulnerability so a vulnerable dependency can never
-# reach production unnoticed.
+# Continuous integration — SECURITY MASTERPLAN.
+# Runs on every push to main and every pull request.
+#   verify — lint, types, tests, build.
+#   audit  — fails on a known runtime vulnerability (Point 18) so a vulnerable
+#            dependency can never reach production unnoticed.
+#   sast   — Semgrep static analysis (defense-in-depth LAYER 1): scans the code
+#            for injection / XSS / secret-leak / masterplan-convention breaks
+#            before it can merge.
 name: CI
 
 on:
@@ -51,3 +55,22 @@ jobs:
         run: npm audit --omit=dev --audit-level=high
       - name: Audit dev dependencies (report only)
         run: npm audit --audit-level=moderate || true
+
+  sast:
+    name: Semgrep (static analysis — defense LAYER 1)
+    runs-on: ubuntu-latest
+    # Official image ships the CLI + rule engine; pinned like node-version above.
+    container:
+      image: semgrep/semgrep:1.175.0
+    steps:
+      - uses: actions/checkout@v4
+      - name: Semgrep scan (fails on any ERROR finding)
+        run: |
+          semgrep scan \
+            --error --severity=ERROR --metrics=off --disable-version-check \
+            --config ./semgrep.yml \
+            --config p/typescript \
+            --config p/react \
+            --config p/nextjs \
+            --config p/owasp-top-ten \
+            --config p/secrets

@@ -12,13 +12,14 @@ que tu cherches, pour ne pas avoir à tout lire à chaque fois.
 
 ---
 
-## 🗺️ Les 4 documents en un coup d'œil
+## 🗺️ Les documents en un coup d'œil
 
 | Document | À quoi il sert | Quand le lire |
 |---|---|---|
 | **ARCHITECTURE-CLAUDE-CODE.md** | L'architecture **production** de référence (schema complet, API, déploiement, sécurité) | Avant de coder — c'est LA référence technique |
 | **ARCHITECTURE-MVP-TEST.md** | L'architecture **test/beta** simplifiée (version gratuite pour 5-10 users) | Pour le MVP 5-10 beta users — version allégée de la précédente |
 | **SWIFTLY_IO_SECURITY_MASTERPLAN_ULTIMATE_COMPLET.md** | Le plan **sécurité complet** (20 points + mitigations + roadmap) | Pour tout ce qui touche à la sécurité, à chaque étape |
+| **SECURITY-3-LAYERS.md** | La **défense en profondeur** : Semgrep (L1) / Zod (L2) / revue logique métier (L3) — où c'est branché, quand ça tourne | Statut des 3 couches ; avant chaque lot |
 | **UPDATE-ARCHITECTURE-REST-API.md** | La **décision REST API** (pourquoi REST, 18 endpoints, format JSON) | Pour comprendre le choix REST vs GraphQL |
 
 ---

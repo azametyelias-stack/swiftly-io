@@ -587,6 +587,12 @@ Result: Payment system LIVE! ✅
 
 ## System 4: SECURITY INFRASTRUCTURE (Days 8-11 + Parallel) — BUILD FOUNDATION
 
+> **État réel & wiring : `docs/2-ARCHITECTURE (…)/SECURITY-3-LAYERS.md`** (source de
+> vérité). Résumé : L1 Semgrep branché en CI le 2026-09-02 (job `sast`) ; L2 Zod
+> registre prêt, se branche par route dès le Lot 1 ; L3 revue logique métier =
+> fin de Lot 3, fin de Lot 5, Day 29 (pas seulement Day 29). Le texte ci-dessous
+> est la note d'intention d'origine.
+
 **3-Layer Security:**
 
 ### Layer 1: SEMGREP (Code Analysis)

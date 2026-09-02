@@ -58,7 +58,8 @@ export async function withMinimumDuration<T>(
     return await work();
   } finally {
     const elapsed = now() - started;
-    const jitter = Math.random() * Math.min(15, Math.max(0, floorMs) * 0.1);
+    // Timing jitter only — not a secret; a CSPRNG would add nothing here.
+    const jitter = Math.random() * Math.min(15, Math.max(0, floorMs) * 0.1); // nosemgrep: swiftly-insecure-random-in-auth
     const remaining = floorMs + jitter - elapsed;
     if (remaining > 0) await sleep(remaining);
   }

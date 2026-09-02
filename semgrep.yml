@@ -1,0 +1,117 @@
+# Semgrep — SECURITY MASTERPLAN, defense-in-depth LAYER 1 (Code Analysis).
+#
+# Runs on every push / PR (see .github/workflows/ci.yml, job "sast"). CI also
+# pulls the managed rule packs (p/typescript, p/react, p/nextjs, p/owasp-top-ten,
+# p/secrets) from the registry — those need network and are NOT listed here.
+#
+# This file holds only the Swiftly-specific rules that encode our own masterplan
+# conventions, so it can also be run offline:  npm run scan
+#
+# Suppress a single false positive with an inline comment naming the rule and a
+# one-line reason:  // nosemgrep: <rule-id> -- <why>
+#
+# Scope note: `.semgrepignore` already drops node_modules/, .next/, ecc/, docs/,
+# public/.
+
+rules:
+  # --- P14: generic errors, nothing internal on the wire ---------------------
+  - id: swiftly-raw-error-in-response-body
+    languages: [typescript]
+    severity: ERROR
+    message: >-
+      A raw error message or stack must never go into an HTTP response body — it
+      leaks internals (SECURITY MASTERPLAN Point 14). Throw an ApiError and let
+      toErrorResponse() build the body, or return a fixed generic string.
+    patterns:
+      - pattern-either:
+          - pattern: "$RESP.json({ ..., error: $ERR.message, ... }, ...)"
+          - pattern: "$RESP.json({ ..., error: $ERR.stack, ... }, ...)"
+          - pattern: "$RESP.json({ ..., message: $ERR.stack, ... }, ...)"
+          - pattern: "$RESP.json({ ..., detail: $ERR.message, ... }, ...)"
+          - pattern: "new Response($ERR.message, ...)"
+          - pattern: "new Response($ERR.stack, ...)"
+      - metavariable-regex:
+          metavariable: $ERR
+          regex: "^(err|error|e|ex|cause)$"
+    paths:
+      exclude:
+        - "**/lib/http/errors.ts" # the one sanctioned collapse point
+
+  # --- P10/P11: no SQL built by string interpolation ------------------------
+  - id: swiftly-sql-string-interpolation
+    languages: [typescript, javascript]
+    severity: ERROR
+    message: >-
+      SQL assembled by string interpolation is an injection risk (SECURITY
+      MASTERPLAN Point 10/11). Use the Supabase query builder (.from().eq()) or
+      parameterized rpc arguments — never a template literal.
+    patterns:
+      - pattern-regex: '`[^`]*(?i:\b(SELECT|INSERT\s+INTO|UPDATE|DELETE\s+FROM|DROP\s+TABLE)\b)[^`]*\$\{[^}]+\}[^`]*`'
+
+  # --- P7: client code never touches server env ----------------------------
+  - id: swiftly-server-env-in-client-component
+    languages: [typescript]
+    severity: ERROR
+    message: >-
+      Components are Client Components — they must read config from
+      @/lib/env/public (NEXT_PUBLIC_* only), never process.env directly
+      (SECURITY MASTERPLAN Point 7).
+    patterns:
+      - pattern: "process.env.$X"
+      - metavariable-regex:
+          metavariable: $X
+          regex: '^(?!NEXT_PUBLIC_|NODE_ENV$).+'
+    paths:
+      include:
+        - "**/components/**"
+
+  # --- P19: codes/tokens/secrets come from a CSPRNG ------------------------
+  - id: swiftly-insecure-random-in-auth
+    languages: [typescript, javascript]
+    severity: ERROR
+    message: >-
+      Math.random() is not cryptographically secure. Invite codes, tokens,
+      secrets, salts and peppers must come from node:crypto (randomInt /
+      randomBytes / randomUUID). SECURITY MASTERPLAN Point 19. For non-security
+      jitter add `// nosemgrep: swiftly-insecure-random-in-auth -- <reason>`.
+    patterns:
+      - pattern: "Math.random(...)"
+    paths:
+      include:
+        - "**/lib/auth/**"
+        - "**/*invite*"
+        - "**/*token*"
+
+  # --- XSS sinks ----------------------------------------------------------
+  - id: swiftly-no-dangerously-set-inner-html
+    languages: [typescript, javascript]
+    severity: ERROR
+    message: >-
+      dangerouslySetInnerHTML is an XSS sink. Render text as children; if raw
+      HTML is unavoidable, sanitize with a vetted library and add a nosemgrep
+      note explaining the source is trusted.
+    patterns:
+      - pattern: "dangerouslySetInnerHTML={...}"
+
+  - id: swiftly-no-eval
+    languages: [typescript, javascript]
+    severity: ERROR
+    message: >-
+      eval() / new Function() executes arbitrary strings as code. Never in
+      Swiftly application code.
+    patterns:
+      - pattern-either:
+          - pattern: "eval(...)"
+          - pattern: "new Function(...)"
+
+  # --- P6: identity is derived server-side, never taken from the request ---
+  - id: swiftly-user-id-from-request-body
+    languages: [typescript, javascript]
+    severity: ERROR
+    message: >-
+      user_id / owner id must come from authenticate() / withAuth, never from
+      the request body, query or params (SECURITY MASTERPLAN Point 6). Set it
+      from `user.id` at the call site, after validation.
+    patterns:
+      # `user_id: req.body.user_id`, `owner_id: params.userId`, `user_id: searchParams.get(...)`, …
+      - pattern-regex: '\b(user_id|owner_id|owner|created_by|account_owner)\s*:\s*(req|request|body|reqBody|params|searchParams|query|payload)\b[^,}\n]*'
