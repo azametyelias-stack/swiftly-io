@@ -102,7 +102,7 @@ Construits au fil des lots mais **spec unique** (§03 de la doc). Le lot indiqu�
 
 Ordre = `SWIFTLY-CARTE-PRODUIT`. **Validation en fin de lot** par Elias avant le suivant.
 
-### LOT 1 — Onboarding & Auth · écrans 01-03 — 🟡 CODÉ (2026-09-02), en attente validation Elias
+### LOT 1 — Onboarding & Auth · écrans 01-03 — 🟢 BACKEND VÉRIFIÉ (2026-09-03), reste la revue visuelle Elias
 - **Écrans** : 01 Landing (`app/page.tsx`) · 02 Connexion Code (`app/(auth)/connexion`) · 03 Connexion Nom (`app/(auth)/connexion/nom`).
 - **Visuel** : `Lot 1 Onboarding.dc.html`. Bande d'identité (nuit) + feuille claire (radius 28, remontée 24) + 1 champ + 1 bouton pilule 56 (bleu `--brand-accent`, même bouton sur les 3 écrans).
 - **Back** :
@@ -110,13 +110,13 @@ Ordre = `SWIFTLY-CARTE-PRODUIT`. **Validation en fin de lot** par Elias avant le
   - `POST /api/auth/verify-code` — claim atomique → `lib/auth/invite-session.ts` (createUser e-mail synthétique + `generateLink` magic-link) → le client fait `verifyOtp({ type:"magiclink", token_hash })`. **Décision Elias 2026-09-02 : échange OTP/magic-link, pas de mot de passe.**
   - `POST /api/auth/profile` (`withAuth` + Zod `profileCreateSchema`) — upsert `users.name` + **Compte Principal à 0 F** (D5, idempotent).
   - ⚠️ `lib/auth/rate-limit.ts` = placeholder no-op — **Point 3 (rate-limit) obligatoire avant prod**, pas bloquant pour le Go/No-Go beta.
-- **Contract-first** (décision Elias 2026-09-02) : env Supabase fictif → routes dégradent (503 `AUTH_UNAVAILABLE`). Validation end-to-end quand un vrai projet Supabase + les migrations sont branchés.
+- **Supabase branché 2026-09-03** : projet `dloyglqjmeipbtsjnncd` (Free, eu-west-1), migrations 0001+0002+0003 appliquées via SQL Editor, `.env.local` complet (URL + publishable + secret + pepper). Flux complet testé de bout en bout contre la vraie base : mint code → claim atomique → createUser + magic-link → `verifyOtp` → session réelle → upsert profil + Compte Principal à 0 F → solde dérivé = 0 → RLS OK (l'utilisateur ne voit que son compte). Routes HTTP live : `verify-code` bad code → 400 `AUTH_INVALID`, `profile` sans token → 401. Code de test pour Elias en base (note « test manuel Elias »).
 - **i18n** : couche légère `lib/i18n/` (fr + en, parité verrouillée par tsc + `tests/i18n`), hook `useMessages()` — zéro texte en dur dans les écrans.
 - **Message d'erreur code** : collapsé sur un seul générique (Point 16 + le dc.html) tant que Point 3 n'est pas là — les messages différenciés `02` §5 reviendront après.
 - **Tables** : `users`, `accounts` (1 ligne), `invitation_codes`.
 - **Composants** : `components/auth/{AuthScreen,AuthButton,CodeInput}` + `lib/auth/code-input.ts` (pur, testé). Le `PrimaryButton` canonique noir = Lot 2.
 - **Tests** : `tests/auth/code-input.test.ts`, `tests/auth/invite-email.test.ts`, `tests/i18n/messages.test.ts`, `profileCreateSchema` (185 verts).
-- **Go/No-Go** : login OK sans bug, redirection Dashboard, session persiste au refresh. — ⏳ à vérifier avec Supabase branché.
+- **Go/No-Go** : login OK sans bug, redirection Dashboard, session persiste au refresh. — backend ✅ ; reste la marche dans le navigateur + le OK visuel d'Elias sur les 3 écrans.
 
 ### LOT 2 — Core UI & Dashboard · écrans 04-05
 - **Écrans** : 04 Dashboard · 05 Menu.
