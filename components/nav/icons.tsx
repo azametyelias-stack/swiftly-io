@@ -115,6 +115,93 @@ export function ArrowUpRightIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+export function TransferIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Svg {...props}>
+      <path d="M4 9h13l-3.2-3.2M20 15H7l3.2 3.2" />
+    </Svg>
+  );
+}
+
+export function CheckIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Svg {...props}>
+      <path d="m5 12.5 4.5 4.5L19 8" />
+    </Svg>
+  );
+}
+
+export function TrashIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Svg {...props}>
+      <path d="M5 7h14M9 7V5h6v2M7 7l1 12h8l1-12" />
+    </Svg>
+  );
+}
+
+export function InfoIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Svg {...props}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 10.5v6M12 7.5v.5" />
+    </Svg>
+  );
+}
+
+export function AlertTriangleIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Svg {...props}>
+      <path d="M12 4 3 19h18L12 4Z" />
+      <path d="M12 10v4M12 17v.5" />
+    </Svg>
+  );
+}
+
+export function CloseIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Svg {...props}>
+      <path d="m6 6 12 12M18 6 6 18" />
+    </Svg>
+  );
+}
+
+/** Account-type glyph (cash / mobile / bank / card). */
+export function AccountTypeIcon({
+  type,
+  ...props
+}: { type: string } & SVGProps<SVGSVGElement>) {
+  if (type === "mobile") {
+    return (
+      <Svg {...props}>
+        <rect x="7" y="3" width="10" height="18" rx="2.5" />
+        <path d="M10.5 18h3" />
+      </Svg>
+    );
+  }
+  if (type === "bank") {
+    return (
+      <Svg {...props}>
+        <path d="M4 10h16M5.5 10v8M18.5 10v8M12 10v8M3 18h18M12 3.5 20 9H4l8-5.5" />
+      </Svg>
+    );
+  }
+  if (type === "card") {
+    return (
+      <Svg {...props}>
+        <rect x="3" y="6" width="18" height="12" rx="2.5" />
+        <path d="M3 10h18" />
+      </Svg>
+    );
+  }
+  // cash
+  return (
+    <Svg {...props}>
+      <rect x="2.5" y="6.5" width="19" height="11" rx="2.5" />
+      <circle cx="12" cy="12" r="2.4" />
+    </Svg>
+  );
+}
+
 const PATHS: Record<NavIcon, React.ReactNode> = {
   dashboard: <path d="M4 13h7V4H4zM13 20h7v-9h-7zM4 20h7v-5H4zM13 8h7V4h-7z" />,
   stats: <path d="M5 20V10M12 20V4M19 20v-7" />,

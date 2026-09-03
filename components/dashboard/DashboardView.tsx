@@ -6,6 +6,7 @@ import Link from "next/link";
 import { BalanceCurve } from "@/components/dashboard/BalanceCurve";
 import { MoneyDropdown } from "@/components/dashboard/MoneyDropdown";
 import { Odometer } from "@/components/dashboard/Odometer";
+import { RecentHistory } from "@/components/dashboard/RecentHistory";
 import { RotatingBanner } from "@/components/dashboard/RotatingBanner";
 import { useNavShell } from "@/components/nav/useNavShell";
 import {
@@ -278,7 +279,7 @@ export function DashboardView() {
               </Link>
             }
           >
-            <p className="t-secondary text-text-secondary">{m.dashboard.history.empty}</p>
+            <RecentHistory />
           </PanelSection>
         </div>
       </div>

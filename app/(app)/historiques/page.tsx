@@ -1,14 +1,6 @@
-import { AppHeader } from "@/components/nav/AppHeader";
+import { HistoryScreen } from "@/components/transactions/HistoryScreen";
 
-// Stub — the real screen is built in Lot 3 (see BUILD-PLAN.md). Kept so the menu
-// route resolves and the nav shell has somewhere to land.
+// SCREEN-6 — Historiques (Lot 3).
 export default function Page() {
-  return (
-    <>
-      <AppHeader title="Historiques" />
-      <main className="mx-[var(--margin-screen)] py-16">
-        <p className="t-body text-text-secondary">« Historiques » — écran construit au Lot 3.</p>
-      </main>
-    </>
-  );
+  return <HistoryScreen />;
 }

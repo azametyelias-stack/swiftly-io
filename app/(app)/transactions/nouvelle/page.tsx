@@ -1,16 +1,15 @@
-import { AppHeader } from "@/components/nav/AppHeader";
+import { TxTypePicker } from "@/components/transactions/TxTypePicker";
+import { TxWizard } from "@/components/transactions/TxWizard";
+import { isTxType } from "@/lib/transactions/model";
 
-// Stub — the transaction flow (SCREEN-8/9/10) is built in Lot 3. Kept so the
-// dashboard's "+ Nouvelle transaction" button has somewhere to land.
-export default function Page() {
-  return (
-    <>
-      <AppHeader title="Nouvelle transaction" />
-      <main className="mx-[var(--margin-screen)] py-16">
-        <p className="t-body text-text-secondary">
-          « Nouvelle transaction » — écran construit au Lot 3.
-        </p>
-      </main>
-    </>
-  );
+// SCREEN-8/9/10 — Créer une transaction (Lot 3). `?type` picks the flow;
+// without it, the "Que voulez-vous enregistrer ?" chooser.
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ type?: string }>;
+}) {
+  const { type } = await searchParams;
+  if (!type || !isTxType(type)) return <TxTypePicker />;
+  return <TxWizard type={type} />;
 }

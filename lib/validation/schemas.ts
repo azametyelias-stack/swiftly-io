@@ -41,6 +41,9 @@ export const currency = z.enum(["XOF", "EUR", "USD"], {
 
 export const uuid = z.uuid("Identifiant invalide.");
 
+/** `[id]` route param. */
+export const idParamSchema = z.object({ id: uuid }).strict();
+
 /** Calendar day `YYYY-MM-DD` that is also a real date. */
 export const isoDate = z
   .string()
@@ -150,6 +153,14 @@ export const categoryCreateSchema = z
 
 export const categoryUpdateSchema = categoryCreateSchema.partial();
 
+/** GET /api/categories?kind= — the transaction-form picker (SCREEN-8/9 § 2). */
+export const categoryListQuerySchema = z
+  .object({ kind: categoryKind.optional() })
+  .strict();
+
+/** GET /api/people, GET /api/projects — "Lié à" pickers. No params for now. */
+export const linkedListQuerySchema = z.object({}).strict();
+
 // ── transactions (SCREEN-8/9/10) ────────────────────────────────────────────
 const expenseTx = z
   .object({
@@ -220,6 +231,19 @@ export const transactionCreateSchema = z
 
 /** Edit reuses the create shape; the route also checks ownership of the row. */
 export const transactionUpdateSchema = transactionCreateSchema;
+
+/** GET /api/transactions — history list query (SCREEN-6 § 4). */
+export const transactionListQuerySchema = z
+  .object({
+    type: z.enum(["expense", "income", "transfer"]).optional(), // omitted ⇒ all
+    account: uuid.optional(),
+    linked_to_type: linkedToType.optional(),
+    linked_to_id: uuid.optional(),
+    /** opaque cursor from the previous page: "<occurred_on>|<id>" */
+    cursor: z.string().max(80).optional(),
+    limit: z.coerce.number().int().min(1).max(100).default(50),
+  })
+  .strict();
 
 // ── templates (SCREEN-14) — the recurrence toggle lives here (D2bis) ─────────
 export const templateCreateSchema = z
@@ -328,6 +352,7 @@ export type AccountUpdateInput = z.infer<typeof accountUpdateSchema>;
 export type PersonCreateInput = z.infer<typeof personCreateSchema>;
 export type CategoryCreateInput = z.infer<typeof categoryCreateSchema>;
 export type TransactionCreateInput = z.infer<typeof transactionCreateSchema>;
+export type TransactionListQuery = z.infer<typeof transactionListQuerySchema>;
 export type TemplateCreateInput = z.infer<typeof templateCreateSchema>;
 export type BudgetCreateInput = z.infer<typeof budgetCreateSchema>;
 export type ProjectCreateInput = z.infer<typeof projectCreateSchema>;
