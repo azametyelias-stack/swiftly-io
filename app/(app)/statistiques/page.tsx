@@ -1,14 +1,6 @@
-import { AppHeader } from "@/components/nav/AppHeader";
+import { StatsView } from "@/components/stats/StatsView";
 
-// Stub — the real screen is built in Lot 4 (see BUILD-PLAN.md). Kept so the menu
-// route resolves and the nav shell has somewhere to land.
+// SCREEN-11 — Statistiques (Lot 4).
 export default function Page() {
-  return (
-    <>
-      <AppHeader title="Statistiques" />
-      <main className="mx-[var(--margin-screen)] py-16">
-        <p className="t-body text-text-secondary">« Statistiques » — écran construit au Lot 4.</p>
-      </main>
-    </>
-  );
+  return <StatsView />;
 }

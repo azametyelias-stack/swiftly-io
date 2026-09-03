@@ -223,6 +223,338 @@ export const fr = {
     },
   },
 
+  stats: {
+    title: "Statistiques",
+    newTransaction: "Nouvelle transaction",
+    modes: {
+      apercu: "Aperçu",
+      expense: "Dépense",
+      income: "Revenu",
+      patrimoine: "Patrimoine",
+    },
+    periods: {
+      day: "Aujourd'hui",
+      week: "Cette semaine",
+      month: "Ce mois",
+      year: "Cette année",
+    },
+    allAccounts: "Tous les comptes",
+    sections: {
+      overview: "Vue d'ensemble",
+      expenseBreakdown: "Répartition des dépenses",
+      incomeBreakdown: "Répartition des revenus",
+      score: "Score financier",
+    },
+    overview: {
+      startBalance: "Solde début",
+      currentBalance: "Solde actuel",
+      income: "Revenus",
+      expenses: "Dépenses",
+      netProfit: "Bénéfice net",
+      vsPeriod: "vs {period}",
+      curveOffline: "Graphique indisponible",
+    },
+    breakdown: {
+      byLabel: {
+        category: "Catégorie",
+        account: "Compte",
+        person: "Personnes",
+        project: "Projets",
+      },
+      expenseTotal: "Dépenses totales",
+      incomeTotal: "Revenus totaux",
+      seeMore: "Voir plus",
+      seeLess: "Voir moins",
+      others: "Autres",
+      unassigned: "Sans catégorie",
+      empty: "Aucune donnée sur la période.",
+      passiveShare: "Dont revenus passifs",
+    },
+    score: {
+      outOf: "/100",
+      seeHelp: "Voir l'aide",
+      seeReport: "Voir le rapport",
+      tiers: {
+        faible: "Faible",
+        moyen: "Moyen",
+        bon: "Bon",
+        excellent: "Excellent",
+      },
+      tierBlurb: {
+        faible:
+          "Vous commencez votre parcours. Concentrez-vous sur l'épargne et la réduction des dépenses.",
+        moyen: "Vous êtes sur la bonne voie. Continuez à investir et diversifier.",
+        bon: "Vous gérez bien vos finances. Visez l'indépendance avec les revenus passifs.",
+        excellent:
+          "Vous êtes très proche ou avez atteint l'indépendance financière.",
+      },
+      criteria: {
+        liberte: "Liberté financière",
+        investissement: "Taux d'investissement",
+        epargne: "Taux d'épargne",
+        diversification: "Diversification des revenus",
+      },
+      weight: "Poids {n} %",
+      sources: "{n} sources",
+      source: "{n} source",
+    },
+    spendMode: {
+      expenseTotal: "Dépensé · {period}",
+      incomeTotal: "Reçu · {period}",
+      vsPrevious: "vs période précédente",
+      investVsConso: "Investissement contre consommation",
+      activeVsPassive: "Revenu actif contre passif",
+      investment: "Investissement",
+      consumption: "Consommation",
+      active: "Revenu actif",
+      passive: "Revenu passif",
+      rising: "Postes en hausse",
+      noRising: "Rien en forte hausse sur la période.",
+    },
+    patrimoine: {
+      title: "Patrimoine estimé",
+      thisYear: "cette année",
+      accounts: "Comptes",
+      completedProjects: "Projets réalisés",
+      noProjects: "Aucun projet terminé pour l'instant.",
+      note: "Le patrimoine additionne vos soldes de comptes et la valeur des projets terminés. Il n'entre pas dans le score.",
+    },
+    empty:
+      "Pas encore de données. Enregistrez des transactions pour voir vos statistiques.",
+    loadError: "Impossible de charger les statistiques.",
+  },
+
+  report: {
+    title: "Rapport",
+    monthly: "Mois",
+    annual: "Année",
+    emptyTitle: "Rapport non encore disponible",
+    emptyBody:
+      "Votre premier rapport sera généré à la fin du mois. En attendant, continuez à enregistrer vos transactions pour que l'application puisse analyser votre situation financière.",
+    backToStats: "Retour aux statistiques",
+    loadError: "Impossible de charger le rapport.",
+    sections: {
+      overview: "Vue d'ensemble",
+      score: "Votre score financier",
+      criteria: "Analyse des critères",
+      projection: "Votre chemin vers l'indépendance",
+      strengths: "Ce que vous avez bien fait",
+      priority: "Votre priorité",
+      advice: "Recommandations",
+    },
+    overview: {
+      totalIncome: "Revenus totaux",
+      totalExpenses: "Dépenses totales",
+      net: "Bilan net",
+      positiveMonth: "Mois positif",
+      negativeMonth: "Mois négatif",
+      active: "Actif",
+      passive: "Passif",
+      investment: "Investissement",
+      consumption: "Consommation",
+    },
+    score: {
+      vsPrevious: "vs {period}",
+      pointsUp: "↑ +{n} points vs {period}",
+      pointsDown: "↓ {n} points vs {period}",
+      pointsFlat: "Stable vs {period}",
+      seeHelp: "Voir l'aide",
+    },
+    criteria: {
+      stable: "Stable",
+      up: "↑ +{n}",
+      down: "↓ {n}",
+      status: {
+        liberte: {
+          low: "Vos revenus passifs couvrent encore peu de vos dépenses — c'est le levier n°1.",
+          mid: "Bon progrès — continuez à développer vos revenus passifs.",
+          high: "Vos revenus passifs couvrent une large part de vos dépenses — excellent.",
+        },
+        investissement: {
+          low: "La plupart de vos dépenses sont consommées, pas investies.",
+          mid: "Une partie de vos dépenses construit du patrimoine — poussez encore.",
+          high: "Vos dépenses construisent largement du patrimoine — au-dessus de la moyenne.",
+        },
+        epargne: {
+          low: "Vous dépensez presque tout ce que vous gagnez.",
+          mid: "Vous mettez de côté chaque mois — bon travail.",
+          high: "Vous épargnez une large part de vos revenus — remarquable.",
+        },
+        diversification: {
+          low: "Une seule source dominante — c'est fragile.",
+          mid: "Un filet de sécurité existe, une source de plus vous rendrait résilient.",
+          high: "Plusieurs sources de revenus distinctes — vous êtes résilient.",
+        },
+      },
+    },
+    projection: {
+      percentDone: "du chemin parcouru",
+      atThisRate: "À ce rythme, dans {n} mois",
+      forecast: "Prévision : {date}",
+      reached: "Vous avez atteint l'indépendance financière.",
+      insufficient:
+        "Données insuffisantes pour une projection fiable — continuez à enregistrer vos transactions.",
+      caveat:
+        "Cette projection suppose que vos tendances se maintiennent. Des changements de revenus ou de dépenses peuvent modifier cette date.",
+    },
+    strengths: {
+      "savings-up":
+        "Vous avez augmenté votre taux d'épargne de {n} % — continuez.",
+      "passive-up":
+        "Vos revenus passifs ont progressé de {n} % — excellente diversification.",
+      "consumption-down":
+        "Vous avez réduit vos dépenses de consommation de {n} % — prudence maintenue.",
+      "investment-up":
+        "Vos dépenses d'investissement ont progressé de {n} % — vous bâtissez du patrimoine.",
+      "back-to-positive": "Vous repassez en positif ce mois-ci — bravo.",
+      none: "Continuez à enregistrer vos transactions : les points forts apparaîtront au prochain rapport.",
+    },
+    priority: {
+      recommendedAction: "Action recommandée",
+      estimatedImpact: "Impact estimé",
+      liberte: {
+        problem: "Vos revenus passifs sont faibles.",
+        context:
+          "Sans revenus passifs, votre indépendance dépend entièrement de votre travail.",
+        action:
+          "Développez une source de revenu passif — loyer, intérêts, participation.",
+        impact:
+          "Chaque franc passif rapproche directement votre date d'indépendance.",
+      },
+      investissement: {
+        problem: "Vos dépenses sont surtout de la consommation.",
+        context: "L'argent consommé ne construit rien de durable.",
+        action:
+          "Réorientez une part de vos dépenses vers ce qui garde de la valeur : formation, outils, projets.",
+        impact: "+5 à 8 points de score et un patrimoine qui grossit.",
+      },
+      epargne: {
+        problem: "Votre taux d'épargne est bas — vous dépensez presque tout.",
+        context: "Sans épargne, pas de coussin de sécurité ni d'investissement futur.",
+        action:
+          "Fixez un montant d'épargne mensuel, même petit, et mettez-le de côté dès que vous êtes payé.",
+        impact:
+          "+5 à 10 points de score et de quoi financer vos futurs revenus passifs.",
+      },
+      diversification: {
+        problem:
+          "Votre diversification des revenus est faible — une seule source dominante.",
+        context: "C'est un risque. Si vous perdez ce revenu, tout s'arrête.",
+        action:
+          "Développez une deuxième source de revenu — freelance, petit commerce, ou investissement passif.",
+        impact:
+          "+8 à 10 points de score, et six mois de gagnés sur votre date d'indépendance.",
+      },
+    },
+    advice: {
+      priority: {
+        liberte:
+          "Développez un revenu passif — c'est votre levier majeur pour l'indépendance.",
+        investissement:
+          "Réorientez une part de vos dépenses vers l'investissement — c'est ce qui bâtit le patrimoine.",
+        epargne:
+          "Fixez-vous un objectif d'épargne mensuel et respectez-le avant toute autre dépense.",
+        diversification:
+          "Développez une deuxième source de revenu — c'est votre levier majeur.",
+      },
+      "invest-savings":
+        "Votre taux d'épargne est bon. Investissez une partie pour générer des revenus passifs.",
+      "keep-investing":
+        "Maintenez vos dépenses d'investissement — c'est ce qui bâtit le patrimoine.",
+      "track-daily":
+        "Enregistrez chaque transaction : des données complètes donnent des conseils plus justes.",
+    },
+  },
+
+  aides: {
+    title: "Aides",
+    intro: {
+      heading: "Comment fonctionne votre Score Financier ?",
+      body: "Votre score reflète la santé globale de vos finances. Il est calculé à partir de 4 indicateurs clés qui mesurent votre chemin vers l'indépendance financière.",
+    },
+    labels: {
+      what: "Qu'est-ce que c'est ?",
+      formula: "Formule",
+      examples: "Exemples",
+      improve: "Pour l'améliorer",
+      why: "Pourquoi c'est important ?",
+    },
+    criteria: {
+      liberte: {
+        title: "Liberté Financière (40 %)",
+        what: "La Liberté Financière mesure le rapport entre vos revenus passifs et vos dépenses totales. Plus ce ratio est élevé, plus vous êtes proche de pouvoir vivre sans travailler.",
+        formula: "Revenus Passifs ÷ Dépenses Totales × 100",
+        example1:
+          "500 F de revenus passifs pour 2 000 F de dépenses : votre Liberté Financière est à 25 %.",
+        example2:
+          "2 000 F de revenus passifs pour 2 000 F de dépenses : vous êtes à 100 % — vous pouvez vivre sans travailler.",
+        improve:
+          "Développez des revenus passifs : loyers, dividendes, intérêts bancaires, royalties. Réduisez vos dépenses non essentielles — chaque franc économisé augmente votre ratio.",
+        why: "C'est l'indicateur le plus puissant de votre indépendance financière. C'est l'objectif final.",
+      },
+      investissement: {
+        title: "Taux d'Investissement (25 %)",
+        what: "Le Taux d'Investissement mesure la part de vos dépenses qui construisent votre patrimoine plutôt que de simplement disparaître.",
+        formula: "Montant investi ÷ Dépenses totales × 100",
+        example1:
+          "3 000 F de consommation et 1 000 F investis : votre taux est à 25 %.",
+        example2:
+          "Si vous n'investissez rien, votre taux est à 0 % — votre argent disparaît.",
+        improve:
+          "Privilégiez les dépenses qui gardent de la valeur : formation, outils professionnels, équipements durables. Investissez dans vous-même et dans des projets qui rapportent.",
+        why: "Les investissements bâtissent votre patrimoine long terme. La consommation pure ne crée rien.",
+      },
+      epargne: {
+        title: "Taux d'Épargne (25 %)",
+        what: "Le Taux d'Épargne mesure la part de vos revenus que vous mettez de côté chaque mois, au lieu de tout dépenser.",
+        formula: "(Revenus − Dépenses) ÷ Revenus × 100",
+        example1:
+          "3 000 F gagnés et 2 500 F dépensés : vous épargnez 500 F, soit 16 %.",
+        example2: "Tout dépenser, c'est vivre au jour le jour — taux à 0 %.",
+        improve:
+          "Fixez-vous un objectif d'épargne mensuel, même petit — 10 % est excellent pour débuter. Mettez de côté avant de dépenser.",
+        why: "L'épargne crée un coussin de sécurité. Elle finance vos investissements futurs.",
+      },
+      diversification: {
+        title: "Diversification des Revenus (10 %)",
+        what: "La Diversification mesure le nombre de sources de revenus actives et distinctes que vous avez. Plus vous avez de sources, plus votre situation est stable.",
+        formula: "Nombre de sources de revenus actives et distinctes",
+        example1:
+          "Une seule source : si vous perdez ce revenu, tout s'effondre.",
+        example2:
+          "Deux sources : un filet de sécurité. Trois ou plus : vous êtes résilient.",
+        improve:
+          "Développez une deuxième source : freelance, petit commerce, investissement. Visez 2 à 3 sources pour une vraie stabilité.",
+        why: "Une source unique de revenu est fragile. Plusieurs sources = stabilité et sécurité.",
+      },
+    },
+    tiersTitle: "Comment interpréter votre score",
+    tiers: {
+      faible: {
+        range: "0–40",
+        label: "Faible",
+        blurb:
+          "Vous commencez votre parcours. Concentrez-vous sur l'épargne et la réduction des dépenses.",
+      },
+      moyen: {
+        range: "41–60",
+        label: "Moyen",
+        blurb: "Vous êtes sur la bonne voie. Continuez à investir et diversifier.",
+      },
+      bon: {
+        range: "61–80",
+        label: "Bon",
+        blurb: "Visez l'indépendance avec les revenus passifs.",
+      },
+      excellent: {
+        range: "81–100",
+        label: "Excellent",
+        blurb: "Vous êtes très proche de l'indépendance financière.",
+      },
+    },
+    back: "Retour au rapport",
+  },
+
   landing: {
     logo: "Swiftly.io",
     titleLine1: "PRENDRE CONTROLE",

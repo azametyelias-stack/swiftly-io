@@ -91,7 +91,7 @@ exactement comme vos documents » → on garde **50 / 91 / 92 %**, alerte à **9
 | D3 | **Solde toujours dérivé**, tout se recalcule à l'édition | ✅ tranché 2026-09-02 |
 | D4 | Solde négatif : dépense/transfert OK + avertissement, affectation projet refusée | ✅ validé 2026-09-02 |
 | D5 | **Compte Principal créé à 0 F**, ajusté via écran 17 (pas d'étape onboarding) | ✅ tranché 2026-09-02 |
-| D6 | Rapport : périmètre MVP | ⏳ différé — à trancher au Lot 4 |
+| D6 | Rapport : périmètre MVP = **sections 1-6 + 10** ; §8 (benchmark communauté) & §9 (comparaison annuelle) → Phase 2 | ✅ tranché 2026-09-03 (Lot 4) |
 
 ### D1 — Devise : conversion réelle ou symbole seul ? 🔴 bloque Lot 1 (choix devise) + partout
 
@@ -175,9 +175,10 @@ exactement comme vos documents » → on garde **50 / 91 / 92 %**, alerte à **9
   priorité, les conseils. (Pas de benchmark communautaire visible — cohérent avec un lancement.)
 - **Problème** : les **benchmarks communautaires** exigent une base multi-utilisateurs qui
   n'existera pas au lancement ; la **comparaison annuelle** exige 12+ mois de données.
-- ✅ **Recommandation MVP** : livrer Score + Aides + Rapport **mensuel sections 1–6 + 10**
-  (vue d'ensemble, score, 4 critères, projection, points forts, priorité, conseils). **Différer**
-  §8 (benchmark communauté) et §9 (comparaison annuelle) → Phase 2.
+- ✅ **Tranché 2026-09-03 (Lot 4)** : Score + Aides + Rapport **mensuel sections 1–6 + 10**
+  (vue d'ensemble, score, 4 critères, projection, points forts, priorité, conseils). **Différé**
+  §8 (benchmark communauté) et §9 (comparaison annuelle) → Phase 2. Le Rapport annuel
+  suit (mêmes sections, périmètre annuel) mais reste secondaire au lancement.
 - **Impacts** : Lot 4, table `reports`, jobs de calcul.
 
 ---

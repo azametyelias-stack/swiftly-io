@@ -325,6 +325,29 @@ export const dashboardQuerySchema = z
   })
   .strict();
 
+// ── statistiques (SCREEN-11) — read query ──────────────────────────────────
+const breakdownDimension = z.enum(["category", "account", "person", "project"]);
+export const statsQuerySchema = z
+  .object({
+    mode: z.enum(["apercu", "expense", "income", "patrimoine"]).default("apercu"),
+    period: z.enum(["day", "week", "month", "year"]).default("month"),
+    account: uuid.optional(), // omitted ⇒ all accounts
+    expense_by: breakdownDimension.default("category"),
+    income_by: breakdownDimension.default("category"),
+  })
+  .strict();
+
+// ── rapport (SCREEN-12) — read query ──────────────────────────────────────
+export const reportQuerySchema = z
+  .object({
+    // "YYYY-MM" or "YYYY"; omitted ⇒ the most recent completed period
+    period: z
+      .string()
+      .regex(/^\d{4}(-\d{2})?$/, "Période invalide.")
+      .optional(),
+  })
+  .strict();
+
 // ── user profile ───────────────────────────────────────────────────────────
 
 /**
@@ -358,5 +381,7 @@ export type BudgetCreateInput = z.infer<typeof budgetCreateSchema>;
 export type ProjectCreateInput = z.infer<typeof projectCreateSchema>;
 export type ProjectAllocateInput = z.infer<typeof projectAllocateSchema>;
 export type DashboardQueryInput = z.infer<typeof dashboardQuerySchema>;
+export type StatsQueryInput = z.infer<typeof statsQuerySchema>;
+export type ReportQueryInput = z.infer<typeof reportQuerySchema>;
 export type ProfileCreateInput = z.infer<typeof profileCreateSchema>;
 export type ProfileUpdateInput = z.infer<typeof profileUpdateSchema>;

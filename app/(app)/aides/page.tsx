@@ -1,14 +1,6 @@
-import { AppHeader } from "@/components/nav/AppHeader";
+import { AidesView } from "@/components/stats/AidesView";
 
-// Stub — the real screen is built in Lot 4 (see BUILD-PLAN.md). Kept so the menu
-// route resolves and the nav shell has somewhere to land.
+// SCREEN-13 — Aides (Lot 4). Static; text verbatim from 13-aides.md § 3.
 export default function Page() {
-  return (
-    <>
-      <AppHeader title="Aides" />
-      <main className="mx-[var(--margin-screen)] py-16">
-        <p className="t-body text-text-secondary">« Aides » — écran construit au Lot 4.</p>
-      </main>
-    </>
-  );
+  return <AidesView />;
 }

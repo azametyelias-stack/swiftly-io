@@ -30,10 +30,10 @@ export interface HistoryState {
  * client re-sorts + groups the loaded window (`lib/transactions/model`). More
  * rows load on scroll via the keyset cursor. setState only in async callbacks.
  */
-export function useHistory(): HistoryState {
+export function useHistory(initialFilter: TypeFilter = "all"): HistoryState {
   const [items, setItems] = useState<TxListItem[]>([]);
   const [status, setStatus] = useState<HistoryStatus>("loading");
-  const [filter, setFilterState] = useState<TypeFilter>("all");
+  const [filter, setFilterState] = useState<TypeFilter>(initialFilter);
   const [cursor, setCursor] = useState<string | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
   const [reloadKey, setReloadKey] = useState(0);

@@ -221,6 +221,330 @@ export const en: Messages = {
     },
   },
 
+  stats: {
+    title: "Statistics",
+    newTransaction: "New transaction",
+    modes: {
+      apercu: "Overview",
+      expense: "Expense",
+      income: "Income",
+      patrimoine: "Net worth",
+    },
+    periods: {
+      day: "Today",
+      week: "This week",
+      month: "This month",
+      year: "This year",
+    },
+    allAccounts: "All accounts",
+    sections: {
+      overview: "Overview",
+      expenseBreakdown: "Expense breakdown",
+      incomeBreakdown: "Income breakdown",
+      score: "Financial score",
+    },
+    overview: {
+      startBalance: "Start balance",
+      currentBalance: "Current balance",
+      income: "Income",
+      expenses: "Expenses",
+      netProfit: "Net profit",
+      vsPeriod: "vs {period}",
+      curveOffline: "Chart unavailable",
+    },
+    breakdown: {
+      byLabel: {
+        category: "Category",
+        account: "Account",
+        person: "People",
+        project: "Projects",
+      },
+      expenseTotal: "Total expenses",
+      incomeTotal: "Total income",
+      seeMore: "See more",
+      seeLess: "See less",
+      others: "Others",
+      unassigned: "Uncategorised",
+      empty: "No data for this period.",
+      passiveShare: "Of which passive income",
+    },
+    score: {
+      outOf: "/100",
+      seeHelp: "See help",
+      seeReport: "See the report",
+      tiers: {
+        faible: "Low",
+        moyen: "Fair",
+        bon: "Good",
+        excellent: "Excellent",
+      },
+      tierBlurb: {
+        faible:
+          "You are starting out. Focus on saving and cutting expenses.",
+        moyen: "You are on the right track. Keep investing and diversifying.",
+        bon: "You manage your finances well. Aim for independence with passive income.",
+        excellent: "You are very close to, or have reached, financial independence.",
+      },
+      criteria: {
+        liberte: "Financial freedom",
+        investissement: "Investment rate",
+        epargne: "Savings rate",
+        diversification: "Income diversification",
+      },
+      weight: "Weight {n} %",
+      sources: "{n} sources",
+      source: "{n} source",
+    },
+    spendMode: {
+      expenseTotal: "Spent · {period}",
+      incomeTotal: "Received · {period}",
+      vsPrevious: "vs previous period",
+      investVsConso: "Investment vs consumption",
+      activeVsPassive: "Active vs passive income",
+      investment: "Investment",
+      consumption: "Consumption",
+      active: "Active income",
+      passive: "Passive income",
+      rising: "Rising items",
+      noRising: "Nothing rising sharply this period.",
+    },
+    patrimoine: {
+      title: "Estimated net worth",
+      thisYear: "this year",
+      accounts: "Accounts",
+      completedProjects: "Completed projects",
+      noProjects: "No completed projects yet.",
+      note: "Net worth adds up your account balances and the value of completed projects. It does not enter the score.",
+    },
+    empty: "No data yet. Record transactions to see your statistics.",
+    loadError: "Could not load the statistics.",
+  },
+
+  report: {
+    title: "Report",
+    monthly: "Month",
+    annual: "Year",
+    emptyTitle: "Report not available yet",
+    emptyBody:
+      "Your first report will be generated at the end of the month. Meanwhile, keep recording your transactions so the app can analyse your financial situation.",
+    backToStats: "Back to statistics",
+    loadError: "Could not load the report.",
+    sections: {
+      overview: "Overview",
+      score: "Your financial score",
+      criteria: "Criteria analysis",
+      projection: "Your path to independence",
+      strengths: "What you did well",
+      priority: "Your priority",
+      advice: "Recommendations",
+    },
+    overview: {
+      totalIncome: "Total income",
+      totalExpenses: "Total expenses",
+      net: "Net result",
+      positiveMonth: "Positive month",
+      negativeMonth: "Negative month",
+      active: "Active",
+      passive: "Passive",
+      investment: "Investment",
+      consumption: "Consumption",
+    },
+    score: {
+      vsPrevious: "vs {period}",
+      pointsUp: "↑ +{n} points vs {period}",
+      pointsDown: "↓ {n} points vs {period}",
+      pointsFlat: "Stable vs {period}",
+      seeHelp: "See help",
+    },
+    criteria: {
+      stable: "Stable",
+      up: "↑ +{n}",
+      down: "↓ {n}",
+      status: {
+        liberte: {
+          low: "Your passive income still covers little of your expenses — this is lever #1.",
+          mid: "Good progress — keep growing your passive income.",
+          high: "Your passive income covers a large share of your expenses — excellent.",
+        },
+        investissement: {
+          low: "Most of your spending is consumed, not invested.",
+          mid: "Part of your spending builds wealth — push further.",
+          high: "Your spending largely builds wealth — above average.",
+        },
+        epargne: {
+          low: "You spend almost everything you earn.",
+          mid: "You put money aside every month — good work.",
+          high: "You save a large share of your income — remarkable.",
+        },
+        diversification: {
+          low: "A single dominant source — that is fragile.",
+          mid: "A safety net exists; one more source would make you resilient.",
+          high: "Several distinct income sources — you are resilient.",
+        },
+      },
+    },
+    projection: {
+      percentDone: "of the way there",
+      atThisRate: "At this rate, in {n} months",
+      forecast: "Forecast: {date}",
+      reached: "You have reached financial independence.",
+      insufficient:
+        "Not enough data for a reliable projection — keep recording your transactions.",
+      caveat:
+        "This projection assumes your trends hold. Changes in income or expenses may move this date.",
+    },
+    strengths: {
+      "savings-up": "You raised your savings rate by {n} % — keep going.",
+      "passive-up":
+        "Your passive income grew by {n} % — excellent diversification.",
+      "consumption-down":
+        "You cut consumption spending by {n} % — steady discipline.",
+      "investment-up":
+        "Your investment spending grew by {n} % — you are building wealth.",
+      "back-to-positive": "You are back in the black this month — well done.",
+      none: "Keep recording your transactions: strengths will show in the next report.",
+    },
+    priority: {
+      recommendedAction: "Recommended action",
+      estimatedImpact: "Estimated impact",
+      liberte: {
+        problem: "Your passive income is low.",
+        context:
+          "Without passive income, your independence depends entirely on your work.",
+        action:
+          "Build a passive income source — rent, interest, a stake in a business.",
+        impact: "Every passive franc moves your independence date closer.",
+      },
+      investissement: {
+        problem: "Your spending is mostly consumption.",
+        context: "Money that is consumed builds nothing lasting.",
+        action:
+          "Shift part of your spending toward things that keep value: training, tools, projects.",
+        impact: "+5 to 8 score points and growing wealth.",
+      },
+      epargne: {
+        problem: "Your savings rate is low — you spend almost everything.",
+        context: "Without savings, there is no safety cushion or future investment.",
+        action:
+          "Set a monthly savings amount, even a small one, and set it aside as soon as you are paid.",
+        impact: "+5 to 10 score points and fuel for future passive income.",
+      },
+      diversification: {
+        problem: "Your income diversification is low — a single dominant source.",
+        context: "That is a risk. If you lose that income, everything stops.",
+        action:
+          "Build a second income source — freelance, a small business, or passive investment.",
+        impact:
+          "+8 to 10 score points, and six months off your independence date.",
+      },
+    },
+    advice: {
+      priority: {
+        liberte:
+          "Build a passive income — it is your main lever for independence.",
+        investissement:
+          "Shift part of your spending toward investment — that is what builds wealth.",
+        epargne:
+          "Set a monthly savings goal and meet it before any other spending.",
+        diversification:
+          "Build a second income source — it is your main lever.",
+      },
+      "invest-savings":
+        "Your savings rate is good. Invest some of it to generate passive income.",
+      "keep-investing":
+        "Keep up your investment spending — that is what builds wealth.",
+      "track-daily":
+        "Record every transaction: complete data gives sharper advice.",
+    },
+  },
+
+  aides: {
+    title: "Help",
+    intro: {
+      heading: "How does your Financial Score work?",
+      body: "Your score reflects the overall health of your finances. It is calculated from 4 key indicators that measure your path to financial independence.",
+    },
+    labels: {
+      what: "What is it?",
+      formula: "Formula",
+      examples: "Examples",
+      improve: "How to improve it",
+      why: "Why it matters",
+    },
+    criteria: {
+      liberte: {
+        title: "Financial Freedom (40 %)",
+        what: "Financial Freedom measures the ratio between your passive income and your total expenses. The higher the ratio, the closer you are to living without working.",
+        formula: "Passive Income ÷ Total Expenses × 100",
+        example1:
+          "500 F of passive income for 2,000 F of expenses: your Financial Freedom is 25 %.",
+        example2:
+          "2,000 F of passive income for 2,000 F of expenses: you are at 100 % — you can live without working.",
+        improve:
+          "Build passive income: rent, dividends, bank interest, royalties. Cut non-essential expenses — every franc saved raises your ratio.",
+        why: "It is the most powerful indicator of your financial independence. It is the end goal.",
+      },
+      investissement: {
+        title: "Investment Rate (25 %)",
+        what: "The Investment Rate measures the share of your spending that builds your wealth rather than simply disappearing.",
+        formula: "Amount invested ÷ Total expenses × 100",
+        example1:
+          "3,000 F of consumption and 1,000 F invested: your rate is 25 %.",
+        example2: "If you invest nothing, your rate is 0 % — your money disappears.",
+        improve:
+          "Favour spending that keeps value: training, professional tools, durable equipment. Invest in yourself and in projects that pay off.",
+        why: "Investments build your long-term wealth. Pure consumption creates nothing.",
+      },
+      epargne: {
+        title: "Savings Rate (25 %)",
+        what: "The Savings Rate measures the share of your income you set aside each month instead of spending it all.",
+        formula: "(Income − Expenses) ÷ Income × 100",
+        example1:
+          "3,000 F earned and 2,500 F spent: you save 500 F, i.e. 16 %.",
+        example2: "Spending everything means living day to day — a 0 % rate.",
+        improve:
+          "Set a monthly savings goal, even a small one — 10 % is excellent to start. Set money aside before spending.",
+        why: "Savings create a safety cushion. They fund your future investments.",
+      },
+      diversification: {
+        title: "Income Diversification (10 %)",
+        what: "Diversification measures the number of active, distinct income sources you have. The more sources, the more stable your situation.",
+        formula: "Number of active, distinct income sources",
+        example1: "A single source: if you lose that income, everything collapses.",
+        example2:
+          "Two sources: a safety net. Three or more: you are resilient.",
+        improve:
+          "Build a second source: freelance, a small business, investment. Aim for 2 to 3 sources for real stability.",
+        why: "A single income source is fragile. Several sources = stability and security.",
+      },
+    },
+    tiersTitle: "How to read your score",
+    tiers: {
+      faible: {
+        range: "0–40",
+        label: "Low",
+        blurb:
+          "You are starting out. Focus on saving and cutting expenses.",
+      },
+      moyen: {
+        range: "41–60",
+        label: "Fair",
+        blurb: "You are on the right track. Keep investing and diversifying.",
+      },
+      bon: {
+        range: "61–80",
+        label: "Good",
+        blurb: "Aim for independence with passive income.",
+      },
+      excellent: {
+        range: "81–100",
+        label: "Excellent",
+        blurb: "You are very close to financial independence.",
+      },
+    },
+    back: "Back to the report",
+  },
+
   landing: {
     logo: "Swiftly.io",
     titleLine1: "TAKE CONTROL",

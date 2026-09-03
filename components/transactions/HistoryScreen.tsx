@@ -27,7 +27,11 @@ import { useLocale, useMessages } from "@/lib/i18n/useMessages";
 
 type Row = TxListItem & { label: string };
 
-export function HistoryScreen() {
+export function HistoryScreen({
+  initialType,
+}: {
+  initialType?: "expense" | "income" | "transfer";
+}) {
   const m = useMessages();
   const t = m.transactions;
   const locale = useLocale() as Locale;
@@ -36,7 +40,7 @@ export function HistoryScreen() {
   const today = todayISO();
 
   const { items, status, filter, setFilter, hasMore, loadMore, remove, reload } =
-    useHistory();
+    useHistory(initialType ?? "all");
   const [sort, setSort] = useState<SortMode>("recent");
   const [pending, setPending] = useState<TxListItem | null>(null);
   const [deleting, setDeleting] = useState(false);

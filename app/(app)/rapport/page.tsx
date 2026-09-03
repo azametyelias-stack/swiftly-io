@@ -1,14 +1,6 @@
-import { AppHeader } from "@/components/nav/AppHeader";
+import { ReportView } from "@/components/stats/ReportView";
 
-// Stub — the real screen is built in Lot 4 (see BUILD-PLAN.md). Kept so the menu
-// route resolves and the nav shell has somewhere to land.
+// SCREEN-12 — Rapport (Lot 4, D6 scope = sections 1-6 + 10).
 export default function Page() {
-  return (
-    <>
-      <AppHeader title="Rapport" />
-      <main className="mx-[var(--margin-screen)] py-16">
-        <p className="t-body text-text-secondary">« Rapport » — écran construit au Lot 4.</p>
-      </main>
-    </>
-  );
+  return <ReportView />;
 }

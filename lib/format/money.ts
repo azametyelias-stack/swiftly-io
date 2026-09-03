@@ -90,6 +90,20 @@ export function formatBalance(value: number, currency: CurrencyCode = "XOF"): st
   return formatMoney(value, { currency, sign: "auto" });
 }
 
+/**
+ * Compact magnitude for a chart axis: `1 200 000` -> "1,2 M", `48 000` -> "48 K",
+ * `900` -> "900". Absolute value, no currency suffix.
+ */
+export function formatCompact(value: number): string {
+  const n = Math.abs(Math.round(value));
+  if (n >= 1_000_000) {
+    const m = n / 1_000_000;
+    return `${(m < 10 ? m.toFixed(1) : Math.round(m).toString()).replace(".", ",")} M`;
+  }
+  if (n >= 1_000) return `${Math.round(n / 1_000)} K`;
+  return String(n);
+}
+
 /** A transaction amount shown with its direction: `+67 000 F` / `−32 200 F`. */
 export function formatSigned(
   magnitude: number,

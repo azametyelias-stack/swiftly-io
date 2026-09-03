@@ -45,6 +45,11 @@ export function formatMonthYear(ym: string, locale: Loc = "fr"): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
+/** Report period label: "Juin 2026" from "2026-06", "2026" stays "2026". */
+export function reportPeriodLabel(key: string, locale: Loc = "fr"): string {
+  return /^\d{4}$/.test(key) ? key : formatMonthYear(key, locale);
+}
+
 /** "9 h 37" (fr) / "09:37" (en) from an ISO timestamp. */
 export function formatClock(isoTimestamp: string, locale: Loc = "fr"): string {
   const d = new Date(isoTimestamp);
