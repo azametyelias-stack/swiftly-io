@@ -136,7 +136,11 @@ export const accountCreateSchema = z
     path: ["monthly_fee"],
   });
 
-export const accountUpdateSchema = z.object(accountShape).partial().strict();
+/** Edit + the quick favori / archivé toggles from the detail screen. */
+export const accountUpdateSchema = z
+  .object({ ...accountShape, is_archived: z.boolean() })
+  .partial()
+  .strict();
 
 // ── people ("Lié à" — person side) ──────────────────────────────────────────
 export const personCreateSchema = z.object({ name: shortLabel }).strict();
@@ -377,8 +381,11 @@ export type CategoryCreateInput = z.infer<typeof categoryCreateSchema>;
 export type TransactionCreateInput = z.infer<typeof transactionCreateSchema>;
 export type TransactionListQuery = z.infer<typeof transactionListQuerySchema>;
 export type TemplateCreateInput = z.infer<typeof templateCreateSchema>;
+export type TemplateUpdateInput = z.infer<typeof templateUpdateSchema>;
 export type BudgetCreateInput = z.infer<typeof budgetCreateSchema>;
+export type BudgetUpdateInput = z.infer<typeof budgetUpdateSchema>;
 export type ProjectCreateInput = z.infer<typeof projectCreateSchema>;
+export type ProjectUpdateInput = z.infer<typeof projectUpdateSchema>;
 export type ProjectAllocateInput = z.infer<typeof projectAllocateSchema>;
 export type DashboardQueryInput = z.infer<typeof dashboardQuerySchema>;
 export type StatsQueryInput = z.infer<typeof statsQuerySchema>;

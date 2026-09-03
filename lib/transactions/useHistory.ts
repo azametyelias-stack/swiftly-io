@@ -30,7 +30,10 @@ export interface HistoryState {
  * client re-sorts + groups the loaded window (`lib/transactions/model`). More
  * rows load on scroll via the keyset cursor. setState only in async callbacks.
  */
-export function useHistory(initialFilter: TypeFilter = "all"): HistoryState {
+export function useHistory(
+  initialFilter: TypeFilter = "all",
+  account?: string,
+): HistoryState {
   const [items, setItems] = useState<TxListItem[]>([]);
   const [status, setStatus] = useState<HistoryStatus>("loading");
   const [filter, setFilterState] = useState<TypeFilter>(initialFilter);
@@ -50,6 +53,7 @@ export function useHistory(initialFilter: TypeFilter = "all"): HistoryState {
   const query = (extra?: Record<string, string>) => {
     const q = new URLSearchParams(extra);
     if (filter !== "all") q.set("type", filter);
+    if (account) q.set("account", account);
     return q.toString();
   };
 

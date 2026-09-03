@@ -29,6 +29,7 @@ import {
   type TxType,
 } from "@/lib/transactions/model";
 import { useTxRefData } from "@/lib/transactions/useTxRefData";
+import { markTemplateUsed } from "@/lib/templates/useTemplates";
 import { interpolate } from "@/lib/i18n";
 import { useMessages } from "@/lib/i18n/useMessages";
 
@@ -36,10 +37,13 @@ export function TxWizard({
   type,
   transactionId,
   initialDraft,
+  launchedTemplateId,
 }: {
   type: TxType;
   transactionId?: string;
   initialDraft?: TxDraft;
+  /** set when this wizard was opened by tapping a template (SCREEN-14 § 6) */
+  launchedTemplateId?: string;
 }) {
   const m = useMessages();
   const t = m.transactions;
@@ -116,6 +120,7 @@ export function TxWizard({
         transaction: res.transaction,
         warning: res.warning ? { balance: res.warning.balance } : null,
       });
+      if (launchedTemplateId && !isEdit) void markTemplateUsed(launchedTemplateId);
     } catch {
       setSaveError(t.errors.saveFailed);
     } finally {

@@ -69,7 +69,7 @@ export function useTxRefData(type: TxType): TxRefData {
         ? Promise.resolve({ categories: [] as RefCategory[] })
         : apiJson<{ categories: RefCategory[] }>(`/api/categories?kind=${kind}`),
       apiJson<{ people: RefNamed[] }>("/api/people"),
-      apiJson<{ projects: RefNamed[] }>("/api/projects"),
+      apiJson<{ projects: RefNamed[] }>("/api/projects?scope=picker"),
     ]).then((res) => {
       if (!alive) return;
       if (res[0].status === "fulfilled") setCategories(res[0].value.categories);

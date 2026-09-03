@@ -18,6 +18,7 @@ _SQL Editor_ → paste the contents of each file in `migrations/` in order and r
 | `0001_privacy_consent.sql` | `consent_logs` (append-only audit trail) + `privacy_settings` (current state) for the GDPR/CCPA consent system. |
 | `0002_core_schema.sql` | Core app schema (`users`, `accounts`, `categories`, `people`, `transactions`, `templates`, `budgets`, `projects`, `alerts`, `reports`) + RLS + system-category seed + `public.account_balance()` (derived balance, no `balance` column). See `docs/3-PRODUCT (Design et Wireframes)/BUILD-PLAN.md` § P1. |
 | `0003_invitation_codes.sql` | `public.invitation_codes` (closed-beta sign-in, SECURITY MASTERPLAN Point 19). HMAC-peppered hash at rest, RLS deny-all (server-write-only via service role). Redeemed by `POST /api/auth/verify-code` (Lot 1, SCREEN-2). Phase 2 drops this table. |
+| `0004_lot5_recurrence_fees.sql` | Lot 5 (D2). `transactions.recurrence_key` (+ partial UNIQUE index) for cron idempotency; `templates.next_run_on`/`last_run_on`; `accounts.last_fee_on`; "Frais bancaires" system category; `public.account_balance()` **rewritten** to net project allocations against project-linked spending (🔎 LAYER 3, no double-counting); `public.allocate_to_project()` (atomic allocation with an insufficient-funds guard, D4). Driven by `POST /api/cron/run` (Vercel Cron). |
 
 Not a migration:
 

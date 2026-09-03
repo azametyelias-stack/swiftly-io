@@ -32,6 +32,10 @@ export type ServerEnvKey =
   // kept OUT of the DB so a database leak alone can't brute-force the 6-digit
   // code space. Read via serverEnv() by the redeem / create-invitations routes.
   | "INVITE_CODE_PEPPER"
+  // Shared secret for the daily cron worker (D2 — POST /api/cron/run). Vercel
+  // Cron sends it as `Authorization: Bearer <CRON_SECRET>`. Empty ⇒ the endpoint
+  // 404s. `openssl rand -base64 32`.
+  | "CRON_SECRET"
   // CORS allow-list override (Point 13). Not a secret; read directly by the
   // dependency-free `lib/http/cors.ts` (runs in `proxy.ts`), not via serverEnv().
   | "CORS_ALLOWED_ORIGINS"

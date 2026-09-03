@@ -86,7 +86,7 @@ exactement comme vos documents » → on garde **50 / 91 / 92 %**, alerte à **9
 | # | Décision | Statut |
 |---|---|---|
 | D1 | Devise = **symbole seul** (pas de conversion au MVP) | ✅ tranché 2026-09-02 |
-| D2 | Récurrences : moment d'exécution | ⏳ différé — à trancher au Lot 5 |
+| D2 | Récurrences : moment d'exécution | ✅ tranché 2026-09-03 (Lot 5) — cron serveur quotidien |
 | D2bis | **Un seul système = Templates** (pas d'écran « Récurrences ») | ✅ tranché 2026-09-02 |
 | D3 | **Solde toujours dérivé**, tout se recalcule à l'édition | ✅ tranché 2026-09-02 |
 | D4 | Solde négatif : dépense/transfert OK + avertissement, affectation projet refusée | ✅ validé 2026-09-02 |
@@ -111,13 +111,13 @@ exactement comme vos documents » → on garde **50 / 91 / 92 %**, alerte à **9
   mention du **moment d'exécution** ni du rattrapage.
 - **Handoff** : idem — « les maquettes montrent la liste et ses états, pas le moment d'exécution »
   (points ouverts §09, ×2).
-- ✅ **Recommandation** : exécution **côté serveur** (cron Supabase / Edge Function planifiée),
-  à la date d'échéance. Échéance ratée (app jamais ouverte) → la transaction est quand même
-  créée à sa date, le solde (dérivé) se met à jour au prochain chargement. Pas d'écran
-  « récurrence en retard » pour le MVP.
-- **Impacts** : Lot 5 (Templates — attention : « template » = pré-remplissage manuel ≠
-  « récurrence » = auto. Vérifier avec Elias si le MVP a vraiment **les deux** ou si la
-  récurrence se limite au toggle du formulaire de transaction). **→ à clarifier (D2bis).**
+- ✅ **Tranché 2026-09-03 (Lot 5, reco retenue par Elias)** : exécution **côté serveur**,
+  **cron quotidien** — `POST /api/cron/run` (Vercel Cron, `0 3 * * *`, gardé par `CRON_SECRET`).
+  Le job (`lib/recurrence/service.ts`) matérialise les échéances dues des templates récurrents
+  **et** prélève les frais mensuels des comptes bancaires/carte. Rattrapage borné (60 échéances
+  max) : une échéance ratée est créée **à sa date**, le solde dérivé se met à jour. Aucun écran
+  « récurrence en retard ». Idempotence : `transactions.recurrence_key` unique par
+  `(règle, échéance)` → un double-passage du cron n'insère aucun doublon (migration `0004`).
 
 ### D2bis — « Template » et « récurrence » : deux systèmes ou un seul ?
 
@@ -218,7 +218,7 @@ exactement comme vos documents » → on garde **50 / 91 / 92 %**, alerte à **9
 
 ## 6. Prochaine étape
 
-→ ✅ D1, D2bis, D3, D4, D5 tranchés. D2 (Lot 5) et D6 (Lot 4) différés.
+→ ✅ D1, D2, D2bis, D3, D4, D5, D6 tous tranchés (D2 → Lot 5, cron serveur quotidien ; D6 → Lot 4).
 → Je produis `BUILD-PLAN.md` (ordre des 6 lots repo, inventaire des 14 composants, tables
 Supabase par lot, jobs de calcul).
 → Puis la couche design system en code (thème Tailwind 4 + 24 jetons + typo + géométrie +

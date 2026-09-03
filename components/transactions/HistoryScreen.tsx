@@ -29,8 +29,10 @@ type Row = TxListItem & { label: string };
 
 export function HistoryScreen({
   initialType,
+  account,
 }: {
   initialType?: "expense" | "income" | "transfer";
+  account?: string;
 }) {
   const m = useMessages();
   const t = m.transactions;
@@ -40,7 +42,7 @@ export function HistoryScreen({
   const today = todayISO();
 
   const { items, status, filter, setFilter, hasMore, loadMore, remove, reload } =
-    useHistory(initialType ?? "all");
+    useHistory(initialType ?? "all", account);
   const [sort, setSort] = useState<SortMode>("recent");
   const [pending, setPending] = useState<TxListItem | null>(null);
   const [deleting, setDeleting] = useState(false);
