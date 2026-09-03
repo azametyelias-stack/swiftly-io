@@ -58,6 +58,63 @@ export function UserIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+export function ChevronDownIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Svg {...props}>
+      <path d="m6 9 6 6 6-6" />
+    </Svg>
+  );
+}
+
+export function PlusIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Svg {...props}>
+      <path d="M12 5v14M5 12h14" />
+    </Svg>
+  );
+}
+
+export function EyeIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Svg {...props}>
+      <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
+      <circle cx="12" cy="12" r="3" />
+    </Svg>
+  );
+}
+
+export function EyeOffIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Svg {...props}>
+      <path d="M3 3l18 18M10.6 10.6a3 3 0 0 0 4.2 4.2M9.4 5.2A9.8 9.8 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-3.3 3.9M6.1 6.1A17 17 0 0 0 2 12s3.5 7 10 7a9.7 9.7 0 0 0 3.4-.6" />
+    </Svg>
+  );
+}
+
+export function FilterIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Svg {...props}>
+      <path d="M3 5h18l-7 8v6l-4-2v-4Z" />
+    </Svg>
+  );
+}
+
+export function ArrowDownLeftIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Svg {...props}>
+      <path d="M17 7 7 17M7 17h7M7 17v-7" />
+    </Svg>
+  );
+}
+
+export function ArrowUpRightIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Svg {...props}>
+      <path d="M7 17 17 7M17 7h-7M17 7v7" />
+    </Svg>
+  );
+}
+
 const PATHS: Record<NavIcon, React.ReactNode> = {
   dashboard: <path d="M4 13h7V4H4zM13 20h7v-9h-7zM4 20h7v-5H4zM13 8h7V4h-7z" />,
   stats: <path d="M5 20V10M12 20V4M19 20v-7" />,

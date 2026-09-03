@@ -118,15 +118,18 @@ Ordre = `SWIFTLY-CARTE-PRODUIT`. **Validation en fin de lot** par Elias avant le
 - **Tests** : `tests/auth/code-input.test.ts`, `tests/auth/invite-email.test.ts`, `tests/i18n/messages.test.ts`, `profileCreateSchema` (185 verts).
 - **Go/No-Go** : login OK sans bug, redirection Dashboard, session persiste au refresh. — backend ✅ ; reste la marche dans le navigateur + le OK visuel d'Elias sur les 3 écrans.
 
-### LOT 2 — Core UI & Dashboard · écrans 04-05
-- **Écrans** : 04 Dashboard · 05 Menu.
-- **Visuel** : `Lot 2 Core UI.dc.html`. C'est le « magasin de pièces » — carte, ligne de liste, chiffre, puce, bandeau — repris tel quel aux lots 3-6.
-- **Comportements clés** (`04`) : sélecteur compte + période pilotent tout ; **animation odomètre du solde** (1 s) au retour de transaction ; **tracé progressif de la courbe** (1200 ms) rejoué au changement compte/période/retour tx, jamais au scroll ; **double scroll** (page ↑ jusqu'à ce que « + Nouvelle transaction » colle en haut, puis scroll interne du panneau blanc) ; **bandeau rotatif** 30 s + swipe + pause à l'interaction + priorisation alertes + notice « rapport prêt » clignotante ; œil masquer/afficher ; historique récent = 3 dernières + « Voir plus » ; troncature note avant « lié à ».
-- **Menu** (`05`) : swipe reveal (P4).
-- **Tables** : lecture `accounts`, `transactions`, `projects`, `alerts`, `reports` (notice).
-- **Composants** : Carte de solde, Courbe de solde, Feuille modale, Carte de liste, bandeau.
-- **Calcul** : solde dérivé + agrégats période (solde début / revenus / dépenses / actuel) + variation vs période précédente équivalente.
-- **Go/No-Go** : navigation fluide, courbe + odomètre OK, double scroll correct.
+### LOT 2 — Core UI & Dashboard · écrans 04-05 — 🟢 BACKEND VÉRIFIÉ (2026-09-03), reste la revue visuelle Elias
+- **Écrans** : 04 Dashboard (`components/dashboard/*` + `app/(app)/dashboard/page.tsx`) · 05 Menu (déjà fait en P4 ; badge alertes ajouté ici).
+- **Visuel** : `Lot 2 Core UI.dc.html`. Le « magasin de pièces » — `components/ui/ListRow` (la ligne unique réutilisée) + `Skeleton`.
+- **Données** :
+  - `lib/dashboard/period.ts` (bornes jour/semaine/mois/année + période précédente équivalente, pur, testé) + `lib/dashboard/aggregates.ts` (début/revenus/dépenses/solde + courbe + variation ; règles « compte dans le solde » calquées sur `account_balance()` ; pur, testé).
+  - `GET /api/dashboard?account&period` · `GET /api/accounts` (solde dérivé via RPC) · `GET /api/me` · `GET /api/alerts/unread-count`. Tous `withAuth`, Zod (`dashboardQuerySchema`). Testés en HTTP contre la vraie base.
+  - `lib/http/api.ts` — client API navigateur (token session + refresh-retry Point 9), `api.fetch` / `apiJson`. `lib/dashboard/useDashboard.ts` = hook data.
+- **Mécaniques** (`04`) : odomètre solde 900 ms (`Odometer`, rAF, sortie douce) · courbe SVG tracé progressif 1400 ms rejouée via `key` au changement compte/période/refresh (`BalanceCurve`, bulle 3 s + marqueur persistant, aucune lib de graphe) · **double-scroll** = bouton « + Nouvelle transaction » en `position: sticky`, fond nuit épinglé, panneau blanc qui défile dessous (barre compacte solde quand figé, via IntersectionObserver) · **bandeau rotatif** `RotatingBanner` (30 s, swipe, points, pause au toucher, tri urgent/blink) · œil masquer/afficher (`localStorage sf-balance-hidden`).
+- **Base vide** → le Dashboard s'affiche en **état vide** (« La courbe démarre à votre première transaction », bandeau « Fixez un objectif »). Templates/Comptes/Historique = états vides, se remplissent aux lots 3-5. `curve: null` tant qu'aucune transaction settled.
+- **i18n** : clés `m.dashboard.*` (fr + en, parité tsc + test).
+- **Tests** : `tests/dashboard/period.test.ts` + `aggregates.test.ts` (12). Total 197 verts. `tsc` 0 · `eslint` 0 · `build` 0 · `scan` 0.
+- **Go/No-Go** : navigation fluide, courbe + odomètre OK, double scroll correct. — backend ✅ ; reste la marche navigateur + OK visuel Elias. (odomètre « au retour de transaction » se testera vraiment au Lot 3.)
 
 ### LOT 3 — Transactions · écrans 06-10
 - **Écrans** : 06 Historiques · 07 Détails · 08 Créer/Modifier Dépense · 09 Revenu · 10 Transfert.
@@ -199,4 +202,4 @@ L1 Semgrep : à chaque push, tous les lots.   L2 Zod : à chaque route, tous les
 LOT 6 peut démarrer en parallèle dès la fin du LOT 1.   Revue L3 finale + scan complet à Day 29.
 ```
 
-**Prochaine action** : Elias valide le LOT 1 (revue visuelle + brancher un projet Supabase pour le test end-to-end), puis LOT 2 — Core UI & Dashboard (écrans 04-05).
+**Prochaine action** : Elias valide le LOT 2 (marche navigateur du Dashboard + revue visuelle), puis LOT 3 — Transactions (écrans 06-10). Lot 3 = 🔎 1re revue logique métier (LAYER 3).

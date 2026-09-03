@@ -293,6 +293,14 @@ export const projectAllocateSchema = z
   .object({ amount, direction: z.enum(["add", "withdraw"]).default("add") })
   .strict();
 
+// ── dashboard (SCREEN-4) — read query ──────────────────────────────────────
+export const dashboardQuerySchema = z
+  .object({
+    account: uuid.optional(), // omitted ⇒ the primary account
+    period: z.enum(["day", "week", "month", "year"]).default("day"),
+  })
+  .strict();
+
 // ── user profile ───────────────────────────────────────────────────────────
 
 /**
@@ -324,5 +332,6 @@ export type TemplateCreateInput = z.infer<typeof templateCreateSchema>;
 export type BudgetCreateInput = z.infer<typeof budgetCreateSchema>;
 export type ProjectCreateInput = z.infer<typeof projectCreateSchema>;
 export type ProjectAllocateInput = z.infer<typeof projectAllocateSchema>;
+export type DashboardQueryInput = z.infer<typeof dashboardQuerySchema>;
 export type ProfileCreateInput = z.infer<typeof profileCreateSchema>;
 export type ProfileUpdateInput = z.infer<typeof profileUpdateSchema>;

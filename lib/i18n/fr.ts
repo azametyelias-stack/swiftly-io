@@ -13,6 +13,63 @@ export const fr = {
     back: "Retour",
     loading: "Chargement…",
     retry: "Réessayer",
+    menu: "Ouvrir le menu",
+    notifications: "Alertes et notifications",
+  },
+
+  dashboard: {
+    greeting: "Bonjour, {name}",
+    balanceLabel: "Solde total",
+    showAmount: "Afficher le montant",
+    hideAmount: "Masquer le montant",
+    variationVs: "vs {period}",
+    variationUnavailable: "Variation indisponible",
+    newTransaction: "Nouvelle transaction",
+    summary: {
+      start: "Début",
+      income: "Revenus",
+      expenses: "Dépenses",
+      current: "Actuel",
+    },
+    curve: {
+      emptyTitle: "La courbe démarre à votre première transaction",
+      emptyBody: "Enregistrez une entrée ou une sortie, le graphique se trace ensuite.",
+      offline: "Graphique indisponible hors connexion",
+    },
+    banner: {
+      emptyTitle: "Fixez un objectif",
+      emptyBody: "Le bandeau affichera votre progression ici.",
+    },
+    templates: {
+      title: "Templates",
+      seeAll: "Voir tout",
+      create: "Créer un template",
+      emptyBody:
+        "Un template enregistre un montant et une catégorie que vous répétez souvent.",
+    },
+    accounts: {
+      title: "Comptes et cartes",
+      add: "Ajouter un compte",
+    },
+    history: {
+      title: "Historique récent",
+      seeMore: "Voir plus",
+      empty: "Aucune transaction pour l'instant.",
+      forNote: "pour {note}",
+      linkedTo: "lié à {name}",
+      kindExpense: "Dépense",
+      kindIncome: "Revenu",
+      kindTransfer: "Transfert",
+    },
+    error: {
+      title: "Données non actualisées",
+      staleAt: "Dernière mise à jour à {time}.",
+      balanceAt: "Solde total · {time}",
+    },
+    emptyState: {
+      title: "Aucune donnée pour aujourd'hui",
+      body: "La courbe démarre à votre première transaction.",
+    },
   },
 
   landing: {

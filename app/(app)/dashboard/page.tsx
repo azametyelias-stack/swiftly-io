@@ -1,14 +1,7 @@
-import { AppHeader } from "@/components/nav/AppHeader";
+import { DashboardView } from "@/components/dashboard/DashboardView";
 
-// Stub — the real screen is built in Lot 2 (see BUILD-PLAN.md). Kept so the menu
-// route resolves and the nav shell has somewhere to land.
+// SCREEN-4 — Dashboard (Lot 2). Renders its own night header (hamburger / logo /
+// bell), so no <AppHeader> here.
 export default function Page() {
-  return (
-    <>
-      <AppHeader title="Dashboard" />
-      <main className="mx-[var(--margin-screen)] py-16">
-        <p className="t-body text-text-secondary">« Dashboard » — écran construit au Lot 2.</p>
-      </main>
-    </>
-  );
+  return <DashboardView />;
 }

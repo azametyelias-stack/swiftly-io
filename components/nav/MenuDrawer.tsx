@@ -8,6 +8,7 @@ import { MarqueeText } from "@/components/nav/MarqueeText";
 import { ThemeToggle } from "@/components/nav/ThemeToggle";
 import { NavGlyph, UserIcon } from "@/components/nav/icons";
 import { useNavShell } from "@/components/nav/useNavShell";
+import { useUnreadAlerts } from "@/components/nav/useUnreadAlerts";
 
 /**
  * The menu that lives under the current screen (SCREEN-05). Title "Menu", a
@@ -19,6 +20,7 @@ export function MenuDrawer() {
   const pathname = usePathname();
   const { open, closeMenu } = useNavShell();
   const active = activeNavItem(pathname);
+  const unread = useUnreadAlerts(pathname);
 
   return (
     <nav
@@ -58,6 +60,14 @@ export function MenuDrawer() {
               >
                 <NavGlyph id={item.id} className="shrink-0 opacity-90" />
                 <MarqueeText text={item.label} className="min-w-0 flex-1 t-body font-semibold" />
+                {item.id === "alerts" && unread > 0 ? (
+                  <span
+                    className="grid min-w-5 flex-none place-items-center rounded-full bg-semantic-out px-1.5 text-[11px] font-bold text-white tabular"
+                    aria-label={`${unread} non lues`}
+                  >
+                    {unread > 99 ? "99+" : unread}
+                  </span>
+                ) : null}
               </Link>
             </li>
           );
