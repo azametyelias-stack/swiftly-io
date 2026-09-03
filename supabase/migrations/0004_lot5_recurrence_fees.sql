@@ -50,9 +50,14 @@ comment on column public.accounts.last_fee_on is
   'First-of-month date the last monthly fee was charged. NULL ⇒ never charged.';
 
 -- ── system category for generated bank-fee rows ───────────────────────────
-insert into public.categories (user_id, name, kind, color, axis) values
-  (null, 'Frais bancaires', 'expense', '#8A8C93', 'consumption')
-on conflict do nothing;
+-- `categories` has no unique constraint, so a bare `on conflict do nothing`
+-- would let a re-run add a duplicate. Guard on existence instead → idempotent.
+insert into public.categories (user_id, name, kind, color, axis)
+select null, 'Frais bancaires', 'expense', '#8A8C93', 'consumption'
+where not exists (
+  select 1 from public.categories
+   where user_id is null and name = 'Frais bancaires' and kind = 'expense'
+);
 
 -- ============================================================================
 -- account_balance() — net project allocations against project-linked spending

@@ -162,13 +162,15 @@ async function runAccountFees(
   if (error) throw error;
   if (!accounts?.length) return 0;
 
-  const { data: feeCat } = await db
+  const { data: feeCats } = await db
     .from("categories")
     .select("id")
     .is("user_id", null)
     .eq("name", "Frais bancaires")
     .eq("kind", "expense")
-    .maybeSingle();
+    .order("created_at", { ascending: true })
+    .limit(1);
+  const feeCat = feeCats?.[0] ?? null;
 
   const ym = monthKey(today);
   const chargeDate = firstOfMonth(today);
