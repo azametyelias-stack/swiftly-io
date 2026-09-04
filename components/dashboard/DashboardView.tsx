@@ -137,8 +137,20 @@ export function DashboardView() {
           }`}
         >
           <div className="flex flex-col gap-4 px-4 pt-1">
-            <p className="text-[15px] font-semibold text-ink-on-surface/85">{greeting}</p>
+            {/* Row 1 (design 04-dashboard.png): salutation + sélecteur de compte */}
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-[15px] font-semibold text-ink-on-surface/85">{greeting}</p>
+              {accounts.length > 1 ? (
+                <MoneyDropdown
+                  ariaLabel="Compte"
+                  value={accountId ?? primaryId(accounts)}
+                  onChange={(id) => setAccountId(id)}
+                  options={accounts.map((a) => ({ value: a.id, label: a.name }))}
+                />
+              ) : null}
+            </div>
 
+            {/* Row 2: solde + sélecteur de période */}
             <div className="flex items-start justify-between gap-3">
               <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-2">
@@ -172,17 +184,6 @@ export function DashboardView() {
                 />
               </div>
 
-              {accounts.length > 1 ? (
-                <MoneyDropdown
-                  ariaLabel="Compte"
-                  value={accountId ?? primaryId(accounts)}
-                  onChange={(id) => setAccountId(id)}
-                  options={accounts.map((a) => ({ value: a.id, label: a.name }))}
-                />
-              ) : null}
-            </div>
-
-            <div className="flex items-center justify-between">
               <MoneyDropdown
                 ariaLabel="Période"
                 value={period}

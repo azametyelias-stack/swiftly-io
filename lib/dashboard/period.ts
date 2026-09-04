@@ -25,6 +25,17 @@ export function toISODate(d: Date): string {
   return d.toISOString().slice(0, 10);
 }
 
+// Bénin is UTC+1, no DST — kept in sync with `lib/format/date.ts::todayISO`.
+// "Today" must resolve the same way here (server) and there (client, e.g. the
+// wizard's default transaction date) — otherwise a transaction dated "today"
+// client-side can land on the wrong side of this module's UTC day boundary and
+// silently vanish from the curve/aggregates for part of every day.
+const BENIN_OFFSET_MS = 60 * 60 * 1000;
+
+function beninNow(now: Date): Date {
+  return new Date(now.getTime() + BENIN_OFFSET_MS);
+}
+
 function utc(y: number, m: number, d: number): Date {
   return new Date(Date.UTC(y, m, d));
 }
@@ -80,7 +91,7 @@ function eachMonthStart(start: Date, end: Date): string[] {
  * tail.
  */
 export function resolvePeriod(period: Period, now: Date = new Date()): PeriodRange {
-  const today = startOfDay(now);
+  const today = startOfDay(beninNow(now));
   const tomorrow = new Date(today);
   tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
 

@@ -6,11 +6,21 @@
  * shown in a row ("Aujourd'hui, 9 h 37") comes from `created_at`.
  */
 
-/** Local calendar day as YYYY-MM-DD. */
+/** Bénin is UTC+1, no DST — kept in sync with `lib/dashboard/period.ts`. */
+const BENIN_OFFSET_MS = 60 * 60 * 1000;
+
+/**
+ * Bénin (UTC+1) calendar day as YYYY-MM-DD — independent of the host's own
+ * OS/browser timezone. Swiftly.io is single-region; deriving "today" from the
+ * *local* clock (as this used to) put the client (browser tz) and the server
+ * (Node's UTC getters) a day apart for part of every day, silently dropping a
+ * same-day transaction from the dashboard curve / cron / budget-month math.
+ */
 export function todayISO(now: Date = new Date()): string {
-  const y = now.getFullYear();
-  const m = String(now.getMonth() + 1).padStart(2, "0");
-  const d = String(now.getDate()).padStart(2, "0");
+  const shifted = new Date(now.getTime() + BENIN_OFFSET_MS);
+  const y = shifted.getUTCFullYear();
+  const m = String(shifted.getUTCMonth() + 1).padStart(2, "0");
+  const d = String(shifted.getUTCDate()).padStart(2, "0");
   return `${y}-${m}-${d}`;
 }
 

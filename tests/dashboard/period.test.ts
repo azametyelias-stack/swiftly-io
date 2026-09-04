@@ -27,6 +27,12 @@ test("day: today only, previous = yesterday", () => {
   assert.equal(r.granularity, "hour");
 });
 
+test("day: 'today' is Bénin (UTC+1), matching lib/format/date.ts::todayISO", () => {
+  // 23:30 UTC = 00:30 in Bénin: the day has already turned over there.
+  const r = resolvePeriod("day", new Date("2026-09-17T23:30:00Z"));
+  assert.equal(r.start, "2026-09-18");
+});
+
 test("week: Monday-based, capped at today, daily buckets", () => {
   const r = resolvePeriod("week", NOW);
   assert.equal(r.start, "2026-09-14"); // Monday

@@ -17,7 +17,11 @@ import type { Locale } from "@/lib/i18n";
  * chart lib. Right gutter carries five magnitude labels, the baseline carries
  * the time axis (hours for "Aujourd'hui", dates otherwise). On mount the line
  * draws itself over ~1400 ms; tap/drag shows a value bubble that fades after 3 s
- * while the marker stays.
+ * while the marker stays. When the balance is negative the whole curve (line,
+ * fill, endpoint, marker, bubble) switches to red — the axis is never anchored
+ * at 0 anymore, it spans from the rounded ceiling above the highest point down
+ * to the rounded floor below the lowest, so a negative range gets its own
+ * negative labels instead of the ceiling collapsing to a meaningless "1".
  */
 
 const W = 343;
@@ -26,19 +30,30 @@ const PAD = { top: 16, right: 44, bottom: 22, left: 4 };
 const DRAW_MS = 1400;
 const BUBBLE_MS = 3000;
 
+// The night panel never theme-flips (design system rule) — it's always dark,
+// so these mirror --ink-in's invariance instead of the theme-aware
+// --semantic-in/--semantic-out tokens.
+const CURVE_IN = "#1DCF02";
+const CURVE_OUT = "#FF6166";
+
 interface CurvePoint {
   date: string;
   balance: number;
   at?: string;
 }
 
-/** Round up to a "nice" 1 / 2 / 2.5 / 5 × 10ⁿ ceiling for the top axis label. */
+/** Round away from zero to a "nice" 1 / 2 / 2.5 / 5 × 10ⁿ step, for an axis edge. */
 function niceCeil(v: number): number {
-  if (v <= 0) return 1;
+  if (v <= 0) return 0;
   const pow = 10 ** Math.floor(Math.log10(v));
   const n = v / pow;
   const step = n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10;
   return step * pow;
+}
+
+/** Signed compact axis label: `-12 700` → "-13 K", `0` → "0". */
+function axisLabel(v: number): string {
+  return v < 0 ? `-${formatCompact(v)}` : formatCompact(v);
 }
 
 export function BalanceCurve({
@@ -61,10 +76,16 @@ export function BalanceCurve({
 
   const safePoints = points.length > 0 ? points : [{ date: "", balance: 0 }];
   const values = safePoints.map((p) => p.balance);
-  const dataMin = Math.min(...values, 0);
-  const dataMax = Math.max(...values, dataMin + 1);
-  const axisMax = niceCeil(dataMax);
-  const span = axisMax - dataMin || 1;
+  const negative = values.at(-1)! < 0;
+  const curveColor = negative ? CURVE_OUT : CURVE_IN;
+
+  // Axis edges are rounded outward from 0, independently above and below —
+  // never anchored at the data's raw min/max, so a range that dips negative
+  // gets real negative labels instead of the ceiling collapsing to "1".
+  const axisMax = niceCeil(Math.max(0, ...values));
+  const axisMin = -niceCeil(Math.max(0, -Math.min(0, ...values)));
+  const dataMin = axisMin;
+  const span = axisMax - axisMin || 1;
 
   const innerW = W - PAD.left - PAD.right;
   const innerH = H - PAD.top - PAD.bottom;
@@ -167,9 +188,9 @@ export function BalanceCurve({
       >
         <defs>
           <linearGradient id="sf-curve-fill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="var(--ink-in)" stopOpacity="0.34" />
-            <stop offset="55%" stopColor="var(--ink-in)" stopOpacity="0.12" />
-            <stop offset="100%" stopColor="var(--ink-in)" stopOpacity="0" />
+            <stop offset="0%" stopColor={curveColor} stopOpacity="0.34" />
+            <stop offset="55%" stopColor={curveColor} stopOpacity="0.12" />
+            <stop offset="100%" stopColor={curveColor} stopOpacity="0" />
           </linearGradient>
         </defs>
 
@@ -194,7 +215,7 @@ export function BalanceCurve({
               fontWeight="600"
               letterSpacing="0.04em"
             >
-              {formatCompact(t.v)}
+              {axisLabel(t.v)}
             </text>
           </g>
           );
@@ -205,7 +226,7 @@ export function BalanceCurve({
           ref={pathRef}
           d={linePath}
           fill="none"
-          stroke="var(--ink-in)"
+          stroke={curveColor}
           strokeWidth={2.4}
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -214,13 +235,13 @@ export function BalanceCurve({
         {/* glowing endpoint */}
         {points.length > 1 ? (
           <>
-            <circle cx={x(end)} cy={y(points[end]!.balance)} r={9} fill="var(--ink-in)" opacity={0.24} />
+            <circle cx={x(end)} cy={y(points[end]!.balance)} r={9} fill={curveColor} opacity={0.24} />
             <circle
               cx={x(end)}
               cy={y(points[end]!.balance)}
               r={4.5}
               fill="#05060F"
-              stroke="var(--ink-in)"
+              stroke={curveColor}
               strokeWidth={2.5}
             />
           </>
@@ -241,7 +262,7 @@ export function BalanceCurve({
               cx={x(marker)}
               cy={y(points[marker]!.balance)}
               r={4}
-              fill="var(--ink-in)"
+              fill={curveColor}
               stroke="#05060F"
               strokeWidth={2}
             />
@@ -273,7 +294,14 @@ export function BalanceCurve({
             top: `${(y(points[marker]!.balance) / H) * 100}%`,
           }}
         >
-          <span className="rounded-[9px] border border-[color-mix(in_srgb,var(--ink-in)_60%,transparent)] bg-[#00351f] px-2.5 py-1 text-[13px] font-bold text-ink-in tabular shadow-lg">
+          <span
+            className="rounded-[9px] border px-2.5 py-1 text-[13px] font-bold tabular shadow-lg"
+            style={{
+              borderColor: `color-mix(in srgb, ${curveColor} 60%, transparent)`,
+              backgroundColor: negative ? "#3a0505" : "#00351f",
+              color: curveColor,
+            }}
+          >
             {formatBalance(points[marker]!.balance, currency)}
           </span>
           {points[marker]!.at ? (

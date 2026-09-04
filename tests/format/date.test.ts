@@ -10,9 +10,11 @@ import {
   todayISO,
 } from "../../lib/format/date.ts";
 
-test("todayISO: local calendar day", () => {
-  assert.match(todayISO(new Date("2026-09-17T23:30:00")), /^\d{4}-\d{2}-\d{2}$/);
-  assert.equal(todayISO(new Date(2026, 8, 5, 12)), "2026-09-05");
+test("todayISO: Bénin (UTC+1) calendar day, independent of host tz", () => {
+  assert.equal(todayISO(new Date("2026-09-05T12:00:00Z")), "2026-09-05");
+  // 23:30 UTC = 00:30 in Bénin — already the next calendar day there.
+  assert.equal(todayISO(new Date("2026-09-17T23:30:00Z")), "2026-09-18");
+  assert.equal(todayISO(new Date("2026-09-17T22:59:00Z")), "2026-09-17");
 });
 
 test("addDaysISO", () => {
