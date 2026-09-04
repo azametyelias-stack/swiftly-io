@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 
 import { SheetButton } from "@/components/transactions/SheetButton";
-import { TxSheet } from "@/components/transactions/TxSheet";
+import { TxSheet, useTxSurface } from "@/components/transactions/TxSheet";
 import { useMessages } from "@/lib/i18n/useMessages";
 import type { TxType } from "@/lib/transactions/model";
 
@@ -12,9 +12,15 @@ export function TxTypePicker() {
   const m = useMessages();
   const t = m.transactions;
   const router = useRouter();
+  const { close } = useTxSurface();
 
   const pick = (type: TxType) =>
     router.replace(`/transactions/nouvelle?type=${type}`);
+
+  const cancel = () => {
+    if (close) close();
+    else router.back();
+  };
 
   return (
     <TxSheet>
@@ -34,7 +40,7 @@ export function TxTypePicker() {
       </div>
       <button
         type="button"
-        onClick={() => router.back()}
+        onClick={cancel}
         className="mt-6 w-full text-center text-[15px] font-semibold text-text-secondary"
       >
         {t.new.cancel}

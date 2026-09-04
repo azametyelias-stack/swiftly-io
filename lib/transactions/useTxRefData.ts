@@ -38,6 +38,10 @@ export interface TxRefData {
   ready: boolean;
   /** create a person on the fly and return it (SCREEN-8/9 § 2) */
   createPerson: (name: string) => Promise<RefNamed | null>;
+  /** create a project (name only — the rest is edited later on SCREEN-16) */
+  createProject: (name: string) => Promise<RefNamed | null>;
+  /** create a category (name only — neutral colour, kind from the tx type) */
+  createCategory: (name: string) => Promise<RefCategory | null>;
   reloadAccounts: () => void;
 }
 
@@ -98,6 +102,47 @@ export function useTxRefData(type: TxType): TxRefData {
     }
   }, []);
 
+  const createProject = useCallback(async (name: string) => {
+    try {
+      const { id } = await apiJson<{ id: string }>("/api/projects", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ name }),
+      });
+      const project: RefNamed = { id, name };
+      setProjects((prev) => [...prev, project]);
+      return project;
+    } catch {
+      return null;
+    }
+  }, []);
+
+  const createCategory = useCallback(
+    async (name: string): Promise<RefCategory | null> => {
+      try {
+        const { category } = await apiJson<{ category: RefCategory }>(
+          "/api/categories",
+          {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({
+              name,
+              kind: type === "income" ? "income" : "expense",
+              color: "#8A8C93",
+            }),
+          },
+        );
+        setCategories((prev) =>
+          [...prev, category].sort((a, b) => a.name.localeCompare(b.name, "fr")),
+        );
+        return category;
+      } catch {
+        return null;
+      }
+    },
+    [type],
+  );
+
   return {
     accounts,
     categories,
@@ -105,6 +150,8 @@ export function useTxRefData(type: TxType): TxRefData {
     projects,
     ready,
     createPerson,
+    createProject,
+    createCategory,
     reloadAccounts,
   };
 }

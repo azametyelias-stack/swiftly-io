@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { TxSheet } from "@/components/transactions/TxSheet";
 import { TxWizard } from "@/components/transactions/TxWizard";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { fetchTemplate } from "@/lib/templates/useTemplates";
@@ -31,9 +32,14 @@ export function LaunchTemplate({ id }: { id: string }) {
 
   if (state === "loading") {
     return (
-      <div className="flex min-h-[100dvh] items-center justify-center bg-brand-deep p-6">
-        <Skeleton className="h-72 w-full max-w-[420px]" rounded="rounded-[28px]" />
-      </div>
+      <TxSheet>
+        <div className="flex flex-col gap-4">
+          <Skeleton className="h-4 w-32" rounded="rounded-full" />
+          <Skeleton className="h-[52px] w-full" rounded="rounded-[14px]" />
+          <Skeleton className="h-16 w-full" rounded="rounded-[14px]" />
+          <Skeleton className="h-[52px] w-full" rounded="rounded-[14px]" />
+        </div>
+      </TxSheet>
     );
   }
   if (state === "error") {

@@ -1,16 +1,23 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import { AccountTypeIcon, ChevronLeftIcon, InfoIcon } from "@/components/nav/icons";
+import {
+  AccountTypeIcon,
+  ChevronLeftIcon,
+  InfoIcon,
+  PlusIcon,
+} from "@/components/nav/icons";
 import { AmountField } from "@/components/transactions/AmountField";
 import { ChoiceGrid } from "@/components/transactions/ChoiceGrid";
 import { LinkedToField } from "@/components/transactions/LinkedToField";
+import { QuickCreateRow } from "@/components/transactions/QuickCreateRow";
 import { SelectField } from "@/components/transactions/SelectField";
 import { SheetButton } from "@/components/transactions/SheetButton";
 import { StepDots } from "@/components/transactions/StepDots";
-import { TxSheet } from "@/components/transactions/TxSheet";
+import { TxSheet, useTxSurface } from "@/components/transactions/TxSheet";
 import { TxSuccess } from "@/components/transactions/TxSuccess";
 import { apiJson } from "@/lib/http/api";
 import { todayISO } from "@/lib/format/date";
@@ -52,10 +59,13 @@ export function TxWizard({
   const today = todayISO();
 
   const ref = useTxRefData(type);
+  const { close } = useTxSurface();
   const [draft, setDraft] = useState<TxDraft>(() => initialDraft ?? emptyDraft(type));
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [creatingCat, setCreatingCat] = useState(false);
+  const [catError, setCatError] = useState(false);
   const [saved, setSaved] = useState<{
     transaction: TxDetail;
     warning: { balance: number } | null;
@@ -94,8 +104,13 @@ export function TxWizard({
   };
 
   const goBack = () => {
-    if (step === 1) router.back();
-    else setStep((s) => (s - 1) as 1 | 2 | 3);
+    if (step > 1) {
+      setStep((s) => (s - 1) as 1 | 2 | 3);
+    } else if (close) {
+      close();
+    } else {
+      router.back();
+    }
   };
 
   const goNext = async () => {
@@ -207,6 +222,7 @@ export function TxWizard({
                   ? t.fields.destinationAccount
                   : t.fields.sourceAccount
               }
+              action={<AddAccountLink label={t.fields.addAccountCta} />}
             >
               <ChoiceGrid
                 ariaLabel={
@@ -252,7 +268,10 @@ export function TxWizard({
                 </span>
               </span>
             </div>
-            <Field label={t.fields.destinationAccount}>
+            <Field
+              label={t.fields.destinationAccount}
+              action={<AddAccountLink label={t.fields.addAccountCta} />}
+            >
               <SelectField
                 ariaLabel={t.fields.destinationAccount}
                 value={eff.destinationAccountId}
@@ -289,7 +308,43 @@ export function TxWizard({
                   label: c.name,
                 }))}
                 onSelect={(id) => patch({ categoryId: id })}
+                onCreate={{
+                  label: t.fields.createCategoryCta,
+                  run: () => {
+                    setCatError(false);
+                    setCreatingCat(true);
+                  },
+                }}
               />
+              {creatingCat ? (
+                <div className="mt-2 flex flex-col gap-1.5">
+                  <QuickCreateRow
+                    placeholder={t.fields.categoryNamePlaceholder}
+                    confirmLabel={m.common.confirm}
+                    cancelLabel={m.common.cancel}
+                    onCancel={() => {
+                      setCreatingCat(false);
+                      setCatError(false);
+                    }}
+                    onSubmit={async (name) => {
+                      setCatError(false);
+                      const created = await ref.createCategory(name);
+                      if (!created) {
+                        setCatError(true);
+                        return false;
+                      }
+                      patch({ categoryId: created.id });
+                      setCreatingCat(false);
+                      return true;
+                    }}
+                  />
+                  {catError ? (
+                    <span className="t-secondary text-semantic-out">
+                      {t.fields.createFailed}
+                    </span>
+                  ) : null}
+                </div>
+              ) : null}
             </Field>
             <div className="h-px bg-surface-divider" />
             <LinkedToField
@@ -302,6 +357,7 @@ export function TxWizard({
               people={ref.people}
               projects={ref.projects}
               createPerson={ref.createPerson}
+              createProject={ref.createProject}
               required={type === "income"}
               invalid={type === "income" && errs.includes("linked-to")}
             />
@@ -415,21 +471,38 @@ function sourceAccount(
 function Field({
   label,
   hint,
+  action,
   children,
 }: {
   label: string;
   hint?: string;
+  action?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2">
         <span className="text-[13px] font-semibold">{label}</span>
-        {hint ? (
+        {action ? (
+          action
+        ) : hint ? (
           <span className="text-[12px] text-text-tertiary">{hint}</span>
         ) : null}
       </div>
       {children}
     </div>
+  );
+}
+
+/** "+ Ajouter un compte" shortcut beside the account field (SCREEN-8/9 § 1). */
+function AddAccountLink({ label }: { label: string }) {
+  return (
+    <Link
+      href="/comptes"
+      className="inline-flex flex-none items-center gap-1 text-[12px] font-semibold text-brand-accent"
+    >
+      <PlusIcon width={12} height={12} />
+      {label}
+    </Link>
   );
 }

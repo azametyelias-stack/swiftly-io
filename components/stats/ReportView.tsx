@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { CheckIcon, ChevronLeftIcon } from "@/components/nav/icons";
@@ -190,12 +191,12 @@ function ReportBody({ report }: { report: ReportPayload }) {
           <span className="text-[13px] font-semibold tabular text-text-secondary">
             {scoreDeltaLabel(report.score.delta, prevLabel, r)}
           </span>
-          <a
+          <Link
             href="/aides"
             className="text-[14px] font-semibold text-brand-accent"
           >
             {r.score.seeHelp}
-          </a>
+          </Link>
         </div>
       </Card>
 

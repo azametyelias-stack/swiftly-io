@@ -156,6 +156,7 @@ export function TemplateFormSheet({
           people={ref.people}
           projects={ref.projects}
           createPerson={ref.createPerson}
+          createProject={ref.createProject}
           required={false}
           invalid={show("linkedTo")}
         />

@@ -72,7 +72,13 @@ export function BalanceCurve({
     const reduce =
       typeof window !== "undefined" &&
       window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    const len = el.getTotalLength();
+    let len = 0;
+    try {
+      len = el.getTotalLength();
+    } catch {
+      return; // some engines throw on a not-yet-laid-out path — skip the trace
+    }
+    if (!Number.isFinite(len) || len <= 0) return;
     el.style.transition = "none";
     el.style.strokeDasharray = `${len}`;
     el.style.strokeDashoffset = reduce ? "0" : `${len}`;

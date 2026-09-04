@@ -78,22 +78,25 @@ export function DashboardView() {
   return (
     <div className="relative flex h-[100dvh] flex-col overflow-y-auto overscroll-contain bg-brand-deep">
       {/* Night background — pinned behind the internal scroll (§ DESIGN-GLOBAL:
-          "le fond bleu reste fixe derrière tout"). */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none sticky top-0 -mb-[100dvh] h-[100dvh] bg-cover bg-center"
-        style={{ backgroundImage: "url(/brand/nuit.jpg)" }}
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none sticky top-0 -mb-[100dvh] h-[100dvh]"
-        style={{
-          background:
-            "linear-gradient(180deg, rgba(6,10,60,0.55) 0%, rgba(6,10,60,0.28) 34%, rgba(6,10,60,0.72) 100%)",
-        }}
-      />
+          "le fond bleu reste fixe derrière tout"). A zero-height sticky wrapper
+          holds the two full-viewport layers: it stays at the top while the page
+          scrolls but adds no height, so it can't squeeze the flex column (the
+          old `-mb-[100dvh]` trick collapsed the layout on mobile). */}
+      <div aria-hidden="true" className="pointer-events-none sticky top-0 z-0 h-0">
+        <div
+          className="absolute inset-x-0 top-0 h-[100dvh] bg-cover bg-center"
+          style={{ backgroundImage: "url(/brand/nuit.jpg)" }}
+        />
+        <div
+          className="absolute inset-x-0 top-0 h-[100dvh]"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(6,10,60,0.55) 0%, rgba(6,10,60,0.28) 34%, rgba(6,10,60,0.72) 100%)",
+          }}
+        />
+      </div>
 
-      <div className="relative flex flex-1 flex-col text-ink-on-surface">
+      <div className="relative z-10 flex flex-1 flex-col text-ink-on-surface">
         {/* Header row */}
         <div className="flex h-14 items-center justify-between px-2" style={{ marginTop: "env(safe-area-inset-top)" }}>
           <button
