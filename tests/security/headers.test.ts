@@ -44,6 +44,13 @@ test("CSP: locks framing, objects and base-uri; upgrades insecure requests", () 
   assert.match(csp, /upgrade-insecure-requests/);
 });
 
+test("CSP: no upgrade-insecure-requests in dev (plain-HTTP LAN testing)", () => {
+  assert.doesNotMatch(
+    buildContentSecurityPolicy({ isDev: true }),
+    /upgrade-insecure-requests/,
+  );
+});
+
 test("CSP: the Supabase origin is added to connect-src (http + wss)", () => {
   const csp = buildContentSecurityPolicy({ supabaseUrl: "https://abc123.supabase.co" });
   const connect = csp.split(";").find((d) => d.trim().startsWith("connect-src"))!;

@@ -61,8 +61,12 @@ export function buildContentSecurityPolicy(options: SecurityHeadersOptions = {})
     .map(([name, values]) => `${name} ${values.join(" ")}`)
     .join("; ");
 
-  // Force any stray http:// subresource up to https://.
-  return `${policy}; upgrade-insecure-requests`;
+  // Force any stray http:// subresource up to https:// — PRODUCTION ONLY.
+  // In dev the server is plain HTTP; over a LAN IP (phone testing) browsers do
+  // apply this upgrade (localhost is exempt, 192.168.x.x is not), which would
+  // rewrite every same-origin asset to https:// and break the page. Prod is
+  // always HTTPS via Vercel, so the directive still applies where it matters.
+  return isDev ? policy : `${policy}; upgrade-insecure-requests`;
 }
 
 /** The full ordered list of security headers for `next.config.ts` → `headers()`. */
