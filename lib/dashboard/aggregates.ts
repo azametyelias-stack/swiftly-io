@@ -15,6 +15,7 @@
  */
 
 export type TxType = "expense" | "income" | "transfer";
+export type Granularity = "hour" | "day" | "month";
 
 export interface TxRow {
   type: TxType;
@@ -22,6 +23,8 @@ export interface TxRow {
   amount: number;
   /** YYYY-MM-DD */
   occurred_on: string;
+  /** ISO timestamp — places the point on the hourly axis for "Aujourd'hui" */
+  created_at: string;
   status: string;
   source_account_id: string | null;
   destination_account_id: string | null;
@@ -47,6 +50,8 @@ export function txDelta(tx: TxRow, accountId: string): number {
 export interface CurvePoint {
   date: string;
   balance: number;
+  /** ISO timestamp for hourly ("Aujourd'hui") points — absent for day/month */
+  at?: string;
 }
 
 export interface DashboardAggregate {
@@ -72,13 +77,24 @@ export interface AggregateInput {
   rangeEnd: string;
   /** bucket start dates within the range, ascending */
   buckets: string[];
+  /** "hour" steps the curve per transaction (today); default steps per bucket */
+  granularity?: Granularity;
 }
 
 export function computeAggregate(input: AggregateInput): DashboardAggregate {
-  const { initialBalance, transactions, accountId, rangeStart, rangeEnd, buckets } = input;
+  const {
+    initialBalance,
+    transactions,
+    accountId,
+    rangeStart,
+    rangeEnd,
+    buckets,
+    granularity = "day",
+  } = input;
 
   const deltas = transactions.map((tx) => ({
     on: tx.occurred_on,
+    at: tx.created_at,
     delta: txDelta(tx, accountId),
   }));
 
@@ -94,19 +110,32 @@ export function computeAggregate(input: AggregateInput): DashboardAggregate {
     if (d.delta > 0) income += d.delta;
     else expenses += -d.delta;
   }
+  const endBalance = startBalance + income - expenses;
 
-  const curve: CurvePoint[] = buckets.map((bucket, i) => {
-    const cutoff = buckets[i + 1] ?? rangeEnd;
-    return { date: bucket, balance: initialBalance + sumBefore(cutoff) };
-  });
+  let curve: CurvePoint[];
+  if (granularity === "hour") {
+    // One point at 00:00, then a running point at each of today's transactions
+    // ordered by created_at, then the current balance to close the line.
+    const inRange = deltas
+      .filter((d) => d.on >= rangeStart && d.on < rangeEnd && d.delta !== 0)
+      .sort((a, b) => (a.at < b.at ? -1 : a.at > b.at ? 1 : 0));
+    let running = startBalance;
+    curve = [{ date: rangeStart, balance: running }];
+    for (const d of inRange) {
+      running += d.delta;
+      curve.push({ date: rangeStart, balance: running, at: d.at });
+    }
+    if (inRange.length > 0) {
+      curve.push({ date: rangeStart, balance: endBalance });
+    }
+  } else {
+    curve = buckets.map((bucket, i) => {
+      const cutoff = buckets[i + 1] ?? rangeEnd;
+      return { date: bucket, balance: initialBalance + sumBefore(cutoff) };
+    });
+  }
 
-  return {
-    startBalance,
-    income,
-    expenses,
-    endBalance: startBalance + income - expenses,
-    curve,
-  };
+  return { startBalance, income, expenses, endBalance, curve };
 }
 
 export interface Variation {

@@ -25,7 +25,8 @@ export interface DashboardData {
   income: number;
   expenses: number;
   variation: Variation;
-  curve: { date: string; balance: number }[] | null;
+  curve: { date: string; balance: number; at?: string }[] | null;
+  granularity: "hour" | "day" | "month";
   hasTransactions: boolean;
 }
 
@@ -55,9 +56,7 @@ export function useDashboard(): DashboardState {
   const [name, setName] = useState<string | null>(null);
   const [accounts, setAccounts] = useState<AccountSummary[]>([]);
   const [accountId, setAccountId] = useState<string | null>(null);
-  // "month" by default: "day" resolves to a single bucket (a flat one-point
-  // line), so the dashboard opened on an actual curve.
-  const [period, setPeriod] = useState<Period>("month");
+  const [period, setPeriod] = useState<Period>("day");
   const [data, setData] = useState<DashboardData | null>(null);
   const [status, setStatus] = useState<DashboardStatus>("loading");
   const [reloadKey, setReloadKey] = useState(0);

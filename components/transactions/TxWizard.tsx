@@ -1,15 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import {
-  AccountTypeIcon,
-  ChevronLeftIcon,
-  InfoIcon,
-  PlusIcon,
-} from "@/components/nav/icons";
+import { AccountTypeIcon, ChevronLeftIcon, InfoIcon } from "@/components/nav/icons";
 import { AmountField } from "@/components/transactions/AmountField";
 import { ChoiceGrid } from "@/components/transactions/ChoiceGrid";
 import { LinkedToField } from "@/components/transactions/LinkedToField";
@@ -222,7 +216,6 @@ export function TxWizard({
                   ? t.fields.destinationAccount
                   : t.fields.sourceAccount
               }
-              action={<AddAccountLink label={t.fields.addAccountCta} />}
             >
               <ChoiceGrid
                 ariaLabel={
@@ -231,6 +224,10 @@ export function TxWizard({
                     : t.fields.sourceAccount
                 }
                 columns={2}
+                trailingAction={{
+                  label: t.fields.newAccount,
+                  onClick: () => router.push("/comptes"),
+                }}
                 options={accountChoices}
                 value={
                   type === "income"
@@ -268,15 +265,16 @@ export function TxWizard({
                 </span>
               </span>
             </div>
-            <Field
-              label={t.fields.destinationAccount}
-              action={<AddAccountLink label={t.fields.addAccountCta} />}
-            >
+            <Field label={t.fields.destinationAccount}>
               <SelectField
                 ariaLabel={t.fields.destinationAccount}
                 value={eff.destinationAccountId}
                 placeholder={t.fields.selectAccount}
                 invalid={errs.includes("same-account")}
+                onCreate={{
+                  label: t.fields.addAccountCta,
+                  run: () => router.push("/comptes"),
+                }}
                 options={ref.accounts.map((a) => ({
                   value: a.id,
                   label: a.name,
@@ -471,38 +469,21 @@ function sourceAccount(
 function Field({
   label,
   hint,
-  action,
   children,
 }: {
   label: string;
   hint?: string;
-  action?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
         <span className="text-[13px] font-semibold">{label}</span>
-        {action ? (
-          action
-        ) : hint ? (
+        {hint ? (
           <span className="text-[12px] text-text-tertiary">{hint}</span>
         ) : null}
       </div>
       {children}
     </div>
-  );
-}
-
-/** "+ Ajouter un compte" shortcut beside the account field (SCREEN-8/9 § 1). */
-function AddAccountLink({ label }: { label: string }) {
-  return (
-    <Link
-      href="/comptes"
-      className="inline-flex flex-none items-center gap-1 text-[12px] font-semibold text-brand-accent"
-    >
-      <PlusIcon width={12} height={12} />
-      {label}
-    </Link>
   );
 }

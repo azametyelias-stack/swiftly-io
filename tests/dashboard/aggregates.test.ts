@@ -15,6 +15,7 @@ const tx = (o: Partial<TxRow>): TxRow => ({
   type: "expense",
   amount: 0,
   occurred_on: "2026-09-10",
+  created_at: "2026-09-10T12:00:00Z",
   status: "done",
   source_account_id: null,
   destination_account_id: null,
@@ -74,6 +75,44 @@ test("computeAggregate: empty history → flat at the initial balance", () => {
   assert.equal(r.income, 0);
   assert.equal(r.expenses, 0);
   assert.deepEqual(r.curve.map((p) => p.balance), [0, 0]);
+});
+
+test("computeAggregate hour: stepped per transaction, closes on the end balance", () => {
+  const r = computeAggregate({
+    initialBalance: 10_000,
+    accountId: A,
+    granularity: "hour",
+    transactions: [
+      tx({ type: "income", amount: 20_000, destination_account_id: A, occurred_on: "2026-09-17", created_at: "2026-09-17T06:22:00Z", status: "done" }),
+      tx({ type: "expense", amount: 5_000, source_account_id: A, occurred_on: "2026-09-17", created_at: "2026-09-17T09:40:00Z" }),
+      // yesterday — folds into the start balance, not a curve point
+      tx({ type: "expense", amount: 3_000, source_account_id: A, occurred_on: "2026-09-16", created_at: "2026-09-16T20:00:00Z" }),
+    ],
+    rangeStart: "2026-09-17",
+    rangeEnd: "2026-09-18",
+    buckets: ["2026-09-17"],
+  });
+  assert.equal(r.startBalance, 7_000); // 10k − 3k yesterday
+  assert.equal(r.endBalance, 22_000); // 7k + 20k − 5k
+  assert.deepEqual(
+    r.curve.map((p) => p.balance),
+    [7_000, 27_000, 22_000, 22_000],
+  );
+  assert.equal(r.curve[1]!.at, "2026-09-17T06:22:00Z");
+  assert.equal(r.curve[0]!.at, undefined);
+});
+
+test("computeAggregate hour: no transactions today → single start point", () => {
+  const r = computeAggregate({
+    initialBalance: 4_000,
+    accountId: A,
+    granularity: "hour",
+    transactions: [],
+    rangeStart: "2026-09-17",
+    rangeEnd: "2026-09-18",
+    buckets: ["2026-09-17"],
+  });
+  assert.deepEqual(r.curve.map((p) => p.balance), [4_000]);
 });
 
 test("computeVariation: amount + percent, null baseline when 0", () => {

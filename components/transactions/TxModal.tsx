@@ -9,16 +9,15 @@ import {
 } from "react";
 import { useRouter } from "next/navigation";
 
-import { CloseIcon } from "@/components/nav/icons";
 import { TxSurfaceContext } from "@/components/transactions/TxSheet";
 
 const EXIT_MS = 280; // keep in sync with --dur-sheet
 
 /**
- * The overlay that wraps an intercepted `/transactions/...` route (SCREEN-8/9
- * feedback). The screen you came from stays mounted behind, blurred + dimmed;
- * the sheet slides up from the bottom and slides back down on close, then the
- * route is popped so the browser lands exactly where it was.
+ * The overlay that wraps an intercepted `/transactions/...` route (SCREEN-8/9,
+ * design `08-creer-modifier-depense`). The screen you came from stays mounted
+ * behind, blurred + dimmed; a centred card fades/rises in and reverses on close,
+ * then the route is popped so the browser lands exactly where it was.
  *
  * Hard load / refresh of the same URL renders the full-page route instead — this
  * component is never on that path.
@@ -72,7 +71,7 @@ export function TxModal({ children }: { children: ReactNode }) {
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex flex-col items-center justify-end"
+      className="fixed inset-0 z-[60] flex items-center justify-center p-4"
       role="dialog"
       aria-modal="true"
     >
@@ -84,17 +83,14 @@ export function TxModal({ children }: { children: ReactNode }) {
         style={{ opacity: open ? 1 : 0 }}
       />
       <div
-        className="relative max-h-[92dvh] w-full max-w-[440px] overflow-y-auto overscroll-contain transition-transform duration-[var(--dur-sheet)] ease-[var(--ease-emphasized)] motion-reduce:transition-none"
-        style={{ transform: open ? "translateY(0)" : "translateY(100%)" }}
+        className="relative max-h-[88dvh] w-full max-w-[440px] overflow-y-auto overscroll-contain transition-[transform,opacity] duration-[var(--dur-sheet)] ease-[var(--ease-emphasized)] motion-reduce:transition-none"
+        style={{
+          opacity: open ? 1 : 0,
+          transform: open
+            ? "translateY(0) scale(1)"
+            : "translateY(12px) scale(0.98)",
+        }}
       >
-        <button
-          type="button"
-          onClick={close}
-          aria-label="Fermer"
-          className="absolute right-4 top-4 z-10 grid size-9 place-items-center rounded-full bg-surface-card/85 text-text-secondary shadow-sm"
-        >
-          <CloseIcon width={16} height={16} />
-        </button>
         <TxSurfaceContext.Provider value={{ variant: "modal", close }}>
           {children}
         </TxSurfaceContext.Provider>

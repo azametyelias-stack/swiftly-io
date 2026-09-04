@@ -7,8 +7,10 @@
  * day: the period is a half-open range of dates `[start, end)` plus the buckets
  * the balance curve is sampled at.
  *
- * The mockup's hourly "Aujourd'hui" axis isn't backed by the data model
- * (date-only) — "day" gets a single segment; the real curve shows from "week" up.
+ * "Aujourd'hui" is drawn on an hourly axis (design `04-dashboard.png`): the
+ * curve is stepped by each of today's transactions, placed by the hour of their
+ * `created_at` (`granularity: "hour"`). `week`/`month` step by day, `year` by
+ * month.
  */
 
 export const PERIODS = ["day", "week", "month", "year"] as const;
@@ -48,8 +50,8 @@ export interface PeriodRange {
   previous: { start: string; end: string };
   /** day boundaries the curve is sampled at, from `start` to `end` inclusive */
   buckets: string[];
-  /** how a bucket label should read */
-  granularity: "day" | "month";
+  /** how the curve is sampled: "hour" (today, stepped per transaction), "day", "month" */
+  granularity: "hour" | "day" | "month";
 }
 
 function eachDay(start: Date, end: Date): string[] {
@@ -121,7 +123,8 @@ export function resolvePeriod(period: Period, now: Date = new Date()): PeriodRan
   const lastBucketDay = new Date(drawnEnd);
   lastBucketDay.setUTCDate(lastBucketDay.getUTCDate() - 1);
 
-  const granularity: "day" | "month" = period === "year" ? "month" : "day";
+  const granularity: "hour" | "day" | "month" =
+    period === "year" ? "month" : period === "day" ? "hour" : "day";
   const buckets =
     granularity === "month"
       ? eachMonthStart(start, lastBucketDay)

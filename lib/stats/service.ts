@@ -242,7 +242,9 @@ export async function getStats(
       .maybeSingle();
     const { data: allTx } = await db
       .from("transactions")
-      .select("type, amount, occurred_on, status, source_account_id, destination_account_id")
+      .select(
+        "type, amount, occurred_on, status, source_account_id, destination_account_id, created_at",
+      )
       .eq("user_id", userId)
       .or(`source_account_id.eq.${acctForCurve},destination_account_id.eq.${acctForCurve}`)
       .lt("occurred_on", range.end);
@@ -250,6 +252,7 @@ export async function getStats(
       type: t.type,
       amount: Number(t.amount),
       occurred_on: t.occurred_on,
+      created_at: t.created_at,
       status: t.status,
       source_account_id: t.source_account_id,
       destination_account_id: t.destination_account_id,

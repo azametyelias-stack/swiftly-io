@@ -24,6 +24,7 @@ test("day: today only, previous = yesterday", () => {
   assert.equal(r.end, "2026-09-18");
   assert.deepEqual(r.previous, { start: "2026-09-16", end: "2026-09-17" });
   assert.deepEqual(r.buckets, ["2026-09-17"]);
+  assert.equal(r.granularity, "hour");
 });
 
 test("week: Monday-based, capped at today, daily buckets", () => {

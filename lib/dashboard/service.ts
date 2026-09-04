@@ -64,7 +64,8 @@ export interface DashboardPayload {
   expenses: number;
   variation: Variation;
   /** null until the account has any settled transaction (SCREEN-4 empty state) */
-  curve: { date: string; balance: number }[] | null;
+  curve: { date: string; balance: number; at?: string }[] | null;
+  granularity: "hour" | "day" | "month";
   hasTransactions: boolean;
 }
 
@@ -90,7 +91,9 @@ export async function getDashboard(
 
   const { data: txData, error: txErr } = await db
     .from("transactions")
-    .select("type, amount, occurred_on, status, source_account_id, destination_account_id")
+    .select(
+      "type, amount, occurred_on, status, source_account_id, destination_account_id, created_at",
+    )
     .eq("user_id", userId)
     .or(`source_account_id.eq.${account.id},destination_account_id.eq.${account.id}`)
     .lt("occurred_on", range.end)
@@ -101,6 +104,7 @@ export async function getDashboard(
     type: t.type,
     amount: Number(t.amount),
     occurred_on: t.occurred_on,
+    created_at: t.created_at,
     status: t.status,
     source_account_id: t.source_account_id,
     destination_account_id: t.destination_account_id,
@@ -113,6 +117,7 @@ export async function getDashboard(
     rangeStart: range.start,
     rangeEnd: range.end,
     buckets: range.buckets,
+    granularity: range.granularity,
   });
 
   // Authoritative live balance (includes project allocations).
@@ -140,6 +145,7 @@ export async function getDashboard(
     expenses: agg.expenses,
     variation: computeVariation(agg.endBalance, prevBaseline),
     curve: hasTransactions ? agg.curve : null,
+    granularity: range.granularity,
     hasTransactions,
   };
 }

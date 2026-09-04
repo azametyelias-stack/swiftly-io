@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useState, type ReactNode, type UIEvent } from "react";
 import Link from "next/link";
 
 import { BalanceCurve } from "@/components/dashboard/BalanceCurve";
@@ -8,6 +8,7 @@ import { MoneyDropdown } from "@/components/dashboard/MoneyDropdown";
 import { Odometer } from "@/components/dashboard/Odometer";
 import { RecentHistory } from "@/components/dashboard/RecentHistory";
 import { RotatingBanner } from "@/components/dashboard/RotatingBanner";
+import { TemplatesCarousel } from "@/components/dashboard/TemplatesCarousel";
 import { useNavShell } from "@/components/nav/useNavShell";
 import {
   BellIcon,
@@ -25,12 +26,29 @@ import type { CurrencyCode } from "@/lib/format/money";
 import { periodLabel, previousPeriodLabel, PERIODS, type Period } from "@/lib/dashboard/period";
 import { useDashboard } from "@/lib/dashboard/useDashboard";
 import { interpolate } from "@/lib/i18n";
-import { useMessages } from "@/lib/i18n/useMessages";
+import { useLocale, useMessages } from "@/lib/i18n/useMessages";
 
 const HIDE_KEY = "sf-balance-hidden";
+const COLLAPSE_AT = 32;
+
+/** first / middle / last bucket dates, short-formatted, for the curve's x-axis. */
+function periodXLabels(
+  curve: { date: string }[] | null,
+  locale: string,
+): string[] {
+  if (!curve || curve.length === 0) return [];
+  const fmt = new Intl.DateTimeFormat(locale === "fr" ? "fr-FR" : "en-US", {
+    day: "numeric",
+    month: "short",
+  });
+  const at = (i: number) => fmt.format(new Date(`${curve[i]!.date}T00:00:00Z`));
+  if (curve.length <= 2) return curve.map((_, i) => at(i));
+  return [at(0), at(Math.floor((curve.length - 1) / 2)), at(curve.length - 1)];
+}
 
 export function DashboardView() {
   const m = useMessages();
+  const locale = useLocale();
   const { openMenu } = useNavShell();
   const { name, accounts, accountId, setAccountId, period, setPeriod, data, status, refresh } =
     useDashboard();
@@ -54,41 +72,36 @@ export function DashboardView() {
     });
   };
 
-  // "+ Nouvelle transaction" freezes at the top; a sentinel above it tells us when.
-  const sentinel = useRef<HTMLDivElement>(null);
-  const [stuck, setStuck] = useState(false);
-  useEffect(() => {
-    const el = sentinel.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      ([entry]) => setStuck(!entry!.isIntersecting),
-      { threshold: 0 },
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
+  // The white panel owns the scroll; past a small threshold the dark hero
+  // collapses to a compact strip (design "bouton figé en haut").
+  const [collapsed, setCollapsed] = useState(false);
+  const onPanelScroll = (e: UIEvent<HTMLDivElement>) => {
+    const y = e.currentTarget.scrollTop;
+    setCollapsed((c) => (c ? y > COLLAPSE_AT / 2 : y > COLLAPSE_AT));
+  };
 
   const currency = (data?.account.currency ?? "XOF") as CurrencyCode;
   const loading = status === "loading" && !data;
   const errored = status === "error";
   const replayKey = `${data?.account.id ?? "none"}:${period}`;
+  const hourAxis = data?.granularity === "hour";
 
   const greeting = name ? interpolate(m.dashboard.greeting, { name }) : m.dashboard.balanceLabel;
 
+  const balanceText = hidden
+    ? formatMoney(0, { currency, masked: true })
+    : formatBalance(data?.balance ?? 0, currency);
+
   return (
-    <div className="relative flex h-[100dvh] flex-col overflow-y-auto overscroll-contain bg-brand-deep">
-      {/* Night background — pinned behind the internal scroll (§ DESIGN-GLOBAL:
-          "le fond bleu reste fixe derrière tout"). A zero-height sticky wrapper
-          holds the two full-viewport layers: it stays at the top while the page
-          scrolls but adds no height, so it can't squeeze the flex column (the
-          old `-mb-[100dvh]` trick collapsed the layout on mobile). */}
-      <div aria-hidden="true" className="pointer-events-none sticky top-0 z-0 h-0">
+    <div className="relative flex h-[100dvh] flex-col overflow-hidden bg-brand-deep">
+      {/* Night background — fixed behind everything. */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         <div
-          className="absolute inset-x-0 top-0 h-[100dvh] bg-cover bg-center"
+          className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: "url(/brand/nuit.jpg)" }}
         />
         <div
-          className="absolute inset-x-0 top-0 h-[100dvh]"
+          className="absolute inset-0"
           style={{
             background:
               "linear-gradient(180deg, rgba(6,10,60,0.55) 0%, rgba(6,10,60,0.28) 34%, rgba(6,10,60,0.72) 100%)",
@@ -96,8 +109,8 @@ export function DashboardView() {
         />
       </div>
 
-      <div className="relative z-10 flex flex-1 flex-col text-ink-on-surface">
-        {/* Header row */}
+      {/* Frozen hero — never scrolls, never covered by the panel. */}
+      <div className="relative z-10 flex-none text-ink-on-surface">
         <div className="flex h-14 items-center justify-between px-2" style={{ marginTop: "env(safe-area-inset-top)" }}>
           <button
             type="button"
@@ -117,121 +130,124 @@ export function DashboardView() {
           </Link>
         </div>
 
-        {/* Greeting + balance block */}
-        <div className="flex flex-col gap-4 px-4 pt-1">
-          <p className="text-[15px] font-semibold text-ink-on-surface/85">{greeting}</p>
+        {/* Collapsible block */}
+        <div
+          className={`overflow-hidden transition-all duration-300 ease-[var(--ease-emphasized)] motion-reduce:transition-none ${
+            collapsed ? "max-h-0 opacity-0" : "max-h-[560px] opacity-100"
+          }`}
+        >
+          <div className="flex flex-col gap-4 px-4 pt-1">
+            <p className="text-[15px] font-semibold text-ink-on-surface/85">{greeting}</p>
 
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center gap-2">
-                <span className="text-[13px] text-ink-on-surface/60">{m.dashboard.balanceLabel}</span>
-                {errored && data ? (
-                  <span className="text-[13px] text-ink-on-surface/50">· {nowTime()}</span>
-                ) : null}
-                <button
-                  type="button"
-                  onClick={toggleHidden}
-                  aria-label={hidden ? m.dashboard.showAmount : m.dashboard.hideAmount}
-                  className="grid size-6 place-items-center text-ink-on-surface/70"
-                >
-                  {hidden ? <EyeOffIcon width={16} height={16} /> : <EyeIcon width={16} height={16} />}
-                </button>
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-[13px] text-ink-on-surface/60">{m.dashboard.balanceLabel}</span>
+                  {errored && data ? (
+                    <span className="text-[13px] text-ink-on-surface/50">· {nowTime()}</span>
+                  ) : null}
+                  <button
+                    type="button"
+                    onClick={toggleHidden}
+                    aria-label={hidden ? m.dashboard.showAmount : m.dashboard.hideAmount}
+                    className="grid size-6 place-items-center text-ink-on-surface/70"
+                  >
+                    {hidden ? <EyeOffIcon width={16} height={16} /> : <EyeIcon width={16} height={16} />}
+                  </button>
+                </div>
+
+                {loading ? (
+                  <Skeleton className="h-[38px] w-44" rounded="rounded-[10px]" />
+                ) : (
+                  <Odometer value={data?.balance ?? 0} currency={currency} masked={hidden} className="t-balance" />
+                )}
+
+                <VariationLine
+                  period={period}
+                  variation={data?.variation ?? null}
+                  currency={currency}
+                  unavailable={errored}
+                  unavailableLabel={m.dashboard.variationUnavailable}
+                  vsTemplate={m.dashboard.variationVs}
+                />
               </div>
 
-              {loading ? (
-                <Skeleton className="h-[38px] w-44" rounded="rounded-[10px]" />
-              ) : (
-                <Odometer
-                  value={data?.balance ?? 0}
-                  currency={currency}
-                  masked={hidden}
-                  className="t-balance"
+              {accounts.length > 1 ? (
+                <MoneyDropdown
+                  ariaLabel="Compte"
+                  value={accountId ?? primaryId(accounts)}
+                  onChange={(id) => setAccountId(id)}
+                  options={accounts.map((a) => ({ value: a.id, label: a.name }))}
                 />
-              )}
-
-              <VariationLine
-                period={period}
-                variation={data?.variation ?? null}
-                currency={currency}
-                unavailable={errored}
-                unavailableLabel={m.dashboard.variationUnavailable}
-                vsTemplate={m.dashboard.variationVs}
-              />
+              ) : null}
             </div>
 
-            {accounts.length > 1 ? (
+            <div className="flex items-center justify-between">
               <MoneyDropdown
-                ariaLabel="Compte"
-                value={accountId ?? primaryId(accounts)}
-                onChange={(id) => setAccountId(id)}
-                options={accounts.map((a) => ({ value: a.id, label: a.name }))}
+                ariaLabel="Période"
+                value={period}
+                onChange={(p) => setPeriod(p as Period)}
+                options={PERIODS.map((p) => ({ value: p, label: periodLabel(p) }))}
               />
-            ) : null}
-          </div>
-
-          <div className="flex items-center justify-between">
-            <MoneyDropdown
-              ariaLabel="Période"
-              value={period}
-              onChange={(p) => setPeriod(p as Period)}
-              options={PERIODS.map((p) => ({ value: p, label: periodLabel(p) }))}
-            />
-          </div>
-        </div>
-
-        {/* Curve */}
-        <div className="px-4 pt-4">
-          {loading ? (
-            <Skeleton className="h-[196px] w-full" rounded="rounded-[16px]" />
-          ) : errored ? (
-            <p className="flex h-[120px] items-center justify-center text-center text-[13px] text-ink-on-surface/60">
-              {m.dashboard.curve.offline}
-            </p>
-          ) : data?.curve && data.curve.length > 0 ? (
-            <BalanceCurve key={replayKey} points={data.curve} currency={currency} />
-          ) : (
-            <div className="flex h-[120px] flex-col items-center justify-center gap-1 text-center">
-              <p className="text-[15px] font-semibold">{m.dashboard.emptyState.title}</p>
-              <p className="max-w-[260px] text-[13px] text-ink-on-surface/60">
-                {m.dashboard.emptyState.body}
-              </p>
             </div>
-          )}
+          </div>
+
+          <div className="px-4 pt-4">
+            {loading ? (
+              <Skeleton className="h-[196px] w-full" rounded="rounded-[16px]" />
+            ) : errored ? (
+              <p className="flex h-[120px] items-center justify-center text-center text-[13px] text-ink-on-surface/60">
+                {m.dashboard.curve.offline}
+              </p>
+            ) : data?.curve && data.curve.length > 0 ? (
+              <BalanceCurve
+                key={replayKey}
+                points={data.curve}
+                currency={currency}
+                hourAxis={hourAxis}
+                xLabels={hourAxis ? undefined : periodXLabels(data.curve, locale)}
+              />
+            ) : (
+              <div className="flex h-[120px] flex-col items-center justify-center gap-1 text-center">
+                <p className="text-[15px] font-semibold">{m.dashboard.emptyState.title}</p>
+                <p className="max-w-[260px] text-[13px] text-ink-on-surface/60">
+                  {m.dashboard.emptyState.body}
+                </p>
+              </div>
+            )}
+          </div>
+
+          <div className="mx-4 mt-4 flex rounded-[16px] border border-white/16 bg-white/[0.06] py-3">
+            <SummaryCell label={m.dashboard.summary.start} value={data?.startBalance ?? 0} currency={currency} loading={loading} masked={hidden} />
+            <Divider />
+            <SummaryCell label={m.dashboard.summary.income} value={data?.income ?? 0} currency={currency} loading={loading} masked={hidden} tone="in" />
+            <Divider />
+            <SummaryCell label={m.dashboard.summary.expenses} value={data?.expenses ?? 0} currency={currency} loading={loading} masked={hidden} tone="out" />
+            <Divider />
+            <SummaryCell label={m.dashboard.summary.current} value={data?.balance ?? 0} currency={currency} loading={loading} masked={hidden} />
+          </div>
+
+          {errored ? (
+            <button
+              type="button"
+              onClick={refresh}
+              className="mx-4 mt-3 flex items-center justify-center gap-2 rounded-[var(--radius-pill)] border border-white/20 bg-white/10 py-2 text-[13px] font-semibold"
+            >
+              {m.common.retry}
+            </button>
+          ) : null}
         </div>
 
-        {/* Period summary */}
-        <div className="mx-4 mt-4 flex rounded-[16px] border border-white/16 bg-white/[0.06] py-3">
-          <SummaryCell label={m.dashboard.summary.start} value={data?.startBalance ?? 0} currency={currency} loading={loading} masked={hidden} />
-          <Divider />
-          <SummaryCell label={m.dashboard.summary.income} value={data?.income ?? 0} currency={currency} loading={loading} masked={hidden} tone="in" />
-          <Divider />
-          <SummaryCell label={m.dashboard.summary.expenses} value={data?.expenses ?? 0} currency={currency} loading={loading} masked={hidden} tone="out" />
-          <Divider />
-          <SummaryCell label={m.dashboard.summary.current} value={data?.balance ?? 0} currency={currency} loading={loading} masked={hidden} />
-        </div>
-
-        {errored ? (
-          <button
-            type="button"
-            onClick={refresh}
-            className="mx-4 mt-3 flex items-center justify-center gap-2 rounded-[var(--radius-pill)] border border-white/20 bg-white/10 py-2 text-[13px] font-semibold"
-          >
-            {m.common.retry}
-          </button>
+        {/* Compact strip — only while collapsed */}
+        {collapsed ? (
+          <div className="flex items-center justify-between px-5 pb-1 pt-1">
+            <span className="text-[13px] text-ink-on-surface/60">{m.dashboard.balanceLabel}</span>
+            <span className="t-section-title tabular">{balanceText}</span>
+          </div>
         ) : null}
 
-        <div ref={sentinel} className="h-px" />
-
-        {/* Frozen action button */}
-        <div className="sticky top-0 z-20 px-4 pb-3 pt-3" style={{ paddingTop: "calc(env(safe-area-inset-top) + 0.75rem)" }}>
-          {stuck ? (
-            <div className="mb-2 flex items-center justify-between text-ink-on-surface">
-              <span className="text-[13px] text-ink-on-surface/60">{m.dashboard.balanceLabel}</span>
-              <span className="t-section-title tabular">
-                {hidden ? formatMoney(0, { currency, masked: true }) : formatBalance(data?.balance ?? 0, currency)}
-              </span>
-            </div>
-          ) : null}
+        {/* The button — always visible, never covered. */}
+        <div className="px-4 pb-3 pt-2">
           <Link
             href="/transactions/nouvelle"
             className="flex h-[var(--size-primary-button)] w-full items-center justify-center gap-2 rounded-[var(--radius-pill)] bg-surface-card text-[17px] font-semibold text-text-primary shadow-[0_16px_34px_-6px_rgba(4,6,30,0.44),0_3px_8px_rgba(4,6,30,0.22)]"
@@ -240,16 +256,18 @@ export function DashboardView() {
             {m.dashboard.newTransaction}
           </Link>
         </div>
+      </div>
 
-        {/* White panel */}
-        <div className="relative z-10 flex flex-1 flex-col gap-3 rounded-t-[var(--radius-content-top)] bg-surface-card px-4 pb-24 pt-4 text-text-primary">
+      {/* White panel — the only scroll container. */}
+      <div
+        onScroll={onPanelScroll}
+        className="relative z-10 min-h-0 flex-1 overflow-y-auto overscroll-contain rounded-t-[var(--radius-content-top)] bg-surface-card px-4 pb-24 pt-4 text-text-primary"
+      >
+        <div className="flex flex-col gap-3">
           <RotatingBanner items={[]} />
 
           <PanelSection title={m.dashboard.templates.title} action={{ label: m.dashboard.templates.seeAll, href: "/templates" }}>
-            <p className="t-secondary text-text-secondary">{m.dashboard.templates.emptyBody}</p>
-            <Link href="/templates" className="mt-1 inline-flex items-center gap-1.5 text-[13px] font-semibold text-brand-accent">
-              <PlusIcon width={14} height={14} /> {m.dashboard.templates.create}
-            </Link>
+            <TemplatesCarousel currency={currency} />
           </PanelSection>
 
           <PanelSection title={m.dashboard.accounts.title}>

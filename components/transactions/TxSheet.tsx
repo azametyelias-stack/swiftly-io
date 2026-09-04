@@ -31,7 +31,7 @@ export function TxSheet({ children }: { children: ReactNode }) {
 
   if (variant === "modal") {
     return (
-      <div className="w-full rounded-t-[var(--radius-content-top)] bg-surface-page p-6 text-text-primary">
+      <div className="w-full rounded-[var(--radius-content-top)] bg-surface-page p-6 text-text-primary shadow-[0_30px_60px_rgba(2,4,24,0.5)]">
         {children}
       </div>
     );
