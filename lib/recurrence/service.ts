@@ -3,6 +3,13 @@ import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { log } from "@/lib/log/logger";
+import {
+  BUDGET_ALERT_TONE,
+  budgetAlertLevel,
+  budgetAlertValue,
+  budgetDedupKey,
+} from "@/lib/alerts/model";
+import { formatBalance } from "@/lib/format/money";
 import { resolveScoringAxis } from "@/lib/transactions/model";
 import {
   advanceRunDate,
@@ -52,6 +59,17 @@ async function insertGenerated(
   row: Record<string, unknown>,
 ): Promise<boolean> {
   const { error } = await db.from("transactions").insert(row);
+  if (!error) return true;
+  if (error.code === UNIQUE_VIOLATION) return false;
+  throw error;
+}
+
+/** Insert a generated alert; a duplicate `dedup_key` is a silent no-op. */
+async function insertAlert(
+  db: SupabaseClient,
+  row: Record<string, unknown>,
+): Promise<boolean> {
+  const { error } = await db.from("alerts").insert(row);
   if (!error) return true;
   if (error.code === UNIQUE_VIOLATION) return false;
   throw error;
@@ -211,13 +229,28 @@ async function runAccountFees(
   return charged;
 }
 
-// ── 3. budget 92 %+ alerts ────────────────────────────────────────────────
+// ── 3. budget threshold alerts (SCREEN-18) ────────────────────────────────
 
+/**
+ * Turn budgets that have crossed a threshold this month into inbox rows.
+ *
+ * Two thresholds, not one: 92 % is a warning, past 100 % is an overspend, and
+ * SCREEN-18's artboard draws them as separate rows in separate colours. The old
+ * version of this function emitted only one alert per budget per month, so a
+ * budget that warned early and blew past its limit later could never report the
+ * overspend at all.
+ *
+ * Idempotency is the DB's job now (`alerts_dedup_key_uq`, migration 0005). The
+ * previous SELECT-then-INSERT was racy — two cron invocations could both see
+ * "none" and both insert — and it used `.maybeSingle()` on a query that returns
+ * many rows, which errors outright once a second alert exists for the budget.
+ */
 async function runBudgetAlerts(
   db: SupabaseClient,
   today: string,
 ): Promise<number> {
   const monthStart = firstOfMonth(today);
+  const ym = monthKey(today);
   const { data: budgets, error } = await db
     .from("budgets")
     .select("id, user_id, category_id, allocated_amount");
@@ -234,34 +267,47 @@ async function runBudgetAlerts(
       .eq("status", "done")
       .eq("category_id", b.category_id)
       .gte("occurred_on", monthStart);
-    const spent = (rows ?? []).reduce((s, r) => s + Number(r.amount), 0);
-    if (spent < Number(b.allocated_amount) * 0.92) continue;
 
-    const { data: existing } = await db
-      .from("alerts")
-      .select("id")
-      .eq("user_id", b.user_id)
-      .eq("link_type", "budget")
-      .eq("link_id", b.id)
-      .gte("created_at", `${monthStart}T00:00:00Z`)
-      .maybeSingle();
-    if (existing) continue;
+    const spent = (rows ?? []).reduce((sum, r) => sum + Number(r.amount), 0);
+    const allocated = Number(b.allocated_amount);
+    const level = budgetAlertLevel(spent, allocated);
+    if (!level) continue;
 
     const { data: cat } = await db
       .from("categories")
       .select("name")
       .eq("id", b.category_id)
       .maybeSingle();
+    // A budget always has a category, but a deleted one leaves the join empty;
+    // "Budget  approche sa limite" with a hole in it would be worse than a
+    // generic word.
+    const name = (cat?.name as string | undefined)?.trim() || "sans catégorie";
 
-    const { error: insErr } = await db.from("alerts").insert({
+    const inserted = await insertAlert(db, {
       user_id: b.user_id,
       kind: "alert",
-      title: `Budget ${cat?.name ?? ""} presque atteint`,
-      body: "Vous avez dépensé plus de 92 % de ce budget ce mois-ci.",
+      title:
+        level === "over"
+          ? `Dépassement Budget ${name}`
+          : `Budget ${name} approche sa limite`,
+      body:
+        level === "over"
+          ? "Des dépenses de cette catégorie ont fait passer le budget au-dessus de sa limite. Un dépassement ne bloque rien, il vous informe."
+          : "Cette catégorie a consommé plus de 92 % de son budget du mois. Il reste de la marge, mais peu.",
+      value: budgetAlertValue(spent, allocated, level),
+      tone: BUDGET_ALERT_TONE[level],
+      // A snapshot, not a join: an alert must keep the limit that was in force
+      // when it fired, even if the budget is edited afterwards.
+      facts: [
+        { label: "Budget concerné", value: name },
+        { label: "Limite du mois", value: formatBalance(allocated, "XOF") },
+        { label: "Dépensé", value: formatBalance(spent, "XOF") },
+      ],
       link_type: "budget",
       link_id: b.id,
+      dedup_key: budgetDedupKey(b.id as string, ym, level),
     });
-    if (!insErr) created += 1;
+    if (inserted) created += 1;
   }
   return created;
 }

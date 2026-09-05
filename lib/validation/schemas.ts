@@ -352,6 +352,32 @@ export const reportQuerySchema = z
   })
   .strict();
 
+// ── alertes (SCREEN-18) ────────────────────────────────────────────────────
+
+/**
+ * GET /api/alerts — the inbox. `kind` mirrors the "Tout" dropdown (§ 4); the
+ * sort is applied client-side because the list is small and three of the four
+ * modes ("plus utilisé", alphabétique, par urgence) rank rows against each
+ * other rather than filtering, so paging them server-side would be wrong.
+ */
+export const alertListQuerySchema = z
+  .object({
+    kind: z.enum(["all", "alert", "scheduled"]).default("all"),
+    limit: z.coerce.number().int().min(1).max(100).optional(),
+    offset: z.coerce.number().int().min(0).optional(),
+  })
+  .strict();
+
+/**
+ * PATCH /api/alerts/:id — alerts are read-only content (§ 8: "pas de formulaire
+ * d'édition"). The only mutable bit is whether it has been read, so that is the
+ * only key this accepts; `.strict()` rejects an attempt to rewrite the message.
+ */
+export const alertUpdateSchema = z.object({ read: z.boolean() }).strict();
+
+/** PATCH /api/alerts — bulk. One action, so one literal rather than a free field. */
+export const alertBulkSchema = z.object({ action: z.literal("read-all") }).strict();
+
 // ── user profile ───────────────────────────────────────────────────────────
 
 /**
@@ -392,3 +418,6 @@ export type StatsQueryInput = z.infer<typeof statsQuerySchema>;
 export type ReportQueryInput = z.infer<typeof reportQuerySchema>;
 export type ProfileCreateInput = z.infer<typeof profileCreateSchema>;
 export type ProfileUpdateInput = z.infer<typeof profileUpdateSchema>;
+export type AlertListQuery = z.infer<typeof alertListQuerySchema>;
+export type AlertUpdateInput = z.infer<typeof alertUpdateSchema>;
+export type AlertBulkInput = z.infer<typeof alertBulkSchema>;

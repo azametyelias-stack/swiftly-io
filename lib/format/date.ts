@@ -37,6 +37,15 @@ export function beninHourOfDay(isoTimestamp: string): number {
   return shifted.getUTCHours() + shifted.getUTCMinutes() / 60;
 }
 
+/**
+ * The Bénin calendar day a timestamp falls on. `alerts.created_at` is a
+ * timestamptz, and SCREEN-18 groups the inbox by day — near midnight the UTC
+ * date and the Bénin date differ, which would file an alert under "Hier".
+ */
+export function beninDayOf(isoTimestamp: string): string {
+  return todayISO(new Date(isoTimestamp));
+}
+
 export function addDaysISO(iso: string, days: number): string {
   const d = new Date(`${iso}T00:00:00Z`);
   d.setUTCDate(d.getUTCDate() + days);

@@ -906,4 +906,50 @@ export const fr = {
     version: "Swiftly.io · version {version}",
   },
 
+
+  // ── SCREEN-18 Alertes & Notifications (Lot 6) ────────────────────────────
+  // Wording from `18-alertes-notifications.md` and the artboard
+  // `Swiftly - Lot 7 Comptes & Notifications.dc.html`.
+  alerts: {
+    title: "Alertes & Notifications",
+
+    filterAll: "Tout",
+    filterAlert: "Alerte",
+    filterScheduled: "Notification",
+    sortRecent: "Plus récent",
+    sortUrgency: "Par urgence",
+    sortFrequent: "Plus utilisé",
+    sortAlpha: "Alphabétique",
+
+    kindAlert: "Alerte",
+    kindScheduled: "Notification",
+    unread: "non lue",
+    read: "lue",
+
+    emptyTitle: "Rien à signaler",
+    emptyBody:
+      "Les alertes de budget et les notifications programmées arrivent ici. Les confirmations d'action, elles, restent des messages passagers.",
+    noResults: "Aucun résultat pour ce filtre.",
+    loadError: "Impossible de charger vos alertes.",
+
+    markAllRead: "Tout marquer comme lu",
+    markRead: "Marquer comme lue",
+    markUnread: "Marquer comme non lue",
+    allReadToast: "Tout est marqué comme lu",
+    deleteTitle: "Supprimer cette notification ?",
+    deleteBody:
+      "Elle disparaît de votre boîte de réception. Ce qui l'a déclenchée — le budget, le rapport — n'est pas touché.",
+    deleted: "Notification supprimée",
+
+    detailTitle: "Détail",
+    whatHappened: "Ce qui s'est passé",
+    triggeredAt: "Déclenchée le",
+    pushNote: "Envoyée aussi en notification push, le {when}.",
+    readOnly: "Cette alerte est en lecture seule — rien à modifier ici.",
+    seeBudget: "Voir le budget",
+    seeProject: "Voir le projet",
+    seeTransaction: "Voir la transaction",
+    seeReport: "Voir le rapport",
+  },
+
 };

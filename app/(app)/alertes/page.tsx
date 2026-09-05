@@ -1,14 +1,7 @@
-import { AppHeader } from "@/components/nav/AppHeader";
+import { AlertsScreen } from "@/components/alerts/AlertsScreen";
 
-// Stub — the real screen is built in Lot 6 (see BUILD-PLAN.md). Kept so the menu
-// route resolves and the nav shell has somewhere to land.
+// SCREEN-18 — Alertes & Notifications (Lot 6). Reached from the menu and from
+// the bell in every AppHeader.
 export default function Page() {
-  return (
-    <>
-      <AppHeader title="Alertes & Notifications" />
-      <main className="mx-[var(--margin-screen)] py-16">
-        <p className="t-body text-text-secondary">« Alertes & Notifications » — écran construit au Lot 6.</p>
-      </main>
-    </>
-  );
+  return <AlertsScreen />;
 }

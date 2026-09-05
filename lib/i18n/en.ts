@@ -892,4 +892,48 @@ export const en: Messages = {
     version: "Swiftly.io · version {version}",
   },
 
+
+  // ── SCREEN-18 Alerts & Notifications (Lot 6) ─────────────────────────────
+  alerts: {
+    title: "Alerts & Notifications",
+
+    filterAll: "All",
+    filterAlert: "Alert",
+    filterScheduled: "Notification",
+    sortRecent: "Most recent",
+    sortUrgency: "By urgency",
+    sortFrequent: "Most frequent",
+    sortAlpha: "Alphabetical",
+
+    kindAlert: "Alert",
+    kindScheduled: "Notification",
+    unread: "unread",
+    read: "read",
+
+    emptyTitle: "Nothing to report",
+    emptyBody:
+      "Budget alerts and scheduled notifications land here. Action confirmations stay passing messages.",
+    noResults: "No results for this filter.",
+    loadError: "Could not load your alerts.",
+
+    markAllRead: "Mark all as read",
+    markRead: "Mark as read",
+    markUnread: "Mark as unread",
+    allReadToast: "Everything marked as read",
+    deleteTitle: "Delete this notification?",
+    deleteBody:
+      "It disappears from your inbox. What triggered it — the budget, the report — is left untouched.",
+    deleted: "Notification deleted",
+
+    detailTitle: "Detail",
+    whatHappened: "What happened",
+    triggeredAt: "Triggered on",
+    pushNote: "Also sent as a push notification on {when}.",
+    readOnly: "This alert is read-only — there is nothing to edit here.",
+    seeBudget: "See the budget",
+    seeProject: "See the project",
+    seeTransaction: "See the transaction",
+    seeReport: "See the report",
+  },
+
 };
