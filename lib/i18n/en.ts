@@ -841,4 +841,55 @@ export const en: Messages = {
       welcomeHelp: "Your space is ready.",
     },
   },
+
+  // ── SCREEN-22 Settings (Lot 6) ───────────────────────────────────────────
+  settings: {
+    title: "Settings",
+    loadError: "Could not load your settings.",
+
+    profileTitle: "My profile",
+    editProfile: "Edit profile",
+    photoLater: "Profile photos are coming in a future version.",
+    nameLabel: "Full name",
+    nameHint: "Two characters minimum.",
+    nameTooShort: "Two characters minimum.",
+    nameTooLong: "120 characters maximum.",
+    nameSaved: "Name updated",
+    emailLabel: "Email",
+    emailHint: "Editable in a future version, after verification by code.",
+
+    prefsTitle: "Preferences",
+    currencyRow: "Currency",
+    currencyTitle: "Default currency",
+    currencyHint: "Applies immediately across every screen.",
+    currencyNames: { XOF: "FCFA", USD: "USD", EUR: "EUR" },
+    currencyDescriptions: {
+      XOF: "West African CFA franc — Togo",
+      USD: "US dollar",
+      EUR: "Euro",
+    },
+    languageRow: "Language",
+    languageTitle: "App language",
+    languageHint: "The change applies immediately.",
+    languageNames: { fr: "Français", en: "English" },
+    languageDescriptions: { fr: "Français", en: "Default language" },
+    darkTheme: "Dark theme",
+
+    helpTitle: "Help & support",
+    helpFaq: "Help & FAQ",
+    privacy: "Privacy policy",
+    terms: "Terms and conditions",
+    support: "Contact support",
+
+    logout: "Log out",
+    logoutTitle: "Log out?",
+    logoutBody:
+      "You'll need your code the next time you open the app. Your data stays saved.",
+    logoutConfirm: "Log out",
+
+    saved: "Settings updated",
+    saveError: "Something went wrong. Try again.",
+    version: "Swiftly.io · version {version}",
+  },
+
 };

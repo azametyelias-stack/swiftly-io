@@ -852,4 +852,58 @@ export const fr = {
       welcomeHelp: "Votre espace est prêt.",
     },
   },
+
+  // ── SCREEN-22 Paramètres (Lot 6) ─────────────────────────────────────────
+  // Wording verbatim from `DESIGN-HANDOFF/design/Swiftly - Lot 9 Paramètres
+  // utilisateur.dc.html` and the screen doc `22-parametres-utilisateur.md`.
+  settings: {
+    title: "Paramètres",
+    loadError: "Impossible de charger vos paramètres.",
+
+    profileTitle: "Mon profil",
+    editProfile: "Modifier le profil",
+    photoLater: "La photo de profil arrive dans une prochaine version.",
+    nameLabel: "Nom complet",
+    nameHint: "Deux caractères minimum.",
+    nameTooShort: "Deux caractères minimum.",
+    nameTooLong: "120 caractères maximum.",
+    nameSaved: "Nom mis à jour",
+    emailLabel: "Email",
+    emailHint:
+      "Modifiable dans une prochaine version, après vérification par code.",
+
+    prefsTitle: "Préférences",
+    currencyRow: "Devise",
+    currencyTitle: "Devise par défaut",
+    currencyHint: "S'applique immédiatement à tous les écrans.",
+    currencyNames: { XOF: "FCFA", USD: "USD", EUR: "EUR" },
+    currencyDescriptions: {
+      XOF: "Franc CFA — Togo",
+      USD: "Dollar américain",
+      EUR: "Euro",
+    },
+    languageRow: "Langue",
+    languageTitle: "Langue de l'application",
+    languageHint: "Le changement s'applique immédiatement.",
+    languageNames: { fr: "Français", en: "English" },
+    languageDescriptions: { fr: "Langue par défaut", en: "English" },
+    darkTheme: "Thème sombre",
+
+    helpTitle: "Aide & support",
+    helpFaq: "Aide & FAQ",
+    privacy: "Politique de confidentialité",
+    terms: "Conditions générales",
+    support: "Contacter le support",
+
+    logout: "Déconnexion",
+    logoutTitle: "Se déconnecter ?",
+    logoutBody:
+      "Il faudra saisir ton code à la prochaine ouverture. Tes données restent enregistrées.",
+    logoutConfirm: "Se déconnecter",
+
+    saved: "Paramètres mis à jour",
+    saveError: "Erreur. Réessayez.",
+    version: "Swiftly.io · version {version}",
+  },
+
 };

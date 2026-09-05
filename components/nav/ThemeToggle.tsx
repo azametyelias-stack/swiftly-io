@@ -2,78 +2,47 @@
 
 import { useEffect, useSyncExternalStore } from "react";
 
+import {
+  applyThemeChoice,
+  readThemeChoice,
+  setThemeChoice,
+  subscribeTheme,
+  THEME_ORDER,
+  type ThemeChoice,
+} from "@/lib/settings/theme";
+
 /**
  * Quick theme switch in the drawer foot (DESIGN-HANDOFF § "Tiroir latéral":
- * "bascule de thème en pied"). Cycles Système → Clair → Sombre and writes
- * `data-theme` on <html> (globals.css: absent = follow the OS). SCREEN-22 owns
- * the full setting; this is the shortcut.
+ * "bascule de thème en pied"). Cycles Système → Clair → Sombre. SCREEN-22 owns
+ * the full setting (and persists it to `users.theme`); this is the shortcut, and
+ * both go through `lib/settings/theme` so they can never disagree.
  *
  * State is read straight from localStorage via useSyncExternalStore (same idiom
  * as ConsentProvider) so there is no setState-in-effect and no hydration flash
- * of the wrong label. A non-"system" choice can still flash the wrong *colours*
- * for one frame on a hard reload until this mounts — a blocking <head> script is
- * a follow-up for SCREEN-22.
+ * of the wrong label.
  */
 
-type ThemeChoice = "system" | "light" | "dark";
-
-const STORAGE_KEY = "sf-theme";
-const CHANGE_EVENT = "sf:theme-change";
-const ORDER: ThemeChoice[] = ["system", "light", "dark"];
 const LABEL: Record<ThemeChoice, string> = {
   system: "Thème : système",
   light: "Thème : clair",
   dark: "Thème : sombre",
 };
 
-function readChoice(): ThemeChoice {
-  try {
-    const v = localStorage.getItem(STORAGE_KEY);
-    if (v === "light" || v === "dark" || v === "system") return v;
-  } catch {
-    /* storage may be unavailable */
-  }
-  return "system";
-}
-
-function applyChoice(choice: ThemeChoice) {
-  const root = document.documentElement;
-  if (choice === "system") delete root.dataset.theme;
-  else root.dataset.theme = choice;
-}
-
-function subscribe(onChange: () => void): () => void {
-  window.addEventListener(CHANGE_EVENT, onChange);
-  window.addEventListener("storage", onChange);
-  return () => {
-    window.removeEventListener(CHANGE_EVENT, onChange);
-    window.removeEventListener("storage", onChange);
-  };
-}
-
 export function ThemeToggle({ className }: { className?: string }) {
   const choice = useSyncExternalStore<ThemeChoice>(
-    subscribe,
-    readChoice,
+    subscribeTheme,
+    readThemeChoice,
     () => "system",
   );
 
   // Keep <html data-theme> in sync with the stored choice (external-system
   // update, not setState).
   useEffect(() => {
-    applyChoice(choice);
+    applyThemeChoice(choice);
   }, [choice]);
 
-  const next = () => {
-    const value = ORDER[(ORDER.indexOf(choice) + 1) % ORDER.length];
-    try {
-      localStorage.setItem(STORAGE_KEY, value);
-    } catch {
-      /* ignore */
-    }
-    applyChoice(value);
-    window.dispatchEvent(new Event(CHANGE_EVENT));
-  };
+  const next = () =>
+    setThemeChoice(THEME_ORDER[(THEME_ORDER.indexOf(choice) + 1) % THEME_ORDER.length]!);
 
   return (
     <button type="button" onClick={next} className={className} aria-label={LABEL[choice]}>

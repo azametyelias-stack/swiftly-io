@@ -40,6 +40,43 @@ export function ChevronLeftIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+export function ChevronRightIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Svg {...props}>
+      <path d="m9 6 6 6-6 6" />
+    </Svg>
+  );
+}
+
+/** The oblique arrow: SCREEN-22's one row that leaves Swiftly ("Conditions générales"). */
+export function ExternalLinkIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Svg {...props}>
+      <path d="M14 4h6v6M20 4l-8.5 8.5" />
+      <path d="M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4" />
+    </Svg>
+  );
+}
+
+/** Read-only marker on SCREEN-22's email field (artboard: "cadenas à droite"). */
+export function LockIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Svg {...props}>
+      <rect x="4" y="10" width="16" height="10" rx="2.5" />
+      <path d="M8 10V7.5a4 4 0 0 1 8 0V10" />
+    </Svg>
+  );
+}
+
+export function LogoutIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Svg {...props}>
+      <path d="M15 17v1.5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-13a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2V7" />
+      <path d="M10 12h10m0 0-3-3m3 3-3 3" />
+    </Svg>
+  );
+}
+
 export function BellIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <Svg {...props}>
