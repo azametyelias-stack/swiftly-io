@@ -50,6 +50,12 @@ export interface BudgetDetail {
     occurred_on: string;
     note: string | null;
   }[];
+  /**
+   * Categories already taken by the caller's OTHER budgets — `budgets` is
+   * UNIQUE (user_id, category_id). The edit sheet needs it to stop offering a
+   * pick the database will refuse.
+   */
+  usedCategoryIds: string[];
 }
 
 export async function fetchBudget(id: string): Promise<BudgetDetail> {

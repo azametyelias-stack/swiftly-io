@@ -160,7 +160,9 @@ export function BudgetDetailScreen({ id }: { id: string }) {
       {editing && data ? (
         <BudgetFormSheet
           budget={data.budget}
-          usedCategoryIds={[]}
+          // Was `[]`, so the sheet happily offered a category another budget
+          // already owned; the unique constraint then rejected the save.
+          usedCategoryIds={data.usedCategoryIds}
           onClose={() => setEditing(false)}
           onSubmit={async (payload) => {
             const updated = await updateBudgetRequest(id, payload);

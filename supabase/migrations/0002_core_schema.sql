@@ -260,6 +260,27 @@ create trigger templates_set_updated_at
 --   expense : source_account_id set, category on the expense side
 --   income  : destination_account_id set, category on the income side
 --   transfer: both accounts set, source <> destination, no category, no "lié à"
+--
+-- ⚠️  PHASE 2 / PAYSTACK — read this before wiring payments.
+--
+--   The FOUNDATION docs (Day 9, `PAYMENT-RECONCILIATION-DEEP-DIVE.md`) design a
+--   separate `payments` table with its own lifecycle and an
+--   `update_balance_from_payment` trigger. It was deliberately NOT built: for
+--   the MVP every movement of money is hand-entered, so a payment and a
+--   transaction were the same row and two tables would have been one table plus
+--   a synchronisation bug.
+--
+--   That stops being true the moment Paystack is connected. A provider payment
+--   has states this table cannot express — pending, failed, reversed, disputed —
+--   and a lifecycle driven by webhooks that arrive out of order and more than
+--   once. Do NOT widen `transactions.status` to carry them: a ledger row means
+--   "this money moved", and a pending charge has not moved yet.
+--
+--   The shape to build then: `payments` owns the provider lifecycle (provider
+--   reference, idempotency key, raw webhook payload, state machine) and INSERTS
+--   a transaction only on settlement, linked by `payments.transaction_id`. The
+--   reconciliation doc still applies; only its assumption that the table exists
+--   from day one does not.
 -- ============================================================================
 create table if not exists public.transactions (
   id                     uuid        primary key default gen_random_uuid(),

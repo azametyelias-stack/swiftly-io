@@ -150,6 +150,8 @@ export const en: Messages = {
       sameAccount: "Choose an account different from the source account.",
       dateRequired: "Choose a date.",
       saveFailed: "Could not save. Try again.",
+      accountsFailed: "Could not load your accounts.",
+      accountsFailedHint: "Without them no transaction can be saved.",
     },
     buttons: {
       next: "Next",

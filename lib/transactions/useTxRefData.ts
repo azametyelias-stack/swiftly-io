@@ -36,6 +36,12 @@ export interface TxRefData {
   people: RefNamed[];
   projects: RefNamed[];
   ready: boolean;
+  /**
+   * Accounts specifically. They are the one blocking dependency: every
+   * transaction needs a source, so an empty list is a dead form. The rest of
+   * the reference data degrades — a missing category can be created inline.
+   */
+  accountsStatus: "loading" | "ready" | "error";
   /** create a person on the fly and return it (SCREEN-8/9 § 2) */
   createPerson: (name: string) => Promise<RefNamed | null>;
   /** create a project (name only — the rest is edited later on SCREEN-16) */
@@ -52,14 +58,26 @@ export function useTxRefData(type: TxType): TxRefData {
   const [projects, setProjects] = useState<RefNamed[]>([]);
   const [ready, setReady] = useState(false);
   const [acctKey, setAcctKey] = useState(0);
+  const [accountsStatus, setAccountsStatus] =
+    useState<TxRefData["accountsStatus"]>("loading");
 
-  const reloadAccounts = useCallback(() => setAcctKey((k) => k + 1), []);
+  const reloadAccounts = useCallback(() => {
+    setAccountsStatus("loading");
+    setAcctKey((k) => k + 1);
+  }, []);
 
   useEffect(() => {
     let alive = true;
     apiJson<{ accounts: RefAccount[] }>("/api/accounts")
-      .then((r) => alive && setAccounts(r.accounts))
-      .catch(() => {});
+      .then((r) => {
+        if (!alive) return;
+        setAccounts(r.accounts);
+        setAccountsStatus("ready");
+      })
+      // This used to be `.catch(() => {})`. The wizard then opened on an empty
+      // account grid with no message: the user could not create anything and
+      // was given no reason. A form that cannot be submitted has to say so.
+      .catch(() => alive && setAccountsStatus("error"));
     return () => {
       alive = false;
     };
@@ -149,6 +167,7 @@ export function useTxRefData(type: TxType): TxRefData {
     people,
     projects,
     ready,
+    accountsStatus,
     createPerson,
     createProject,
     createCategory,

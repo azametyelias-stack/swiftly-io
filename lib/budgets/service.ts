@@ -110,6 +110,16 @@ export async function getBudget(
     occurred_on: string;
     note: string | null;
   }[];
+  /**
+   * Categories already spoken for by the caller's OTHER budgets.
+   *
+   * `budgets` is UNIQUE (user_id, category_id), and the edit sheet has to know
+   * that before it offers a category — otherwise the pick is accepted, the
+   * database refuses it, and the user gets an error for a choice the form let
+   * them make. Returned here rather than fetched separately so the sheet needs
+   * one round trip, not two.
+   */
+  usedCategoryIds: string[];
 }> {
   const { data, error } = await db
     .from("budgets")
@@ -146,7 +156,16 @@ export async function getBudget(
   }));
   const spent = rows.reduce((s, r) => s + r.amount, 0);
 
+  // Excludes this budget's own category: re-picking it is not a duplicate, and
+  // hiding it would make the sheet open with its own value missing.
+  const { data: others } = await db
+    .from("budgets")
+    .select("category_id")
+    .eq("user_id", user.id)
+    .neq("id", id);
+
   return {
+    usedCategoryIds: (others ?? []).map((r) => r.category_id as string),
     budget: {
       id: data!.id as string,
       category: { id: cat.id, name: cat.name, color: cat.color },
@@ -197,7 +216,16 @@ export async function updateBudget(
     .update(input)
     .eq("id", id)
     .eq("user_id", user.id);
-  if (error) throw error;
+  if (error) {
+    // `createBudget` has always translated this; the update path did not, so
+    // moving a budget onto a category that already has one surfaced the raw
+    // constraint failure as a generic 500 — "Une erreur est survenue" for a
+    // situation the user can actually fix.
+    if (error.code === UNIQUE_VIOLATION) {
+      throw new BadRequestError("Un budget existe déjà pour cette catégorie.");
+    }
+    throw error;
+  }
 }
 
 export async function deleteBudget(

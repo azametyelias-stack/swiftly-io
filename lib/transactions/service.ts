@@ -20,6 +20,13 @@ import type { TransactionCreateInput } from "@/lib/validation/schemas";
 /**
  * Server-side transaction reads/writes (SCREEN-6/7/8/9/10) — the financial core.
  *
+ * PHASE 2 / PAYSTACK: this table also absorbs what the FOUNDATION docs call the
+ * `payments` table (Day 9). That merge is right for a ledger everyone fills in
+ * by hand and wrong the day a provider is connected — a pending or reversed
+ * charge is not a movement of money and does not belong in these rows. The full
+ * note, and the shape to build instead, is at the head of the `transactions`
+ * table in supabase/migrations/0002_core_schema.sql.
+ *
  * SECURITY (BUILD-PLAN § LOT 3 · 🔎 LAYER 3):
  *  - identity comes from `withAuth`, never the body;
  *  - EVERY referenced row (source/destination account, category, person/project)

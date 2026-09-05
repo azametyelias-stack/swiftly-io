@@ -152,6 +152,8 @@ export const fr = {
       sameAccount: "Sélectionnez un compte différent du compte source.",
       dateRequired: "Choisissez une date.",
       saveFailed: "Enregistrement impossible. Réessayez.",
+      accountsFailed: "Impossible de charger vos comptes.",
+      accountsFailedHint: "Sans eux, aucune transaction ne peut être enregistrée.",
     },
     buttons: {
       next: "Suivant",

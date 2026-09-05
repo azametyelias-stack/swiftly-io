@@ -226,6 +226,26 @@ export function TxWizard({
                   : t.fields.sourceAccount
               }
             >
+              {ref.accountsStatus === "error" ? (
+                // Every transaction needs a source account, so this is the one
+                // reference load that stops the form dead. It used to fail
+                // silently: an empty grid, no message, nothing to click.
+                <div className="flex flex-col items-start gap-2 rounded-[var(--radius-card)] border border-semantic-out/40 bg-surface-card p-4">
+                  <p className="t-body font-semibold text-semantic-out">
+                    {t.errors.accountsFailed}
+                  </p>
+                  <p className="t-secondary text-text-secondary">
+                    {t.errors.accountsFailedHint}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={ref.reloadAccounts}
+                    className="mt-1 rounded-[var(--radius-pill)] border border-surface-rail px-4 py-2 text-[13px] font-semibold"
+                  >
+                    {m.common.retry}
+                  </button>
+                </div>
+              ) : (
               <ChoiceGrid
                 ariaLabel={
                   type === "income"
@@ -251,6 +271,7 @@ export function TxWizard({
                   )
                 }
               />
+              )}
             </Field>
           </>
         ) : null}
