@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { useRouter } from "next/navigation";
 
 import { AppHeader } from "@/components/nav/AppHeader";
 import { LogoutIcon } from "@/components/nav/icons";
@@ -20,7 +19,7 @@ import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useToast } from "@/components/ui/Toast";
 import { interpolate } from "@/lib/i18n";
-import { useMessages } from "@/lib/i18n/useMessages";
+import { setLocale, useMessages } from "@/lib/i18n/useMessages";
 import {
   APP_VERSION,
   CURRENCIES,
@@ -52,7 +51,6 @@ import { getBrowserClient } from "@/lib/supabase/client";
 export function SettingsScreen() {
   const m = useMessages();
   const s = m.settings;
-  const router = useRouter();
   const toast = useToast();
   const { profile, status, reload, save } = useProfile();
 
@@ -203,11 +201,12 @@ export function SettingsScreen() {
           }))}
           onSelect={(language) => {
             setPicker(null);
-            void commit({ language }, s.saved).then((okay) => {
-              // The dictionary is picked from the profile at the root, so the
-              // tree has to re-read it for the new language to take effect.
-              if (okay) router.refresh();
-            });
+            // `useMessages` reads the locale from localStorage, not from the
+            // profile — so the DB write alone would save "en" and leave the UI
+            // in French. Switch the live locale first (every `useLocale`
+            // subscriber re-renders), then persist.
+            setLocale(language);
+            void commit({ language }, s.saved);
           }}
         />
       ) : null}

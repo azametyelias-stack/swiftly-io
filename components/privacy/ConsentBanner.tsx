@@ -7,9 +7,26 @@ import { useEffect, useRef, useState } from "react";
 import { useConsent } from "@/components/privacy/ConsentProvider";
 
 /**
- * SCREEN-20 — Consent banner.
- * Fixed to the bottom with a dimming backdrop, sticky until the user acts.
- * Shown only when no consent decision exists for the current policy version.
+ * SCREEN-19 — the consent sheet. Reconciled onto Swiftly's grammar for Lot 6
+ * (artboard `Swiftly - Lot 8 Privacy.dc.html`); it used to be a web cookie
+ * banner in a borrowed skin, and the artboard says why that mattered: this is
+ * the first thing a new user sees, before their balance — "s'il ressemble à un
+ * bandeau de cookies emprunté à un autre produit, il apprend que Swiftly n'est
+ * pas un lieu sérieux pour son argent".
+ *
+ * Four decisions carried over from the artboard, each of which changed the code:
+ *  - a bottom-fixed banner becomes a rising sheet with a 26 radius, like every
+ *    other sheet since Lot 5;
+ *  - "Accepter tout" is BLACK, not blue. Black is Swiftly's action colour since
+ *    Lot 2; blue is links and active switches only, and giving it a primary
+ *    button would open a second action hierarchy across the whole app;
+ *  - both buttons carry the same visual weight — same height, same full width,
+ *    stacked. A shrunken or grey "Personnaliser" is a disguised refusal, and
+ *    GDPR compliance rests precisely on the choice being equally easy both ways;
+ *  - no close affordance. The doc says "sticky jusqu'à action"; closing without
+ *    choosing would leave consent in an undefined state.
+ *
+ * The balance stays visible behind, dimmed: the sheet is a step, not a wall.
  */
 export function ConsentBanner() {
   const { ready, hasDecision, acceptAll } = useConsent();
@@ -36,52 +53,62 @@ export function ConsentBanner() {
 
   return (
     <>
-      <div className="fixed inset-0 z-40 bg-black/30" aria-hidden="true" />
+      <div
+        className="fixed inset-0 z-40 bg-[rgba(4,7,40,0.55)] backdrop-blur-[2px]"
+        aria-hidden="true"
+      />
       <div
         role="alertdialog"
         aria-modal="true"
         aria-labelledby="consent-title"
         aria-describedby="consent-desc"
-        className={`fixed inset-x-0 bottom-0 z-50 border-t border-sf-border bg-white shadow-[0_-4px_12px_rgba(0,0,0,0.1)] ${
-          closing ? "animate-consent-out" : "animate-consent-in"
+        className={`fixed inset-x-0 bottom-0 z-50 rounded-t-[var(--radius-sheet-top)] bg-surface-page shadow-[0_-20px_50px_rgba(2,4,24,0.45)] ${
+          closing ? "sheet-fall" : "sheet-rise"
         }`}
       >
-        <div className="mx-auto flex max-w-[1200px] flex-col gap-3 p-4 sm:p-6">
-          <h2
-            id="consent-title"
-            className="text-base font-semibold text-sf-ink sm:text-lg"
-          >
-            🔒 Politique de Confidentialité
+        <div className="mx-auto flex max-w-[460px] flex-col gap-3 px-5 pb-[calc(env(safe-area-inset-bottom)+20px)] pt-4">
+          {/* Decorative handle — the sheet does not drag away (see above). */}
+          <span
+            aria-hidden="true"
+            className="mx-auto h-1 w-9 flex-none rounded-full bg-surface-rail"
+          />
+
+          <h2 id="consent-title" className="t-section-title">
+            Politique de confidentialité
           </h2>
-          <p id="consent-desc" className="text-sm leading-relaxed text-sf-muted">
-            Nous collectons certaines données pour améliorer ton expérience
-            (email, téléphone, historique des transactions).{" "}
-            <Link
-              href="/privacy"
-              className="font-medium text-sf-blue underline underline-offset-2 hover:text-sf-blue-dark"
-            >
-              Voir la politique complète →
-            </Link>
+          <p id="consent-desc" className="t-body text-text-secondary">
+            Nous collectons certaines données pour améliorer ton expérience :
+            email, téléphone, historique des transactions.
           </p>
-          <div className="flex flex-col gap-2 sm:flex-row sm:gap-4">
+          <Link
+            href="/privacy"
+            className="t-body font-semibold text-brand-accent underline underline-offset-2"
+          >
+            Voir la politique complète
+          </Link>
+
+          <div className="mt-1 flex flex-col gap-2.5">
             <button
               ref={acceptRef}
               type="button"
               onClick={handleAccept}
-              aria-label="Accepter la politique de confidentialité"
-              className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-sf-blue px-6 py-2.5 text-sm font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-sf-blue-dark hover:shadow-[0_4px_12px_rgba(37,99,235,0.3)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sf-blue active:translate-y-0 active:bg-sf-blue-darker sm:px-8 sm:py-3"
+              className="flex h-[var(--size-primary-button)] w-full items-center justify-center rounded-[var(--radius-pill)] bg-action-primary text-[17px] font-semibold text-action-on-primary transition-transform active:scale-[0.975] motion-reduce:active:scale-100"
             >
-              ✅ Accepter tout
+              Accepter tout
             </button>
             <button
               type="button"
               onClick={() => router.push("/privacy-settings")}
-              aria-label="Personnaliser les paramètres de cookies"
-              className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-[#d1d5db] bg-sf-surface px-6 py-2.5 text-sm font-semibold text-sf-ink transition-all hover:-translate-y-0.5 hover:border-[#9ca3af] hover:bg-sf-border focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sf-blue active:translate-y-0 sm:px-8 sm:py-3"
+              className="flex h-[var(--size-primary-button)] w-full items-center justify-center rounded-[var(--radius-pill)] border border-surface-rail bg-surface-card text-[17px] font-semibold text-text-primary transition-transform active:scale-[0.975] motion-reduce:active:scale-100"
             >
-              ⚙️ Personnaliser
+              Personnaliser
             </button>
           </div>
+
+          <p className="text-center t-secondary text-text-tertiary">
+            Les données essentielles au fonctionnement de l&apos;app sont
+            toujours collectées.
+          </p>
         </div>
       </div>
     </>

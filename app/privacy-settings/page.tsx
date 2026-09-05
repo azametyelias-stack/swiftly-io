@@ -4,13 +4,32 @@ import Link from "next/link";
 
 import { useConsent } from "@/components/privacy/ConsentProvider";
 import { ConsentToggle } from "@/components/privacy/ConsentToggle";
-import { BackButton } from "@/components/ui/BackButton";
+import { NightScreen } from "@/components/ui/NightScreen";
 import { useToast } from "@/components/ui/Toast";
 import type { ConsentCategory } from "@/lib/privacy/consent";
 
+/**
+ * SCREEN-21 — Paramètres de confidentialité. Reconciled onto Swiftly's grammar
+ * for Lot 6 (artboard `Swiftly - Lot 8 Privacy.dc.html`).
+ *
+ * What changed and why, from the artboard:
+ *  - the title is not shouted. "ESSENTIAL COOKIES (REQUIS)" reads more slowly
+ *    and shouts; the name in 16/700 plus a "Requis" badge says the same thing in
+ *    the voice of every other screen;
+ *  - the technical detail ("Collecteur · Durée · Impact") was three list lines
+ *    adding 60 px to every card. As bullets under a rule the information stays
+ *    available without turning a setting into a spec sheet;
+ *  - emoji become 1.7 px stroke glyphs — 🔒 ⚙️ 📊 render differently on two
+ *    phones and have no weight. Here the badge carries the meaning, so the
+ *    emoji simply go;
+ *  - the active switch is blue, not green (see `ConsentToggle`);
+ *  - still no "Enregistrer": each switch writes at once and the toast confirms.
+ *    A save button at the foot would suggest you can leave without anything
+ *    applying — on consent, that ambiguity is a legal risk.
+ */
+
 interface CardConfig {
   key: ConsentCategory;
-  icon: string;
   title: string;
   description: string;
   details: string[];
@@ -21,54 +40,34 @@ interface CardConfig {
 const CARDS: CardConfig[] = [
   {
     key: "essential",
-    icon: "✅",
-    title: "Cookies essentiels (requis)",
+    title: "Essentiels",
     description:
-      "Requis pour le fonctionnement de l'app (session, sécurité, authentification).",
-    details: [
-      "Collecteur : Swiftly.io",
-      "Durée : 15 min – 30 jours",
-      "Impact : obligatoire pour utiliser l'app",
-    ],
+      "Session, sécurité, authentification. Sans eux, l'app ne fonctionne pas.",
+    details: ["access_token · 15 min", "refresh_token · 30 j"],
     state: "on-locked",
-    badge: "REQUIS",
+    badge: "Requis",
   },
   {
     key: "analytics",
-    icon: "📊",
-    title: "Google Analytics (optionnel)",
+    title: "Google Analytics",
     description:
       "Nous aide à comprendre comment tu utilises l'app : pages visitées, clics, temps passé.",
-    details: [
-      "Collecteur : Google",
-      "Durée : 12 mois",
-      "Impact : sans cela, statistiques anonymes uniquement",
-    ],
+    details: ["Google · 12 mois", "Sans cela : statistiques anonymes uniquement"],
     state: "toggle",
   },
   {
     key: "marketing",
-    icon: "🎯",
-    title: "Emails marketing (optionnel)",
+    title: "Emails marketing",
     description:
-      "Newsletters, promotions et nouvelles fonctionnalités. Fréquence modérée : 1–2 fois par semaine.",
-    details: [
-      "Collecteur : SendGrid (Phase 2)",
-      "Désabonnement : en 1 clic",
-      "Impact : rester informé des nouveautés",
-    ],
+      "Newsletters et nouveautés, 1 à 2 fois par semaine.",
+    details: ["SendGrid · désabonnement en 1 clic"],
     state: "toggle",
   },
   {
     key: "location",
-    icon: "🌍",
-    title: "Localisation / GPS (optionnel, à venir)",
-    description:
-      "Pour des services géolocalisés quand ils seront disponibles.",
-    details: [
-      "État : bientôt disponible",
-      "Impact : recommandations personnalisées par zone",
-    ],
+    title: "Localisation",
+    description: "Services géolocalisés quand ils seront disponibles.",
+    details: ["Recommandations personnalisées par zone"],
     state: "coming-soon",
     badge: "Bientôt",
   },
@@ -80,92 +79,73 @@ export default function PrivacySettingsPage() {
 
   function toggle(key: ConsentCategory, next: boolean) {
     save({ ...categories, [key]: next }, "update");
-    toast.show("✅ Paramètres sauvegardés !");
+    toast.show("Paramètres sauvegardés");
   }
 
   return (
-    <div className="min-h-full bg-white">
-      <header className="border-b border-sf-border">
-        <div className="mx-auto flex max-w-[800px] items-center justify-between px-4 py-4 sm:px-6">
-          <Link href="/" className="text-lg font-bold text-sf-ink">
-            Swiftly<span className="text-sf-blue">.io</span>
-          </Link>
-          <BackButton className="text-sm font-medium text-sf-muted hover:text-sf-ink" />
-        </div>
-      </header>
-
-      <main className="mx-auto max-w-[800px] px-4 py-8 sm:px-6 sm:py-12">
-        <h1 className="mb-4 text-2xl font-bold text-sf-ink sm:text-4xl">
-          ⚙️ Paramètres de Confidentialité
-        </h1>
-        <p className="mb-3 text-base leading-relaxed text-sf-muted">
+    <NightScreen title="Confidentialité">
+      <div className="flex flex-col gap-4 p-4 pb-10">
+        <p className="t-body text-text-secondary">
           Personnalise ton expérience en gérant quelles données tu acceptes de
-          partager avec nous.
+          partager.
         </p>
+
+        {CARDS.map((card) => {
+          const checked =
+            card.state === "coming-soon" ? false : categories[card.key];
+          const disabled = card.state !== "toggle" || !ready;
+          return (
+            <section
+              key={card.key}
+              className={`flex flex-col gap-2 rounded-[var(--radius-card)] bg-surface-card p-[var(--pad-card)] ${
+                // "Bientôt" — 60 % opacity, so it reads as not-yours-yet rather
+                // than as a control that refuses to respond.
+                card.state === "coming-soon" ? "opacity-60" : ""
+              }`}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <h2 className="flex flex-wrap items-center gap-2 text-[16px] font-bold">
+                  {card.title}
+                  {card.badge ? (
+                    <span
+                      className={`rounded-[var(--radius-pill)] px-2 py-0.5 text-[11px] font-bold uppercase tracking-[0.04em] ${
+                        card.state === "coming-soon"
+                          ? "bg-[color-mix(in_srgb,var(--semantic-warn)_20%,transparent)] text-semantic-warn-text"
+                          : "bg-surface-field text-text-secondary"
+                      }`}
+                    >
+                      {card.badge}
+                    </span>
+                  ) : null}
+                </h2>
+                <ConsentToggle
+                  checked={checked}
+                  disabled={disabled}
+                  label={`${card.title} — ${checked ? "activé" : "désactivé"}`}
+                  onChange={(next) => toggle(card.key, next)}
+                />
+              </div>
+
+              <p className="t-body text-text-secondary">{card.description}</p>
+
+              <ul className="mt-1 flex flex-col gap-1 border-t border-surface-hairline pt-2 t-secondary text-text-tertiary">
+                {card.details.map((d) => (
+                  <li key={d}>· {d}</li>
+                ))}
+              </ul>
+            </section>
+          );
+        })}
+
         <Link
           href="/privacy"
-          className="text-sm text-sf-blue underline underline-offset-2 hover:text-sf-blue-dark"
+          className="text-center t-body font-semibold text-brand-accent underline underline-offset-2"
         >
-          Voir la politique de confidentialité complète →
+          Politique de confidentialité
         </Link>
-
-        <div className="mt-8 flex flex-col gap-4">
-          {CARDS.map((card) => {
-            const checked =
-              card.state === "coming-soon" ? false : categories[card.key];
-            const disabled = card.state !== "toggle" || !ready;
-            return (
-              <div
-                key={card.key}
-                className={`relative rounded-xl border border-sf-border bg-white p-5 transition-all hover:border-sf-blue hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] ${
-                  card.state === "coming-soon" ? "opacity-60" : ""
-                }`}
-              >
-                {card.badge && (
-                  <span
-                    className={`absolute right-4 top-4 rounded-full px-3 py-1 text-xs font-semibold text-white ${
-                      card.state === "coming-soon" ? "bg-sf-amber" : "bg-sf-blue"
-                    }`}
-                  >
-                    {card.badge}
-                  </span>
-                )}
-                <div className="mb-3 flex items-start justify-between gap-4 pr-16">
-                  <h2 className="text-base font-semibold text-sf-ink">
-                    <span aria-hidden="true">{card.icon}</span> {card.title}
-                  </h2>
-                  <ConsentToggle
-                    checked={checked}
-                    disabled={disabled}
-                    label={`${card.title} — ${checked ? "activé" : "désactivé"}`}
-                    onChange={(next) => toggle(card.key, next)}
-                  />
-                </div>
-                <p className="text-sm leading-relaxed text-sf-body">
-                  {card.description}
-                </p>
-                <ul className="mt-3 space-y-1 text-xs text-sf-muted">
-                  {card.details.map((d) => (
-                    <li key={d}>• {d}</li>
-                  ))}
-                </ul>
-              </div>
-            );
-          })}
-        </div>
-
-        <div className="mt-8 flex flex-col items-center justify-between gap-4 border-t border-sf-border pt-6 sm:flex-row">
-          <BackButton className="inline-flex w-full items-center justify-center rounded-lg border border-[#d1d5db] bg-sf-surface px-6 py-2.5 text-sm font-semibold text-sf-ink transition-colors hover:bg-sf-border sm:w-auto" />
-          <Link
-            href="/privacy"
-            className="text-sm text-sf-blue underline underline-offset-2 hover:text-sf-blue-dark"
-          >
-            Voir la politique complète →
-          </Link>
-        </div>
-      </main>
+      </div>
 
       {toast.node}
-    </div>
+    </NightScreen>
   );
 }

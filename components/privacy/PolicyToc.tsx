@@ -2,14 +2,24 @@
 
 import { useEffect, useState } from "react";
 
+import { ChevronDownIcon } from "@/components/nav/icons";
+
 export interface TocSection {
   id: string;
   title: string;
 }
 
 /**
- * SCREEN-21 table of contents: sticky on desktop, collapsible on mobile,
- * with scroll-spy highlighting the section currently in view.
+ * SCREEN-20's table of contents. Reconciled onto Swiftly's grammar for Lot 6:
+ * the artboard is blunt that "le sommaire sticky de 250 px n'existe pas sur
+ * 375" — so the desktop sidebar is gone and what remains is the collapsible
+ * block at the head of the page, which is the mobile behaviour the screen doc
+ * already described. One layout instead of two means one thing to keep right.
+ *
+ * Entries are numbered the way the artboard draws them (1…8): in a list of
+ * eight long section titles, the number is what the eye comes back to.
+ * Scroll-spy stays — it is what tells the reader where they are in a long
+ * document.
  */
 export function PolicyToc({ sections }: { sections: TocSection[] }) {
   const [active, setActive] = useState(sections[0]?.id ?? "");
@@ -33,50 +43,56 @@ export function PolicyToc({ sections }: { sections: TocSection[] }) {
     return () => observer.disconnect();
   }, [sections]);
 
-  const links = (
-    <ul className="flex flex-col gap-1">
-      {sections.map((s) => (
-        <li key={s.id}>
-          <a
-            href={`#${s.id}`}
-            onClick={() => setOpen(false)}
-            aria-current={active === s.id ? "true" : undefined}
-            className={`block border-l-2 py-1 pl-3 text-sm transition-colors ${
-              active === s.id
-                ? "border-sf-blue bg-[#eff6ff] font-semibold text-sf-blue"
-                : "border-transparent text-sf-body hover:border-sf-blue hover:text-sf-blue"
-            }`}
-          >
-            {s.title}
-          </a>
-        </li>
-      ))}
-    </ul>
-  );
-
   return (
-    <nav aria-label="Table des matières" className="lg:w-[250px] lg:shrink-0">
-      {/* Mobile: collapsible */}
-      <div className="lg:hidden">
-        <button
-          type="button"
-          onClick={() => setOpen((v) => !v)}
-          aria-expanded={open}
-          className="flex w-full items-center justify-between rounded-lg bg-sf-subtle px-4 py-3 text-sm font-semibold text-sf-ink"
-        >
-          📑 Table des matières
-          <span aria-hidden="true">{open ? "▲" : "▼"}</span>
-        </button>
-        {open && <div className="mt-2 rounded-lg bg-sf-subtle p-3">{links}</div>}
-      </div>
+    <nav aria-label="Sommaire">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="flex min-h-[var(--size-list-button)] w-full items-center justify-between gap-3 rounded-[var(--radius-card)] bg-surface-card px-[var(--pad-card)] text-[16px] font-semibold"
+      >
+        Sommaire
+        <ChevronDownIcon
+          width={18}
+          height={18}
+          className={`text-text-quaternary transition-transform ${open ? "rotate-180" : ""}`}
+          style={{
+            transitionDuration: "var(--dur-toggle)",
+            transitionTimingFunction: "var(--ease-standard)",
+          }}
+        />
+      </button>
 
-      {/* Desktop: sticky */}
-      <div className="sticky top-20 hidden max-h-[calc(100vh-6rem)] overflow-auto rounded-lg bg-sf-subtle p-4 lg:block">
-        <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-sf-muted">
-          Table des matières
-        </p>
-        {links}
-      </div>
+      {open ? (
+        <ul className="mt-2 overflow-hidden rounded-[var(--radius-card)] bg-surface-card px-[var(--pad-card)]">
+          {sections.map((s, i) => (
+            <li key={s.id} className="border-b border-surface-hairline last:border-b-0">
+              <a
+                href={`#${s.id}`}
+                onClick={() => setOpen(false)}
+                aria-current={active === s.id ? "true" : undefined}
+                className="flex min-h-[var(--row-setting)] items-center gap-3 py-2"
+              >
+                <span
+                  aria-hidden="true"
+                  className={`grid size-7 flex-none place-items-center rounded-full text-[13px] font-bold ${
+                    active === s.id
+                      ? "bg-brand-accent text-ink-on-surface"
+                      : "bg-surface-field text-text-tertiary"
+                  }`}
+                >
+                  {i + 1}
+                </span>
+                <span
+                  className={`t-body ${active === s.id ? "font-semibold text-text-primary" : "text-text-secondary"}`}
+                >
+                  {s.title}
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      ) : null}
     </nav>
   );
 }
