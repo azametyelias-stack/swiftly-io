@@ -5,7 +5,12 @@ import { useCallback, useEffect, useState } from "react";
 import { apiJson } from "@/lib/http/api";
 import type { Period } from "@/lib/dashboard/period";
 import type { Variation } from "@/lib/dashboard/aggregates";
-import { ACCOUNT_CHANGED_EVENT, getLastAccount, setLastAccount } from "@/lib/dashboard/lastAccount";
+import {
+  ACCOUNT_CHANGED_EVENT,
+  DASHBOARD_STALE_EVENT,
+  getLastAccount,
+  setLastAccount,
+} from "@/lib/dashboard/lastAccount";
 
 export interface AccountSummary {
   id: string;
@@ -81,6 +86,14 @@ export function useDashboard(): DashboardState {
     window.addEventListener(ACCOUNT_CHANGED_EVENT, onChange);
     return () => window.removeEventListener(ACCOUNT_CHANGED_EVENT, onChange);
   }, []);
+
+  // A transaction was just saved: re-fetch balance, curve and history so the
+  // dashboard already shows the movement when the wizard closes onto it,
+  // instead of needing a manual pull-to-refresh.
+  useEffect(() => {
+    window.addEventListener(DASHBOARD_STALE_EVENT, refresh);
+    return () => window.removeEventListener(DASHBOARD_STALE_EVENT, refresh);
+  }, [refresh]);
 
   useEffect(() => {
     let alive = true;

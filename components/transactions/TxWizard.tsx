@@ -14,7 +14,7 @@ import { StepDots } from "@/components/transactions/StepDots";
 import { TxSheet, useTxSurface } from "@/components/transactions/TxSheet";
 import { TxSuccess } from "@/components/transactions/TxSuccess";
 import { apiJson } from "@/lib/http/api";
-import { setLastAccount } from "@/lib/dashboard/lastAccount";
+import { notifyDashboardStale, setLastAccount } from "@/lib/dashboard/lastAccount";
 import { todayISO } from "@/lib/format/date";
 import type { CurrencyCode } from "@/lib/format/money";
 import {
@@ -135,6 +135,9 @@ export function TxWizard({
       const usedAccountId =
         type === "income" ? eff.destinationAccountId : eff.sourceAccountId;
       if (usedAccountId) setLastAccount(usedAccountId);
+      // …and its balance/curve/history must be re-fetched on return, whether or
+      // not the account changed (the dashboard stays mounted under this modal).
+      notifyDashboardStale();
       if (launchedTemplateId && !isEdit) void markTemplateUsed(launchedTemplateId);
     } catch {
       setSaveError(t.errors.saveFailed);

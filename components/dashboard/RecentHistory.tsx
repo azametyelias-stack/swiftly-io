@@ -10,6 +10,7 @@ import {
 } from "@/components/nav/icons";
 import { ListRow } from "@/components/ui/ListRow";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { DASHBOARD_STALE_EVENT } from "@/lib/dashboard/lastAccount";
 import { apiJson } from "@/lib/http/api";
 import { formatBalance, formatMoney } from "@/lib/format/money";
 import { formatRowMoment, todayISO } from "@/lib/format/date";
@@ -29,6 +30,16 @@ export function RecentHistory({ accountId }: { accountId: string | null }) {
   const today = todayISO();
 
   const [items, setItems] = useState<TxListItem[] | null>(null);
+  // Bumped when a transaction is saved — the dashboard stays mounted under the
+  // wizard modal, so without this the strip would still list the old three rows
+  // until a manual reload.
+  const [reloadKey, setReloadKey] = useState(0);
+
+  useEffect(() => {
+    const bump = () => setReloadKey((k) => k + 1);
+    window.addEventListener(DASHBOARD_STALE_EVENT, bump);
+    return () => window.removeEventListener(DASHBOARD_STALE_EVENT, bump);
+  }, []);
 
   useEffect(() => {
     let alive = true;
@@ -40,7 +51,7 @@ export function RecentHistory({ accountId }: { accountId: string | null }) {
     return () => {
       alive = false;
     };
-  }, [accountId]);
+  }, [accountId, reloadKey]);
 
   if (items === null) {
     return <Skeleton className="h-12 w-full" rounded="rounded-[14px]" />;

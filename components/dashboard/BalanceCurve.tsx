@@ -2,11 +2,14 @@
 
 import {
   useEffect,
+  useId,
   useRef,
   useState,
   type PointerEvent as ReactPointerEvent,
 } from "react";
 
+import { useCurveDraw } from "@/components/dashboard/useCurveDraw";
+import { axisLabel as signedAxisLabel, curveScale, curveTicks, smoothPath } from "@/lib/dashboard/curve";
 import { formatBalance, formatCompact, type CurrencyCode } from "@/lib/format/money";
 import { beninHourOfDay, formatClock } from "@/lib/format/date";
 import { useLocale } from "@/lib/i18n/useMessages";
@@ -42,99 +45,6 @@ interface CurvePoint {
   at?: string;
 }
 
-/** Round away from zero to a "nice" 1 / 2 / 2.5 / 5 × 10ⁿ step, for an axis edge. */
-function niceCeil(v: number): number {
-  if (v <= 0) return 0;
-  const pow = 10 ** Math.floor(Math.log10(v));
-  const n = v / pow;
-  const step = n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10;
-  return step * pow;
-}
-
-/** Signed compact axis label: `-12 700` → "-13 K", `0` → "0". */
-function axisLabel(v: number): string {
-  return v < 0 ? `-${formatCompact(v)}` : formatCompact(v);
-}
-
-/**
- * A smooth monotone cubic Hermite spline through `(xs[i], ys[i])`, as an SVG
- * path — rounded peaks/troughs instead of the sharp, angular joins a raw
- * polyline gives on a series with only a handful of points (Elias: "les pics
- * et les creux doivent être arrondis").
- *
- * This is the full Fritsch–Carlson construction (the same one behind
- * d3.curveMonotoneX), not a naive averaged-tangent shortcut: our x-spacing is
- * very uneven (an hour axis bunches several transactions close together and
- * leaves long flat gaps elsewhere), and a plain averaged tangent overshoots
- * badly on that kind of grid — a first attempt at this produced a curve that
- * shot off the top of the chart and looped back down through it. Tangents are
- * weighted by segment length, then rescaled per-segment (the classic
- * `alpha²+beta²>9` test) so the curve can never leave the range spanned by
- * its own two endpoints — no overshoot, whatever the spacing.
- */
-function smoothPath(xs: number[], ys: number[]): string {
-  const n = xs.length;
-  if (n === 0) return "";
-  if (n === 1) return `M ${xs[0]!.toFixed(1)} ${ys[0]!.toFixed(1)}`;
-  if (n === 2) {
-    return `M ${xs[0]!.toFixed(1)} ${ys[0]!.toFixed(1)} L ${xs[1]!.toFixed(1)} ${ys[1]!.toFixed(1)}`;
-  }
-
-  const h: number[] = [];
-  const d: number[] = [];
-  for (let i = 0; i < n - 1; i += 1) {
-    const dx = xs[i + 1]! - xs[i]!;
-    h.push(dx);
-    d.push(dx === 0 ? 0 : (ys[i + 1]! - ys[i]!) / dx);
-  }
-
-  const m = new Array<number>(n);
-  m[0] = d[0]!;
-  m[n - 1] = d[n - 2]!;
-  for (let i = 1; i < n - 1; i += 1) {
-    const left = d[i - 1]!;
-    const right = d[i]!;
-    if (left === 0 || right === 0 || (left < 0) !== (right < 0)) {
-      m[i] = 0;
-    } else {
-      const w1 = 2 * h[i]! + h[i - 1]!;
-      const w2 = h[i]! + 2 * h[i - 1]!;
-      m[i] = (w1 + w2) / (w1 / left + w2 / right);
-    }
-  }
-
-  // Per-segment rescale: keeps each side's tangent inside the circle of
-  // radius 3 in (m/d) space, the exact condition that guarantees the curve
-  // stays between its two endpoints on that segment.
-  for (let i = 0; i < n - 1; i += 1) {
-    const di = d[i]!;
-    if (di === 0) {
-      m[i] = 0;
-      m[i + 1] = 0;
-      continue;
-    }
-    const a = m[i]! / di;
-    const b = m[i + 1]! / di;
-    const s = a * a + b * b;
-    if (s > 9) {
-      const t = 3 / Math.sqrt(s);
-      m[i] = t * a * di;
-      m[i + 1] = t * b * di;
-    }
-  }
-
-  let path = `M ${xs[0]!.toFixed(1)} ${ys[0]!.toFixed(1)}`;
-  for (let i = 0; i < n - 1; i += 1) {
-    const dx = h[i]! / 3;
-    const c1x = xs[i]! + dx;
-    const c1y = ys[i]! + m[i]! * dx;
-    const c2x = xs[i + 1]! - dx;
-    const c2y = ys[i + 1]! - m[i + 1]! * dx;
-    path += ` C ${c1x.toFixed(1)} ${c1y.toFixed(1)}, ${c2x.toFixed(1)} ${c2y.toFixed(1)}, ${xs[i + 1]!.toFixed(1)} ${ys[i + 1]!.toFixed(1)}`;
-  }
-  return path;
-}
-
 export function BalanceCurve({
   points,
   currency = "XOF",
@@ -148,7 +58,10 @@ export function BalanceCurve({
   xLabels?: string[];
 }) {
   const locale = useLocale() as Locale;
+  const uid = useId().replace(/:/g, "");
   const pathRef = useRef<SVGPathElement>(null);
+  const dotRef = useRef<SVGGElement>(null);
+  const revealRef = useRef<SVGRectElement>(null);
   const [marker, setMarker] = useState<number | null>(null);
   const [bubbleVisible, setBubbleVisible] = useState(false);
   const bubbleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -158,13 +71,11 @@ export function BalanceCurve({
   const negative = values.at(-1)! < 0;
   const curveColor = negative ? CURVE_OUT : CURVE_IN;
 
-  // Axis edges are rounded outward from 0, independently above and below —
-  // never anchored at the data's raw min/max, so a range that dips negative
-  // gets real negative labels instead of the ceiling collapsing to "1".
-  const axisMax = niceCeil(Math.max(0, ...values));
-  const axisMin = -niceCeil(Math.max(0, -Math.min(0, ...values)));
-  const dataMin = axisMin;
-  const span = axisMax - axisMin || 1;
+  // Scale + spline come from lib/dashboard/curve.ts, shared verbatim with the
+  // Statistiques chart so both pages plot the same series the same way.
+  const scale = curveScale(values);
+  const dataMin = scale.min;
+  const span = scale.span;
 
   const innerW = W - PAD.left - PAD.right;
   const innerH = H - PAD.top - PAD.bottom;
@@ -193,13 +104,14 @@ export function BalanceCurve({
       : smoothPath(
           points.map((_, i) => x(i)),
           points.map((p) => y(p.balance)),
+          { top: PAD.top, bottom: baseY },
         );
 
   const areaPath = `${linePath} L ${PAD.left + innerW} ${baseY} L ${PAD.left} ${baseY} Z`;
 
-  const yTicks = [1, 0.75, 0.5, 0.25, 0].map((f) => ({
-    v: dataMin + f * span,
-    yPos: PAD.top + innerH - f * innerH,
+  const yTicks = curveTicks(scale).map((v, i) => ({
+    v,
+    yPos: PAD.top + (i / 4) * innerH,
   }));
 
   // "00h" → "23h59", never "0h"/"00h" at both ends — those read as the same
@@ -208,30 +120,8 @@ export function BalanceCurve({
     ? ["00h", "6h", "12h", "18h", "23h59"]
     : (xLabels ?? []);
 
-  // Progressive draw — measured length, animated via a CSS transition on mount.
-  useEffect(() => {
-    const el = pathRef.current;
-    if (!el) return;
-    const reduce =
-      typeof window !== "undefined" &&
-      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    let len = 0;
-    try {
-      len = el.getTotalLength();
-    } catch {
-      return;
-    }
-    if (!Number.isFinite(len) || len <= 0) return;
-    el.style.transition = "none";
-    el.style.strokeDasharray = `${len}`;
-    el.style.strokeDashoffset = reduce ? "0" : `${len}`;
-    if (reduce) return;
-    const raf = requestAnimationFrame(() => {
-      el.style.transition = `stroke-dashoffset ${DRAW_MS}ms cubic-bezier(0.32, 0.72, 0, 1)`;
-      el.style.strokeDashoffset = "0";
-    });
-    return () => cancelAnimationFrame(raf);
-  }, [linePath]);
+  // Line, leading dot and area fill all advance together off one rAF loop.
+  useCurveDraw({ pathRef, dotRef, revealRef, linePath, durationMs: DRAW_MS, width: W });
 
   useEffect(() => {
     return () => {
@@ -257,8 +147,6 @@ export function BalanceCurve({
     bubbleTimer.current = setTimeout(() => setBubbleVisible(false), BUBBLE_MS);
   };
 
-  const end = points.length - 1;
-
   return (
     <div className="relative -mx-1 h-[196px] flex-none">
       <svg
@@ -270,11 +158,16 @@ export function BalanceCurve({
         onPointerMove={(e) => e.buttons === 1 && pick(e)}
       >
         <defs>
-          <linearGradient id="sf-curve-fill" x1="0" y1="0" x2="0" y2="1">
+          <linearGradient id={`sf-curve-fill-${uid}`} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor={curveColor} stopOpacity="0.34" />
             <stop offset="55%" stopColor={curveColor} stopOpacity="0.12" />
             <stop offset="100%" stopColor={curveColor} stopOpacity="0" />
           </linearGradient>
+          {/* Reveals the fill in step with the line — its width is driven by
+              the same rAF loop, so the fill never runs ahead of the stroke. */}
+          <clipPath id={`sf-curve-reveal-${uid}`}>
+            <rect ref={revealRef} x={0} y={0} width={0} height={H} />
+          </clipPath>
         </defs>
 
         {yTicks.map((t, i) => {
@@ -298,13 +191,15 @@ export function BalanceCurve({
               fontWeight="600"
               letterSpacing="0.04em"
             >
-              {axisLabel(t.v)}
+              {signedAxisLabel(t.v, formatCompact)}
             </text>
           </g>
           );
         })}
 
-        <path d={areaPath} fill="url(#sf-curve-fill)" />
+        <g clipPath={`url(#sf-curve-reveal-${uid})`}>
+          <path d={areaPath} fill={`url(#sf-curve-fill-${uid})`} />
+        </g>
         <path
           ref={pathRef}
           d={linePath}
@@ -315,19 +210,17 @@ export function BalanceCurve({
           strokeLinejoin="round"
         />
 
-        {/* glowing endpoint */}
+        {/* Glowing head of the line — rides along it during the draw (the rAF
+            loop translates this group), and comes to rest on the last point. */}
         {points.length > 1 ? (
-          <>
-            <circle cx={x(end)} cy={y(points[end]!.balance)} r={9} fill={curveColor} opacity={0.24} />
-            <circle
-              cx={x(end)}
-              cy={y(points[end]!.balance)}
-              r={4.5}
-              fill="#05060F"
-              stroke={curveColor}
-              strokeWidth={2.5}
-            />
-          </>
+          <g
+            ref={dotRef}
+            style={{ opacity: 0 }}
+            transform={`translate(${x(0)} ${y(points[0]!.balance)})`}
+          >
+            <circle r={9} fill={curveColor} opacity={0.24} />
+            <circle r={4.5} fill="#05060F" stroke={curveColor} strokeWidth={2.5} />
+          </g>
         ) : null}
 
         {marker !== null && points[marker] ? (

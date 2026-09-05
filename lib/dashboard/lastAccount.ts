@@ -14,6 +14,22 @@
 
 const KEY = "sf-dashboard-account";
 export const ACCOUNT_CHANGED_EVENT = "sf:dashboard-account-changed";
+export const DASHBOARD_STALE_EVENT = "sf:dashboard-stale";
+
+/**
+ * Announce that the dashboard's numbers are out of date — a transaction was
+ * just written. Needed for the same reason as the event above: the wizard is an
+ * intercepted route rendered in the `@modal` slot, so `DashboardView` never
+ * unmounts and never remounts on the way back, and nothing would otherwise
+ * re-fetch. Elias: "je suis obligé d'actualiser manuellement pour voir le
+ * changement". Fires even when the account is unchanged, which is why it is
+ * separate from ACCOUNT_CHANGED_EVENT.
+ */
+export function notifyDashboardStale(): void {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event(DASHBOARD_STALE_EVENT));
+  }
+}
 
 export function getLastAccount(): string | null {
   try {

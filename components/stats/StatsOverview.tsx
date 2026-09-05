@@ -2,7 +2,7 @@
 
 import { StatCurve } from "@/components/stats/StatCurve";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { formatBalance, formatCompact, formatMoney } from "@/lib/format/money";
+import { formatBalance, formatMoney } from "@/lib/format/money";
 import { interpolate } from "@/lib/i18n";
 import { useMessages } from "@/lib/i18n/useMessages";
 import type { StatsPayload } from "@/lib/stats/model";
@@ -24,16 +24,13 @@ export function StatsOverview({
     return <Skeleton className="h-72 w-full" rounded="rounded-[20px]" />;
   }
 
-  const yLabels = data.curve && data.curve.length
-    ? yScale(data.curve.map((p) => p.balance))
-    : undefined;
   const netUp = data.net >= 0;
   const netVar = data.netVariation;
 
   return (
     <div className="flex flex-col gap-4 rounded-[var(--radius-card)] bg-surface-card p-4">
       {data.curve && data.curve.length > 0 ? (
-        <StatCurve points={data.curve} yLabels={yLabels} />
+        <StatCurve points={data.curve} />
       ) : (
         <p className="t-secondary py-8 text-center text-text-tertiary">
           {o.curveOffline}
@@ -79,14 +76,6 @@ export function StatsOverview({
         ) : null}
       </div>
     </div>
-  );
-}
-
-function yScale(values: number[]): string[] {
-  const max = Math.max(...values, 1);
-  const min = Math.min(...values, 0);
-  return [1, 0.75, 0.5, 0.25, 0].map((f) =>
-    formatCompact(min + (max - min) * f),
   );
 }
 
