@@ -79,6 +79,15 @@ export interface AggregateInput {
   buckets: string[];
   /** "hour" steps the curve per transaction (today); default steps per bucket */
   granularity?: Granularity;
+  /**
+   * ISO timestamp for "right now" — places the hour-mode closing point on the
+   * axis at the actual current time instead of pinning it to end-of-day
+   * (falls back to the last transaction's time if omitted). Without this the
+   * closing point renders at the 24h mark regardless of the real hour, which
+   * on an axis that only spans 0h→now visually wraps the curve back on
+   * itself — the bug Elias caught testing at 2 a.m.
+   */
+  now?: string;
 }
 
 export function computeAggregate(input: AggregateInput): DashboardAggregate {
@@ -90,6 +99,7 @@ export function computeAggregate(input: AggregateInput): DashboardAggregate {
     rangeEnd,
     buckets,
     granularity = "day",
+    now,
   } = input;
 
   const deltas = transactions.map((tx) => ({
@@ -126,7 +136,7 @@ export function computeAggregate(input: AggregateInput): DashboardAggregate {
       curve.push({ date: rangeStart, balance: running, at: d.at });
     }
     if (inRange.length > 0) {
-      curve.push({ date: rangeStart, balance: endBalance });
+      curve.push({ date: rangeStart, balance: endBalance, at: now ?? inRange.at(-1)!.at });
     }
   } else {
     curve = buckets.map((bucket, i) => {

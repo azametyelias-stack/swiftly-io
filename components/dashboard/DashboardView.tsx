@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 
 import { BalanceCurve } from "@/components/dashboard/BalanceCurve";
@@ -77,6 +77,23 @@ export function DashboardView() {
       return next;
     });
   };
+
+  // Detects whether the sticky button is actually pinned yet — while it still
+  // sits in its natural spot right under the curve, it must show the night
+  // background through (Elias: "il y a un bandeau blanc, enlever ça"), and
+  // only turn into an opaque light strip once it's really stuck at the top,
+  // so the panel content scrolling up doesn't show through its padding.
+  const [stuck, setStuck] = useState(false);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([entry]) => setStuck(!entry.isIntersecting), {
+      threshold: 1,
+    });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   const currency = (data?.account.currency ?? "XOF") as CurrencyCode;
   const loading = status === "loading" && !data;
@@ -233,9 +250,18 @@ export function DashboardView() {
         </div>
       </div>
 
+      {/* Zero-height sentinel just before the button — when it scrolls out of
+          view the button is the one that just became stuck at the top. */}
+      <div ref={sentinelRef} aria-hidden="true" />
+
       {/* The button — scrolls with the page, then freezes at the top. Opaque
-          background: once stuck, the panel below scrolls up underneath it. */}
-      <div className="sticky top-0 z-20 bg-surface-page px-4 pb-3 pt-2">
+          only once actually stuck: before that, the night background must
+          show through underneath it. */}
+      <div
+        className={`sticky top-0 z-20 px-4 pb-3 pt-2 transition-colors duration-200 ${
+          stuck ? "bg-surface-page" : "bg-brand-deep"
+        }`}
+      >
         <Link
           href="/transactions/nouvelle"
           className="flex h-[var(--size-primary-button)] w-full items-center justify-center gap-2 rounded-[var(--radius-pill)] bg-surface-card text-[17px] font-semibold text-text-primary shadow-[0_16px_34px_-6px_rgba(4,6,30,0.44),0_3px_8px_rgba(4,6,30,0.22)]"

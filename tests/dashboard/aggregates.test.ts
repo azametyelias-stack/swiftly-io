@@ -91,6 +91,7 @@ test("computeAggregate hour: stepped per transaction, closes on the end balance"
     rangeStart: "2026-09-17",
     rangeEnd: "2026-09-18",
     buckets: ["2026-09-17"],
+    now: "2026-09-17T11:00:00Z",
   });
   assert.equal(r.startBalance, 7_000); // 10k − 3k yesterday
   assert.equal(r.endBalance, 22_000); // 7k + 20k − 5k
@@ -100,6 +101,25 @@ test("computeAggregate hour: stepped per transaction, closes on the end balance"
   );
   assert.equal(r.curve[1]!.at, "2026-09-17T06:22:00Z");
   assert.equal(r.curve[0]!.at, undefined);
+  // The closing point sits at the real current time, not pinned to end-of-day
+  // — pinning it there wrapped the curve back on itself when "now" isn't
+  // actually midnight yet (Elias caught this testing at 2 a.m.).
+  assert.equal(r.curve[3]!.at, "2026-09-17T11:00:00Z");
+});
+
+test("computeAggregate hour: closing point falls back to the last transaction's time when `now` is omitted", () => {
+  const r = computeAggregate({
+    initialBalance: 0,
+    accountId: A,
+    granularity: "hour",
+    transactions: [
+      tx({ type: "income", amount: 1_000, destination_account_id: A, occurred_on: "2026-09-17", created_at: "2026-09-17T02:15:00Z", status: "done" }),
+    ],
+    rangeStart: "2026-09-17",
+    rangeEnd: "2026-09-18",
+    buckets: ["2026-09-17"],
+  });
+  assert.equal(r.curve.at(-1)!.at, "2026-09-17T02:15:00Z");
 });
 
 test("computeAggregate hour: no transactions today → single start point", () => {

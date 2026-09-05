@@ -87,7 +87,8 @@ export async function getDashboard(
   if (accErr) throw accErr;
   if (!account) return null;
 
-  const range = resolvePeriod(period);
+  const now = new Date();
+  const range = resolvePeriod(period, now);
 
   const { data: txData, error: txErr } = await db
     .from("transactions")
@@ -118,6 +119,7 @@ export async function getDashboard(
     rangeEnd: range.end,
     buckets: range.buckets,
     granularity: range.granularity,
+    now: now.toISOString(),
   });
 
   // Authoritative live balance (includes project allocations).
