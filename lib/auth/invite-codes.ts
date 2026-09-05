@@ -31,6 +31,39 @@
 import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 
 export const INVITE_CODE_ALPHABET = "0123456789";
+
+/**
+ * 6 chiffres — OK pour la bêta fermée (5-10 codes valides), tranché avec Elias
+ * le 2026-09-05 avec le rate limiting du Point 3 en place.
+ *
+ * ⚠️  ALLONGER À 8-10 CARACTÈRES AVANT TOUT LANCEMENT PUBLIC.
+ *
+ * Le raisonnement, pour qu'il ne se reperde pas : le risque ne vient pas de la
+ * taille de l'espace seule, il vient du RAPPORT entre codes valides et espace.
+ * À 10 codes sur 10^6, un balayage a une chance sur 100 000 par tentative. À
+ * quelques milliers de codes valides, le même espace devient exploitable — et
+ * une attaque répartie sur beaucoup d'IP passe le filtre par IP par
+ * définition (voir `lib/auth/rate-limit-policy.ts`, qui le dit aussi). Le rate
+ * limiting multiplie le coût ; il ne remplace pas l'entropie.
+ *
+ * ⚠️  Ce n'est PAS un changement d'une ligne. Trois choses cassent :
+ *
+ *   1. `INVITE_CODE_SPACE` ci-dessous suppose un alphabet de chiffres
+ *      (`10 ** LENGTH`). Passer à de l'alphanumérique le rend faux sans rien
+ *      signaler — ce serait `ALPHABET.length ** LENGTH`.
+ *
+ *   2. `REJECT_AT` tire 3 octets (2^24 ≈ 16,7 M). Dès que l'espace dépasse
+ *      2^24 — c'est-à-dire dès 8 chiffres — `floor(2^24 / SPACE)` vaut 0, donc
+ *      `REJECT_AT` vaut 0, donc `generateInviteCode()` BOUCLE À L'INFINI.
+ *      Il faut élargir le tirage en même temps.
+ *
+ *   3. `normalizeInviteCode()` supprime tout ce qui n'est pas un chiffre, et
+ *      `isValidInviteCodeShape()` avec. Un code alphanumérique serait vidé de
+ *      ses lettres à la saisie.
+ *
+ * L'écran 02 (`CodeInput`) est bâti sur 6 cases ; il faudra le suivre.
+ * Les codes déjà distribués deviennent invalides — prévoir la reprise.
+ */
 export const INVITE_CODE_LENGTH = 6;
 export const INVITE_CODE_SPACE = 10 ** INVITE_CODE_LENGTH; // 1_000_000
 export const INVITE_CODE_TTL_DAYS = 30;
