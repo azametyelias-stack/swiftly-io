@@ -1,0 +1,4 @@
+{
+  "//": "Scripts d'exploitation lancés directement par node, hors du bundle Next. Même rôle que tests/package.json : déclarer les .ts de ce dossier comme modules ES.",
+  "type": "module"
+}
