@@ -137,7 +137,13 @@ export function NavShell({ children }: { children: ReactNode }) {
 
   return (
     <NavShellContext.Provider value={value}>
-      <div className="relative min-h-dvh overflow-hidden bg-brand-deep">
+      {/* `overflow-x-clip`, NOT `overflow-hidden`: we only ever need to hide the
+          pushed layer sideways, and `hidden` would make this box the nearest
+          scroll container for every descendant — which silently kills
+          `position: sticky` inside the screens (the dashboard's pinned
+          "+ Nouvelle transaction" button just scrolled away). `clip` hides the
+          same overflow without creating a scroll container. */}
+      <div className="relative min-h-dvh overflow-x-clip bg-brand-deep">
         <MenuDrawer />
 
         <div

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import Link from "next/link";
 
 import { BalanceCurve } from "@/components/dashboard/BalanceCurve";
@@ -77,23 +77,6 @@ export function DashboardView() {
       return next;
     });
   };
-
-  // Detects whether the sticky button is actually pinned yet — while it still
-  // sits in its natural spot right under the curve, it must show the night
-  // background through (Elias: "il y a un bandeau blanc, enlever ça"), and
-  // only turn into an opaque light strip once it's really stuck at the top,
-  // so the panel content scrolling up doesn't show through its padding.
-  const [stuck, setStuck] = useState(false);
-  const sentinelRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const el = sentinelRef.current;
-    if (!el) return;
-    const io = new IntersectionObserver(([entry]) => setStuck(!entry.isIntersecting), {
-      threshold: 1,
-    });
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
 
   const currency = (data?.account.currency ?? "XOF") as CurrencyCode;
   const loading = status === "loading" && !data;
@@ -250,34 +233,22 @@ export function DashboardView() {
         </div>
       </div>
 
-      {/* Zero-height sentinel just before the button — when it scrolls out of
-          view the button is the one that just became stuck at the top. */}
-      <div ref={sentinelRef} aria-hidden="true" />
-
-      {/* The button — scrolls with the page, then freezes at the top. Opaque
-          only once actually stuck: before that it continues the night photo
-          (same image, bottom-cropped) instead of a flat color patch, and its
-          bottom corners match the panel's radius so no square notch shows
-          through the panel's rounded top corners just below it. */}
-      <div
-        className={`sticky top-0 z-20 overflow-hidden rounded-b-[var(--radius-content-top)] px-4 pb-3 pt-2 transition-colors duration-300 ${
-          stuck ? "bg-surface-page" : "bg-brand-deep"
-        }`}
-      >
-        {!stuck ? (
-          <>
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-0 bg-cover"
-              style={{ backgroundImage: "url(/brand/nuit.jpg)", backgroundPosition: "center bottom" }}
-            />
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-0"
-              style={{ background: "rgba(6,10,60,0.72)" }}
-            />
-          </>
-        ) : null}
+      {/* The button — scrolls with the page, then freezes at the top and stays
+          in view. Per the design artboard it is ALWAYS a band of the night
+          background (photo + the gradient's own tail tint), never a light strip
+          and never rounded: the rounded edge in the design belongs to the white
+          panel below, which cuts its corners out of this dark band. */}
+      <div className="sticky top-0 z-20 overflow-hidden px-4 pb-4 pt-3">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-cover"
+          style={{ backgroundImage: "url(/brand/nuit.jpg)", backgroundPosition: "center bottom" }}
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+          style={{ background: "rgba(6,10,60,0.72)" }}
+        />
         <Link
           href="/transactions/nouvelle"
           className="relative z-10 flex h-[var(--size-primary-button)] w-full items-center justify-center gap-2 rounded-[var(--radius-pill)] bg-surface-card text-[17px] font-semibold text-text-primary shadow-[0_16px_34px_-6px_rgba(4,6,30,0.44),0_3px_8px_rgba(4,6,30,0.22)]"
@@ -287,9 +258,13 @@ export function DashboardView() {
         </Link>
       </div>
 
-      {/* White panel — flows right after the button, same page scroll. */}
-      <div className="relative z-10 rounded-t-[var(--radius-content-top)] bg-surface-card px-4 pb-24 pt-4 text-text-primary">
-        <div className="flex flex-col gap-3">
+      {/* White panel — flows right after the button, same page scroll. The dark
+          wrapper is what shows through the panel's rounded top corners, so the
+          radius reads against the night blue as in the design (a light-on-light
+          corner would just look like a square edge). */}
+      <div className="relative z-10 bg-brand-deep">
+        <div className="rounded-t-[var(--radius-content-top)] bg-surface-card px-4 pb-24 pt-4 text-text-primary">
+          <div className="flex flex-col gap-3">
           <RotatingBanner items={[]} />
 
           <PanelSection title={m.dashboard.templates.title} action={{ label: m.dashboard.templates.seeAll, href: "/templates" }}>
@@ -328,6 +303,7 @@ export function DashboardView() {
           >
             <RecentHistory accountId={data?.account.id ?? accountId} />
           </PanelSection>
+          </div>
         </div>
       </div>
     </div>
