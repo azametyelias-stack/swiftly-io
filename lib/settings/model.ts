@@ -19,7 +19,11 @@ export type SettingsCurrency = (typeof CURRENCIES)[number];
 export const LANGUAGES = ["fr", "en"] as const;
 export type SettingsLanguage = (typeof LANGUAGES)[number];
 
-export const THEMES = ["light", "dark"] as const;
+// Mirrors `users.theme` and `schemas.ts::theme`. "system" is not offered as a
+// third position on SCREEN-22's switch — the artboard is explicit that the
+// theme is "un interrupteur, pas deux boutons" — it is what the drawer's cycle
+// can set and what a fresh account starts on.
+export const THEMES = ["system", "light", "dark"] as const;
 export type SettingsTheme = (typeof THEMES)[number];
 
 export function isCurrency(v: unknown): v is SettingsCurrency {

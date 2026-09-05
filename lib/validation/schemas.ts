@@ -102,7 +102,10 @@ export const linkedToType = z.enum(["person", "project"], {
 export const projectStatus = z.enum(["active", "done", "paused", "onhold"], {
   error: "Statut de projet invalide.",
 });
-export const theme = z.enum(["light", "dark"]);
+// "system" = follow the OS: no `data-theme` attribute, `globals.css` decides.
+// It is the default for a fresh browser, so the account has to be able to hold
+// it — see supabase/migrations/0006_theme_system.sql.
+export const theme = z.enum(["system", "light", "dark"]);
 export const language = z.enum(["fr", "en"]);
 
 // ════════════════════════════════════════════════════════════════════════════

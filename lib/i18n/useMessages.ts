@@ -19,7 +19,9 @@ import {
  * language selector on top of `setLocale`. Until then everything is FR.
  */
 
-const STORAGE_KEY = "sf-lang";
+/** Exported so `lib/settings/preferences.ts` reads the same key, not a copy. */
+export const LOCALE_STORAGE_KEY = "sf-lang";
+const STORAGE_KEY = LOCALE_STORAGE_KEY;
 const CHANGE_EVENT = "sf:lang-change";
 
 function readLocale(): Locale {

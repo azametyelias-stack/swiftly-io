@@ -1,5 +1,7 @@
 "use client";
 
+import { useSyncExternalStore } from "react";
+
 /**
  * The one place that owns `<html data-theme>` and its stored choice.
  *
@@ -58,8 +60,8 @@ export function subscribeTheme(onChange: () => void): () => void {
 }
 
 /**
- * The choice resolved to the two values `users.theme` can hold — "system" asks
- * the OS. Used by SCREEN-22's switch, which has no third position.
+ * The choice resolved to what is actually painted — "system" asks the OS.
+ * Used by SCREEN-22's switch, which has no third position.
  */
 export function resolvedTheme(choice: ThemeChoice): "light" | "dark" {
   if (choice !== "system") return choice;
@@ -67,4 +69,22 @@ export function resolvedTheme(choice: ThemeChoice): "light" | "dark" {
     window.matchMedia?.("(prefers-color-scheme: dark)").matches
     ? "dark"
     : "light";
+}
+
+/**
+ * The theme currently ON SCREEN, tracked live.
+ *
+ * SCREEN-22's switch used to read `profile.theme` from the row, which since
+ * "system" became storable could say one thing while the app painted another:
+ * choice "system" under a dark OS is a dark app and an unchecked switch. A
+ * control has to report what is true, so the switch reads what is applied.
+ */
+export function useAppliedTheme(): "light" | "dark" {
+  return useSyncExternalStore(
+    subscribeTheme,
+    () => resolvedTheme(readThemeChoice()),
+    // Server render: the boot script has not run, so assume the light palette
+    // the CSS starts on rather than guessing.
+    () => "light",
+  );
 }

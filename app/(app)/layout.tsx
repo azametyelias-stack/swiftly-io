@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import { RequireSession } from "@/components/auth/RequireSession";
 import { NavShell } from "@/components/nav/NavShell";
+import { PreferencesSync } from "@/components/settings/PreferencesSync";
 
 /**
  * The authenticated app. The browser session lives in the root
@@ -23,6 +24,10 @@ export default function AppLayout({
 }) {
   return (
     <RequireSession>
+      {/* Renders nothing — adopts `users.theme` / `users.language` once the
+          session exists, so a new device follows the account instead of its
+          own localStorage defaults. */}
+      <PreferencesSync />
       <NavShell>{children}</NavShell>
       {modal}
     </RequireSession>
