@@ -60,10 +60,17 @@ function axisLabel(v: number): string {
  * A smooth monotone cubic Hermite spline through `(xs[i], ys[i])`, as an SVG
  * path — rounded peaks/troughs instead of the sharp, angular joins a raw
  * polyline gives on a series with only a handful of points (Elias: "les pics
- * et les creux doivent être arrondis"). Tangents are zeroed wherever the slope
- * changes sign so the curve never overshoots past a local high/low into a
- * dip that isn't actually in the data — it stays a fair picture of the
- * balance, just smoothed.
+ * et les creux doivent être arrondis").
+ *
+ * This is the full Fritsch–Carlson construction (the same one behind
+ * d3.curveMonotoneX), not a naive averaged-tangent shortcut: our x-spacing is
+ * very uneven (an hour axis bunches several transactions close together and
+ * leaves long flat gaps elsewhere), and a plain averaged tangent overshoots
+ * badly on that kind of grid — a first attempt at this produced a curve that
+ * shot off the top of the chart and looped back down through it. Tangents are
+ * weighted by segment length, then rescaled per-segment (the classic
+ * `alpha²+beta²>9` test) so the curve can never leave the range spanned by
+ * its own two endpoints — no overshoot, whatever the spacing.
  */
 function smoothPath(xs: number[], ys: number[]): string {
   const n = xs.length;
@@ -73,28 +80,56 @@ function smoothPath(xs: number[], ys: number[]): string {
     return `M ${xs[0]!.toFixed(1)} ${ys[0]!.toFixed(1)} L ${xs[1]!.toFixed(1)} ${ys[1]!.toFixed(1)}`;
   }
 
+  const h: number[] = [];
   const d: number[] = [];
   for (let i = 0; i < n - 1; i += 1) {
     const dx = xs[i + 1]! - xs[i]!;
+    h.push(dx);
     d.push(dx === 0 ? 0 : (ys[i + 1]! - ys[i]!) / dx);
   }
 
-  const slope = new Array<number>(n);
-  slope[0] = d[0]!;
-  slope[n - 1] = d[n - 2]!;
+  const m = new Array<number>(n);
+  m[0] = d[0]!;
+  m[n - 1] = d[n - 2]!;
   for (let i = 1; i < n - 1; i += 1) {
     const left = d[i - 1]!;
     const right = d[i]!;
-    slope[i] = left === 0 || right === 0 || (left > 0) !== (right > 0) ? 0 : (left + right) / 2;
+    if (left === 0 || right === 0 || (left < 0) !== (right < 0)) {
+      m[i] = 0;
+    } else {
+      const w1 = 2 * h[i]! + h[i - 1]!;
+      const w2 = h[i]! + 2 * h[i - 1]!;
+      m[i] = (w1 + w2) / (w1 / left + w2 / right);
+    }
+  }
+
+  // Per-segment rescale: keeps each side's tangent inside the circle of
+  // radius 3 in (m/d) space, the exact condition that guarantees the curve
+  // stays between its two endpoints on that segment.
+  for (let i = 0; i < n - 1; i += 1) {
+    const di = d[i]!;
+    if (di === 0) {
+      m[i] = 0;
+      m[i + 1] = 0;
+      continue;
+    }
+    const a = m[i]! / di;
+    const b = m[i + 1]! / di;
+    const s = a * a + b * b;
+    if (s > 9) {
+      const t = 3 / Math.sqrt(s);
+      m[i] = t * a * di;
+      m[i + 1] = t * b * di;
+    }
   }
 
   let path = `M ${xs[0]!.toFixed(1)} ${ys[0]!.toFixed(1)}`;
   for (let i = 0; i < n - 1; i += 1) {
-    const dx = (xs[i + 1]! - xs[i]!) / 3;
+    const dx = h[i]! / 3;
     const c1x = xs[i]! + dx;
-    const c1y = ys[i]! + slope[i]! * dx;
+    const c1y = ys[i]! + m[i]! * dx;
     const c2x = xs[i + 1]! - dx;
-    const c2y = ys[i + 1]! - slope[i + 1]! * dx;
+    const c2y = ys[i + 1]! - m[i + 1]! * dx;
     path += ` C ${c1x.toFixed(1)} ${c1y.toFixed(1)}, ${c2x.toFixed(1)} ${c2y.toFixed(1)}, ${xs[i + 1]!.toFixed(1)} ${ys[i + 1]!.toFixed(1)}`;
   }
   return path;
