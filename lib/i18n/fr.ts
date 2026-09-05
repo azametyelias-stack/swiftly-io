@@ -890,7 +890,6 @@ export const fr = {
     languageHint: "Le changement s'applique immédiatement.",
     languageNames: { fr: "Français", en: "English" },
     languageDescriptions: { fr: "Langue par défaut", en: "English" },
-    darkTheme: "Thème sombre",
 
     helpTitle: "Aide & support",
     helpFaq: "Aide & FAQ",

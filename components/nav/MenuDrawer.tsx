@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 
 import { NAV_ITEMS, activeNavItem } from "@/lib/nav/items";
 import { MarqueeText } from "@/components/nav/MarqueeText";
-import { ThemeToggle } from "@/components/nav/ThemeToggle";
 import { NavGlyph, UserIcon } from "@/components/nav/icons";
 import { useNavShell } from "@/components/nav/useNavShell";
 import { useUnreadAlerts } from "@/components/nav/useUnreadAlerts";
@@ -80,9 +79,10 @@ export function MenuDrawer() {
         })}
       </ul>
 
-      <div className="px-4 pb-[calc(env(safe-area-inset-bottom)+16px)] pt-2">
-        <ThemeToggle className="t-secondary rounded-[var(--radius-pill)] border border-surface-divider bg-surface-card px-4 py-2.5 text-text-secondary" />
-      </div>
+      {/* Le pied portait la bascule de theme, retiree avec le mode sombre
+          (2026-09-06). La marge basse reste : elle degage l'indicateur
+          d'accueil iOS sous la derniere entree du menu. */}
+      <div aria-hidden className="pb-[calc(env(safe-area-inset-bottom)+16px)]" />
     </nav>
   );
 }

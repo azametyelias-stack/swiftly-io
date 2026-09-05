@@ -11,15 +11,15 @@
 
    Rules:
      • No hex in a component — always a token (`bg-surface-card`, `text-text-primary`…).
-     • One set of names, two sets of values, resolved by the active theme.
-     • The identity zone (night gradient, onboarding, bank cards, toast) never
-       theme-flips: it always uses --brand-deep / --ink-*.
+     • One set of names, ONE set of values.
+     • The identity zone (night gradient, onboarding, bank cards, toast) uses
+       --brand-deep / --ink-* rather than the surface tokens.
 
-   Theme states (viewer + screen-22 toggle):
-     • bare :root                       → light
-     • @media (prefers-color-scheme: dark) on :root:not([data-theme="light"])
-                                        → follows the OS
-     • :root[data-theme="dark"|"light"] → explicit toggle, wins both ways
+   Une seule palette (décision Elias, 2026-09-06). Le thème sombre a été retiré :
+   plus de bloc `prefers-color-scheme`, plus d'attribut `data-theme`, plus de
+   sélecteur de thème sur SCREEN-22. `color-scheme: light` ci-dessous dit au
+   navigateur de ne pas assombrir les widgets natifs (champs, barres de
+   défilement) même quand l'OS est en mode nuit.
    ========================================================================== */
 
 :root {
@@ -101,68 +101,6 @@
   --ease-out: ease-out; /* contact response */
   --ease-standard: cubic-bezier(0.23, 1, 0.32, 1); /* toggle / press */
   --ease-emphasized: cubic-bezier(0.32, 0.72, 0, 1); /* sheet / drawer / curve */
-}
-
-/* Dark — OS preference, unless the user pinned "light" on screen 22 */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    color-scheme: dark;
-
-    --surface-page: #121318;
-    --surface-card: #1c1d23;
-    --surface-elev: #25262e;
-    --surface-field: #1c1d23;
-    --surface-divider: #2c2e36;
-    --surface-hairline: #2c2e36;
-    --surface-rail: #383a44;
-    --surface-control-off: #383a44;
-
-    --text-primary: #f2f2f5;
-    --text-secondary: #a6a8b4;
-    --text-tertiary: #7e808c;
-    --text-quaternary: #5e606c;
-
-    --action-primary: #f2f2f5;
-    --action-on-primary: #0a0a0c;
-    --brand-accent: #7c8cff;
-
-    --semantic-in: #1dcf02;
-    --semantic-in-bg: #1c1d23;
-    --semantic-out: #ff6166;
-    --semantic-out-bg: #1c1d23;
-    --semantic-warn: #f5a524;
-    --semantic-warn-text: #f5a524;
-  }
-}
-
-/* Dark — explicit screen-22 toggle, wins in both directions */
-:root[data-theme="dark"] {
-  color-scheme: dark;
-
-  --surface-page: #121318;
-  --surface-card: #1c1d23;
-  --surface-elev: #25262e;
-  --surface-field: #1c1d23;
-  --surface-divider: #2c2e36;
-  --surface-hairline: #2c2e36;
-  --surface-rail: #383a44;
-  --surface-control-off: #383a44;
-
-  --text-primary: #f2f2f5;
-  --text-secondary: #a6a8b4;
-  --text-tertiary: #7e808c;
-  --text-quaternary: #5e606c;
-
-  --action-primary: #f2f2f5;
-  --action-on-primary: #0a0a0c;
-  --brand-accent: #7c8cff;
-
-  --semantic-in: #1dcf02;
-  --semantic-in-bg: #1c1d23;
-  --semantic-out: #ff6166;
-  --semantic-out-bg: #1c1d23;
-  --semantic-warn: #f5a524;
-  --semantic-warn-text: #f5a524;
 }
 
 /* ---- Tailwind theme: expose tokens as utilities ------------------------------

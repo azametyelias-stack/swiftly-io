@@ -89,11 +89,18 @@ export const PWA = {
 } as const;
 
 /**
- * `<meta name="theme-color">` per applied theme — the value of `--surface-page`
- * in `app/globals.css`, because that is what sits under the status bar on every
- * screen (`AppHeader` is `bg-surface-page`). Keep the two in step.
+ * `<meta name="theme-color">` — la couleur que le système peint derrière la
+ * barre d'état. Une seule valeur depuis le retrait du thème sombre (2026-09-06).
+ *
+ * C'est `--brand-deep` de `app/globals.css`, pas `--surface-page`. Erreur
+ * corrigée le 2026-09-06 : j'avais pris `--surface-page` en me fiant à
+ * `AppHeader`, qui peint bien cette couleur — mais `AppHeader` n'est rendu que
+ * par SCREEN-22. Les 21 autres écrans laissent voir le `--brand-deep` de
+ * `NavShell`, d'où un bandeau clair au-dessus d'un en-tête navy.
+ *
+ * Sur iOS la question ne se pose plus (`black-translucent` ne peint aucun
+ * fond) ; cette valeur sert à Android, à Chrome de bureau, et de repli partout
+ * ailleurs. `--brand-deep` est marqué « invariant » dans globals.css : il ne
+ * dépendait déjà d'aucun thème.
  */
-export const THEME_COLOR = {
-  light: "#EBEBEF",
-  dark: "#121318",
-} as const;
+export const THEME_COLOR = "#0A1466";

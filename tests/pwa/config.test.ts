@@ -15,15 +15,17 @@ import {
   SW_STATIC_PREFIXES,
   THEME_COLOR,
 } from "../../lib/pwa/config.ts";
-import { THEME_BOOT_SCRIPT } from "../../lib/settings/boot-script.ts";
+import { LANG_BOOT_SCRIPT } from "../../lib/settings/boot-script.ts";
 
 const root = (p: string) => fileURLToPath(new URL(`../../${p}`, import.meta.url));
 const sw = readFileSync(root("public/sw.js"), "utf8");
 const manifestSource = readFileSync(root("app/manifest.ts"), "utf8");
+const layoutSource = readFileSync(root("app/layout.tsx"), "utf8");
+const cssSource = readFileSync(root("app/globals.css"), "utf8");
 const landingSource = readFileSync(root("app/page.tsx"), "utf8");
 
 /*
- * `public/sw.js` and `THEME_BOOT_SCRIPT` are both plain strings that ship
+ * `public/sw.js` and `LANG_BOOT_SCRIPT` are both plain strings that ship
  * verbatim — no import can reach into either scope. These tests are the only
  * thing standing between them and lib/pwa/config.ts drifting apart.
  */
@@ -113,7 +115,8 @@ test("everything precached is actually reachable from the cache", () => {
   for (const url of PRECACHE_URLS) {
     const servedAsNavigation = url === LANDING_URL || url === OFFLINE_URL;
     const servedAsStatic =
-      SW_STATIC_PREFIXES.some((p) => url.startsWith(p)) || SW_STATIC_PATHS.includes(url);
+      SW_STATIC_PREFIXES.some((p) => url.startsWith(p)) ||
+      (SW_STATIC_PATHS as readonly string[]).includes(url);
     assert.ok(
       servedAsNavigation || servedAsStatic,
       `${url} is precached but no branch of the fetch handler would ever serve it`,
@@ -152,16 +155,18 @@ test("sw.js cleans up the caches of previous versions", () => {
   assert.match(sw, /clients\.claim/);
 });
 
-test("the boot script writes the same theme colours as THEME_COLOR", () => {
+test("the theme colour is one static value, emitted by the viewport export", () => {
+  // Une seule palette depuis le 2026-09-06 : plus de valeur a choisir au vol,
+  // donc plus de raison de poser la balise par script. `viewport.themeColor`
+  // la met dans le HTML initial, ce qui est strictement mieux.
+  assert.match(THEME_COLOR, /^#[0-9A-F]{6}$/, "colours stay uppercase 6-digit hex");
+  assert.match(layoutSource, /themeColor: THEME_COLOR/);
+  assert.doesNotMatch(LANG_BOOT_SCRIPT, /theme-color/);
+  // La valeur peinte sous la barre d'etat sur 21 des 22 ecrans.
   assert.ok(
-    THEME_BOOT_SCRIPT.includes(`'${THEME_COLOR.dark}'`),
-    "boot script must use the dark --surface-page value",
+    cssSource.toLowerCase().includes(`--brand-deep: ${THEME_COLOR.toLowerCase()}`),
+    `globals.css must declare --brand-deep as ${THEME_COLOR}`,
   );
-  assert.ok(
-    THEME_BOOT_SCRIPT.includes(`'${THEME_COLOR.light}'`),
-    "boot script must use the light --surface-page value",
-  );
-  assert.match(THEME_BOOT_SCRIPT, /theme-color/);
 });
 
 test("the manifest is built from lib/pwa/config, not from literals", () => {

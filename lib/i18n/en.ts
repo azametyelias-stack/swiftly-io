@@ -876,7 +876,6 @@ export const en: Messages = {
     languageHint: "The change applies immediately.",
     languageNames: { fr: "Français", en: "English" },
     languageDescriptions: { fr: "Français", en: "Default language" },
-    darkTheme: "Dark theme",
 
     helpTitle: "Help & support",
     helpFaq: "Help & FAQ",

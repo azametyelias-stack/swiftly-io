@@ -4,9 +4,8 @@ import { SessionProvider } from "@/components/auth/SessionProvider";
 import { ConsentProvider } from "@/components/privacy/ConsentProvider";
 import { ConsentBanner } from "@/components/privacy/ConsentBanner";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
-import { ThemeColorMeta } from "@/components/settings/ThemeColorMeta";
-import { THEME_BOOT_SCRIPT } from "@/lib/settings/boot-script";
-import { PWA } from "@/lib/pwa/config";
+import { LANG_BOOT_SCRIPT } from "@/lib/settings/boot-script";
+import { PWA, THEME_COLOR } from "@/lib/pwa/config";
 import { PwaRegister } from "./pwa-register";
 import { InstallPrompt } from "./install-prompt";
 
@@ -54,34 +53,37 @@ export const metadata: Metadata = {
  * is the intended behaviour but worth knowing when reading a diff of one screen
  * and wondering why its spacing moved.
  *
- * No `themeColor` here — see the note below the metadata block.
+ * `themeColor` peut enfin etre statique : depuis le retrait du theme sombre il
+ * n'y a plus qu'une palette, donc plus de valeur "juste pour un theme et fausse
+ * pour l'autre". C'est --brand-deep, la couleur reellement peinte sous la barre
+ * d'etat sur 21 des 22 ecrans (cf. lib/pwa/config.ts).
+ *
+ * iOS l'ignore ici — `black-translucent` ne peint aucun fond. Elle sert a
+ * Android, a Chrome de bureau, et de repli partout ailleurs.
  */
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
+  themeColor: THEME_COLOR,
 };
-
-// No `themeColor` here on purpose: a static value has to pick one palette and be
-// wrong about the other. THEME_BOOT_SCRIPT writes the meta pre-paint and
-// <ThemeColorMeta> keeps it in step — see lib/pwa/config.ts § THEME_COLOR.
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    // `suppressHydrationWarning`: the boot script below sets `data-theme` and
-    // `lang` before React hydrates, so the server markup and the live DOM are
-    // meant to differ here. Scoped to this element — it does not silence
-    // mismatches anywhere in the tree.
+    // `suppressHydrationWarning`: le script d'amorce ci-dessous fixe `lang`
+    // avant l'hydratation, donc le balisage serveur et le DOM vivant sont
+    // censes differer ici. Portee limitee a cet element.
     <html lang="fr" className="h-full scroll-smooth antialiased" suppressHydrationWarning>
       <head>
         {/*
-          First thing in the document: paints the right theme before the body
-          exists, instead of flashing white and correcting after hydration.
-          Content is a compile-time constant from lib/settings/boot-script.ts —
-          no interpolation, nothing user-supplied, nothing from the network.
+          Premiere chose dans le document : fixe la langue avant que le corps
+          existe, pour que la page hors ligne (bilingue sans JavaScript, via
+          :root[lang="en"]) soit juste des la premiere peinture. Contenu = une
+          constante de compilation de lib/settings/boot-script.ts, sans
+          interpolation, rien qui vienne de l'utilisateur ni du reseau.
         */}
         {/* nosemgrep: swiftly-no-dangerously-set-inner-html */}
-        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: LANG_BOOT_SCRIPT }} />
       </head>
       <body className="min-h-full flex flex-col">
         <SessionProvider>
@@ -89,7 +91,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             {children}
             <GoogleAnalytics />
             <ConsentBanner />
-            <ThemeColorMeta />
             <PwaRegister />
             <InstallPrompt />
           </ConsentProvider>

@@ -77,7 +77,7 @@ export default function OfflinePage() {
         instead of sending them to the landing screen.
 
         Compile-time constant, no interpolation, nothing user-supplied — same
-        shape as THEME_BOOT_SCRIPT in app/layout.tsx.
+        shape as LANG_BOOT_SCRIPT in app/layout.tsx.
       */}
       {/* nosemgrep: swiftly-no-dangerously-set-inner-html */}
       <script dangerouslySetInnerHTML={{ __html: RETRY_SCRIPT }} />

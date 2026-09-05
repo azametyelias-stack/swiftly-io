@@ -3,44 +3,40 @@
 import { apiJson } from "@/lib/http/api";
 import { isLocale, type Locale } from "@/lib/i18n";
 import { LOCALE_STORAGE_KEY, setLocale } from "@/lib/i18n/useMessages";
-import { readThemeChoice, setThemeChoice, type ThemeChoice } from "@/lib/settings/theme";
 
 /**
  * Reconciles the two places a preference lives — audit 2026-09-05, point 3.
  *
- * Before this, `users.theme` and `users.language` were written by SCREEN-22 and
- * read by nobody. The app ran entirely off localStorage, so the account setting
- * was decorative: a new phone started in French on the light theme however the
- * profile was set, and SCREEN-22 displayed the stored row while the app applied
- * something else.
+ * Il ne reste que la langue. Le thème a été retiré le 2026-09-06 : une seule
+ * palette, plus rien à choisir ni à synchroniser. La colonne `users.theme`
+ * survit en base — la retirer demanderait une migration irréversible sur une
+ * base de production pour un gain nul — mais plus personne ne l'écrit ni ne la
+ * lit.
  *
- * ── Who wins ───────────────────────────────────────────────────────────────
+ * Avant ce module, `users.language` était écrit par SCREEN-22 et lu par
+ * personne. L'app tournait entièrement sur localStorage, donc le réglage du
+ * compte était décoratif : un nouveau téléphone démarrait en français quel que
+ * soit le profil, et SCREEN-22 affichait la ligne stockée pendant que l'app
+ * appliquait autre chose.
  *
- * The row wins on load. It is the only value that follows the person across
- * devices, so a fresh browser must adopt it rather than impose its own default.
+ * ── Qui gagne ──────────────────────────────────────────────────────────────
  *
- * That is only coherent if every writer persists. The drawer's quick switch
- * used to write localStorage alone; with the row winning at the next load, that
- * change would have been silently reverted — a worse bug than the one being
- * fixed. So `setThemePreference` below is now the single entry point for both
- * writers, and it does both halves.
+ * La ligne gagne au chargement. C'est la seule valeur qui suit la personne d'un
+ * appareil à l'autre, donc un navigateur neuf doit l'adopter plutôt qu'imposer
+ * son propre défaut. Cela n'est cohérent que si tout écrivain persiste, d'où le
+ * point d'entrée unique ci-dessous.
  *
- * ── Why the write is fire-and-forget ───────────────────────────────────────
+ * ── Pourquoi l'écriture est sans attente ───────────────────────────────────
  *
- * The local half has already applied when the request goes out. Blocking the
- * switch on a round-trip would make it feel broken offline, and a failed write
- * costs the user one preference on their next device — not their session, not
- * their money. It is logged, not surfaced.
+ * La moitié locale est déjà appliquée quand la requête part. Bloquer le
+ * basculement sur un aller-retour le ferait paraître cassé hors ligne, et une
+ * écriture ratée coûte une préférence sur le prochain appareil — pas la
+ * session, pas l'argent. C'est journalisé, pas remonté à l'écran.
  */
 
 /** The shape `PreferencesSync` needs out of `/api/me`. */
 export interface StoredPreferences {
-  theme: ThemeChoice;
   language: Locale;
-}
-
-function isThemeChoice(v: unknown): v is ThemeChoice {
-  return v === "system" || v === "light" || v === "dark";
 }
 
 /** Persist to `users.*`, best-effort. Never throws — see the header. */
@@ -56,18 +52,7 @@ async function persist(patch: Partial<StoredPreferences>): Promise<void> {
   }
 }
 
-/**
- * Apply a theme everywhere: DOM, localStorage, every subscriber, and the row.
- *
- * Both the drawer cycle and SCREEN-22's switch call this, which is what keeps
- * them from disagreeing.
- */
-export function setThemePreference(choice: ThemeChoice): void {
-  setThemeChoice(choice);
-  void persist({ theme: choice });
-}
-
-/** The language counterpart. */
+/** Apply a language everywhere: DOM, localStorage, every subscriber, and the row. */
 export function setLanguagePreference(locale: Locale): void {
   setLocale(locale);
   void persist({ language: locale });
@@ -81,9 +66,6 @@ export function setLanguagePreference(locale: Locale): void {
  * dispatches no events and re-renders nothing.
  */
 export function adoptStoredPreferences(prefs: Partial<StoredPreferences>): void {
-  if (isThemeChoice(prefs.theme) && prefs.theme !== readThemeChoice()) {
-    setThemeChoice(prefs.theme);
-  }
   if (isLocale(prefs.language)) {
     let current: string | null = null;
     try {

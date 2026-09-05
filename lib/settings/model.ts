@@ -19,10 +19,13 @@ export type SettingsCurrency = (typeof CURRENCIES)[number];
 export const LANGUAGES = ["fr", "en"] as const;
 export type SettingsLanguage = (typeof LANGUAGES)[number];
 
-// Mirrors `users.theme` and `schemas.ts::theme`. "system" is not offered as a
-// third position on SCREEN-22's switch — the artboard is explicit that the
-// theme is "un interrupteur, pas deux boutons" — it is what the drawer's cycle
-// can set and what a fresh account starts on.
+// Mirrors `users.theme` and `schemas.ts::theme`.
+//
+// VESTIGE. Le thème sombre a été retiré le 2026-09-06 : l'app n'a plus qu'une
+// palette, SCREEN-22 n'affiche plus d'interrupteur et plus personne n'écrit
+// cette colonne. Le type reste parce que la colonne reste — `/api/me` renvoie
+// toujours le champ, et des lignes existantes portent 'system' ou 'dark'. Le
+// décrire faussement serait pire que de le décrire mort.
 export const THEMES = ["system", "light", "dark"] as const;
 export type SettingsTheme = (typeof THEMES)[number];
 

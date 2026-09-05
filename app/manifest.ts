@@ -14,7 +14,7 @@ import { PWA } from "@/lib/pwa/config";
  *    splash screen is shown before React runs, and the first screen after it is
  *    SCREEN-01's full-bleed night gradient — same colour, no flash between them.
  *  - `theme_color` is the *fallback* for the system bar. Once a page is loaded,
- *    Chrome prefers `<meta name="theme-color">`, which `THEME_BOOT_SCRIPT`
+ *    Chrome prefers `<meta name="theme-color">`, which the `viewport` export
  *    writes pre-paint and `ThemeColorMeta` keeps in sync with the applied
  *    theme — that is what stops the status bar from clashing with a dark app
  *    (règle 2 : cohérence avec le thème réellement appliqué).

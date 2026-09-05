@@ -12,7 +12,7 @@ import {
   SettingExternalRow,
   SettingGroup,
   SettingNavRow,
-  SettingToggleRow,
+
   SettingValueRow,
 } from "@/components/settings/SettingRow";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
@@ -30,7 +30,6 @@ import {
   type SettingsCurrency,
   type SettingsLanguage,
 } from "@/lib/settings/model";
-import { setThemeChoice, useAppliedTheme } from "@/lib/settings/theme";
 import { useProfile } from "@/lib/settings/useProfile";
 import { getBrowserClient } from "@/lib/supabase/client";
 
@@ -44,7 +43,7 @@ import { getBrowserClient } from "@/lib/supabase/client";
  * not a row — the profile card, "la seule chose de l'écran qui identifie une
  * personne : elle mérite sa propre surface avant que la liste commence".
  *
- * Currency / language / theme write on tap and confirm with a toast; the name
+ * Currency / language write on tap and confirm with a toast; the name
  * (free text) writes behind an explicit "Enregistrer"; logging out — the only
  * irreversible action here — is the one thing that asks first.
  */
@@ -56,7 +55,6 @@ export function SettingsScreen() {
   // What is PAINTED, not what the row holds. Since "system" became storable the
   // two can differ — "system" under a dark OS is a dark app — and a switch that
   // reports the row would sit unchecked on a dark screen.
-  const appliedTheme = useAppliedTheme();
 
   const [picker, setPicker] = useState<"currency" | "language" | null>(null);
   const [editing, setEditing] = useState(false);
@@ -136,17 +134,6 @@ export function SettingsScreen() {
           label={s.languageRow}
           value={s.languageNames[profile.language]}
           onClick={() => setPicker("language")}
-        />
-        <SettingToggleRow
-          label={s.darkTheme}
-          checked={appliedTheme === "dark"}
-          onChange={(next) => {
-            const theme = next ? "dark" : "light";
-            // Paint first, persist second: the switch has to move under the
-            // finger, and `data-theme` is what actually recolours the app.
-            setThemeChoice(theme);
-            void commit({ theme }, s.saved);
-          }}
         />
       </SettingGroup>
 
