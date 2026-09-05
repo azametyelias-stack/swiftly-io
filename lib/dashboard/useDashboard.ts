@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { apiJson } from "@/lib/http/api";
 import type { Period } from "@/lib/dashboard/period";
 import type { Variation } from "@/lib/dashboard/aggregates";
+import { ACCOUNT_CHANGED_EVENT, getLastAccount, setLastAccount } from "@/lib/dashboard/lastAccount";
 
 export interface AccountSummary {
   id: string;
@@ -55,13 +56,31 @@ export interface DashboardState {
 export function useDashboard(): DashboardState {
   const [name, setName] = useState<string | null>(null);
   const [accounts, setAccounts] = useState<AccountSummary[]>([]);
-  const [accountId, setAccountId] = useState<string | null>(null);
+  const [accountId, setAccountIdState] = useState<string | null>(() => getLastAccount());
   const [period, setPeriod] = useState<Period>("day");
   const [data, setData] = useState<DashboardData | null>(null);
   const [status, setStatus] = useState<DashboardStatus>("loading");
   const [reloadKey, setReloadKey] = useState(0);
 
   const refresh = useCallback(() => setReloadKey((k) => k + 1), []);
+
+  /** User picks a different account in the dropdown — persist it too. */
+  const setAccountId = useCallback((id: string | null) => {
+    setAccountIdState(id);
+    setLastAccount(id);
+  }, []);
+
+  // A transaction saved on another account (from the modal wizard, which keeps
+  // this component mounted underneath) dispatches this instead of relying on
+  // `localStorage` alone — the browser's own "storage" event never fires in
+  // the tab that wrote the value.
+  useEffect(() => {
+    const onChange = (e: Event) => {
+      setAccountIdState((e as CustomEvent<string | null>).detail);
+    };
+    window.addEventListener(ACCOUNT_CHANGED_EVENT, onChange);
+    return () => window.removeEventListener(ACCOUNT_CHANGED_EVENT, onChange);
+  }, []);
 
   useEffect(() => {
     let alive = true;

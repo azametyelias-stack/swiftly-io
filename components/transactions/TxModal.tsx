@@ -41,17 +41,22 @@ export function TxModal({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const close = useCallback(() => {
-    if (closing) return;
-    setClosing(true);
-    exitTimer.current = setTimeout(() => {
-      if (typeof window !== "undefined" && window.history.length > 1) {
-        router.back();
-      } else {
-        router.push("/dashboard");
-      }
-    }, EXIT_MS);
-  }, [closing, router]);
+  const close = useCallback(
+    (path?: string) => {
+      if (closing) return;
+      setClosing(true);
+      exitTimer.current = setTimeout(() => {
+        if (path) {
+          router.push(path);
+        } else if (typeof window !== "undefined" && window.history.length > 1) {
+          router.back();
+        } else {
+          router.push("/dashboard");
+        }
+      }, EXIT_MS);
+    },
+    [closing, router],
+  );
 
   useEffect(() => {
     return () => {
@@ -78,7 +83,7 @@ export function TxModal({ children }: { children: ReactNode }) {
       <button
         type="button"
         aria-label="Fermer"
-        onClick={close}
+        onClick={() => close()}
         className="absolute inset-0 cursor-default bg-[rgba(4,7,40,0.5)] backdrop-blur-[8px] transition-opacity duration-200 motion-reduce:transition-none"
         style={{ opacity: open ? 1 : 0 }}
       />

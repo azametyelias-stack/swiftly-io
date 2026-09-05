@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode, type UIEvent } from "react";
+import { useState, type ReactNode } from "react";
 import Link from "next/link";
 
 import { BalanceCurve } from "@/components/dashboard/BalanceCurve";
@@ -29,18 +29,24 @@ import { interpolate } from "@/lib/i18n";
 import { useLocale, useMessages } from "@/lib/i18n/useMessages";
 
 const HIDE_KEY = "sf-balance-hidden";
-const COLLAPSE_AT = 32;
 
-/** first / middle / last bucket dates, short-formatted, for the curve's x-axis. */
+/**
+ * First / middle / last bucket dates for the curve's x-axis, formatted to
+ * match the granularity actually being shown — "jour" buckets (week/month
+ * periods) as a day + short month, "mois" buckets (year period) as the month
+ * name alone. The label vocabulary must always agree with the period picker
+ * above the graph (semaine → jours, année → mois, jamais un axe horaire figé).
+ */
 function periodXLabels(
   curve: { date: string }[] | null,
   locale: string,
+  granularity: "day" | "month",
 ): string[] {
   if (!curve || curve.length === 0) return [];
-  const fmt = new Intl.DateTimeFormat(locale === "fr" ? "fr-FR" : "en-US", {
-    day: "numeric",
-    month: "short",
-  });
+  const fmt = new Intl.DateTimeFormat(
+    locale === "fr" ? "fr-FR" : "en-US",
+    granularity === "month" ? { month: "short" } : { day: "numeric", month: "short" },
+  );
   const at = (i: number) => fmt.format(new Date(`${curve[i]!.date}T00:00:00Z`));
   if (curve.length <= 2) return curve.map((_, i) => at(i));
   return [at(0), at(Math.floor((curve.length - 1) / 2)), at(curve.length - 1)];
@@ -72,70 +78,57 @@ export function DashboardView() {
     });
   };
 
-  // The white panel owns the scroll; past a small threshold the dark hero
-  // collapses to a compact strip (design "bouton figé en haut").
-  const [collapsed, setCollapsed] = useState(false);
-  const onPanelScroll = (e: UIEvent<HTMLDivElement>) => {
-    const y = e.currentTarget.scrollTop;
-    setCollapsed((c) => (c ? y > COLLAPSE_AT / 2 : y > COLLAPSE_AT));
-  };
-
   const currency = (data?.account.currency ?? "XOF") as CurrencyCode;
   const loading = status === "loading" && !data;
   const errored = status === "error";
   const replayKey = `${data?.account.id ?? "none"}:${period}`;
   const hourAxis = data?.granularity === "hour";
+  const xGranularity = data?.granularity === "month" ? "month" : "day";
 
   const greeting = name ? interpolate(m.dashboard.greeting, { name }) : m.dashboard.balanceLabel;
 
-  const balanceText = hidden
-    ? formatMoney(0, { currency, masked: true })
-    : formatBalance(data?.balance ?? 0, currency);
-
   return (
-    <div className="relative flex h-[100dvh] flex-col overflow-hidden bg-brand-deep">
-      {/* Night background — fixed behind everything. */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url(/brand/nuit.jpg)" }}
-        />
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(180deg, rgba(6,10,60,0.55) 0%, rgba(6,10,60,0.28) 34%, rgba(6,10,60,0.72) 100%)",
-          }}
-        />
-      </div>
-
-      {/* Frozen hero — never scrolls, never covered by the panel. */}
-      <div className="relative z-10 flex-none text-ink-on-surface">
-        <div className="flex h-14 items-center justify-between px-2" style={{ marginTop: "env(safe-area-inset-top)" }}>
-          <button
-            type="button"
-            onClick={openMenu}
-            aria-label={m.common.menu}
-            className="grid size-10 place-items-center rounded-full border border-white/20 bg-white/10"
-          >
-            <MenuIcon width={18} height={18} />
-          </button>
-          <span className="font-logo text-[19px] tracking-[-0.01em]">Swiftly.io</span>
-          <Link
-            href="/alertes"
-            aria-label={m.common.notifications}
-            className="grid size-10 place-items-center rounded-full border border-white/20 bg-white/10"
-          >
-            <BellIcon width={18} height={18} />
-          </Link>
+    // A single natural page scroll (no nested scroll containers). The
+    // "+ Nouvelle transaction" button below is `sticky` — it scrolls with the
+    // page like everything above it, then freezes at the top the moment it
+    // gets there, and the white panel keeps scrolling underneath it.
+    <div className="relative min-h-[100dvh] bg-surface-page">
+      {/* Night hero — natural height, holds the header/balance/curve/summary. */}
+      <div className="relative overflow-hidden text-ink-on-surface">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: "url(/brand/nuit.jpg)" }}
+          />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(6,10,60,0.55) 0%, rgba(6,10,60,0.28) 34%, rgba(6,10,60,0.72) 100%)",
+            }}
+          />
         </div>
 
-        {/* Collapsible block */}
-        <div
-          className={`overflow-hidden transition-all duration-300 ease-[var(--ease-emphasized)] motion-reduce:transition-none ${
-            collapsed ? "max-h-0 opacity-0" : "max-h-[560px] opacity-100"
-          }`}
-        >
+        <div className="relative z-10">
+          <div className="flex h-14 items-center justify-between px-2" style={{ marginTop: "env(safe-area-inset-top)" }}>
+            <button
+              type="button"
+              onClick={openMenu}
+              aria-label={m.common.menu}
+              className="grid size-10 place-items-center rounded-full border border-white/20 bg-white/10"
+            >
+              <MenuIcon width={18} height={18} />
+            </button>
+            <span className="font-logo text-[19px] tracking-[-0.01em]">Swiftly.io</span>
+            <Link
+              href="/alertes"
+              aria-label={m.common.notifications}
+              className="grid size-10 place-items-center rounded-full border border-white/20 bg-white/10"
+            >
+              <BellIcon width={18} height={18} />
+            </Link>
+          </div>
+
           <div className="flex flex-col gap-4 px-4 pt-1">
             {/* Row 1 (design 04-dashboard.png): salutation + sélecteur de compte */}
             <div className="flex items-center justify-between gap-3">
@@ -206,7 +199,7 @@ export function DashboardView() {
                 points={data.curve}
                 currency={currency}
                 hourAxis={hourAxis}
-                xLabels={hourAxis ? undefined : periodXLabels(data.curve, locale)}
+                xLabels={hourAxis ? undefined : periodXLabels(data.curve, locale, xGranularity)}
               />
             ) : (
               <div className="flex h-[120px] flex-col items-center justify-center gap-1 text-center">
@@ -238,32 +231,22 @@ export function DashboardView() {
             </button>
           ) : null}
         </div>
-
-        {/* Compact strip — only while collapsed */}
-        {collapsed ? (
-          <div className="flex items-center justify-between px-5 pb-1 pt-1">
-            <span className="text-[13px] text-ink-on-surface/60">{m.dashboard.balanceLabel}</span>
-            <span className="t-section-title tabular">{balanceText}</span>
-          </div>
-        ) : null}
-
-        {/* The button — always visible, never covered. */}
-        <div className="px-4 pb-3 pt-2">
-          <Link
-            href="/transactions/nouvelle"
-            className="flex h-[var(--size-primary-button)] w-full items-center justify-center gap-2 rounded-[var(--radius-pill)] bg-surface-card text-[17px] font-semibold text-text-primary shadow-[0_16px_34px_-6px_rgba(4,6,30,0.44),0_3px_8px_rgba(4,6,30,0.22)]"
-          >
-            <PlusIcon width={20} height={20} />
-            {m.dashboard.newTransaction}
-          </Link>
-        </div>
       </div>
 
-      {/* White panel — the only scroll container. */}
-      <div
-        onScroll={onPanelScroll}
-        className="relative z-10 min-h-0 flex-1 overflow-y-auto overscroll-contain rounded-t-[var(--radius-content-top)] bg-surface-card px-4 pb-24 pt-4 text-text-primary"
-      >
+      {/* The button — scrolls with the page, then freezes at the top. Opaque
+          background: once stuck, the panel below scrolls up underneath it. */}
+      <div className="sticky top-0 z-20 bg-surface-page px-4 pb-3 pt-2">
+        <Link
+          href="/transactions/nouvelle"
+          className="flex h-[var(--size-primary-button)] w-full items-center justify-center gap-2 rounded-[var(--radius-pill)] bg-surface-card text-[17px] font-semibold text-text-primary shadow-[0_16px_34px_-6px_rgba(4,6,30,0.44),0_3px_8px_rgba(4,6,30,0.22)]"
+        >
+          <PlusIcon width={20} height={20} />
+          {m.dashboard.newTransaction}
+        </Link>
+      </div>
+
+      {/* White panel — flows right after the button, same page scroll. */}
+      <div className="relative z-10 rounded-t-[var(--radius-content-top)] bg-surface-card px-4 pb-24 pt-4 text-text-primary">
         <div className="flex flex-col gap-3">
           <RotatingBanner items={[]} />
 
@@ -301,7 +284,7 @@ export function DashboardView() {
               </Link>
             }
           >
-            <RecentHistory />
+            <RecentHistory accountId={data?.account.id ?? accountId} />
           </PanelSection>
         </div>
       </div>

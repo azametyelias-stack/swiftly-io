@@ -17,8 +17,12 @@ import { directionOf, type TxListItem } from "@/lib/transactions/model";
 import { type Locale } from "@/lib/i18n";
 import { useLocale, useMessages } from "@/lib/i18n/useMessages";
 
-/** The dashboard "Historique récent" strip (SCREEN-4 § 8) — the 3 latest rows. */
-export function RecentHistory() {
+/**
+ * The dashboard "Historique récent" strip (SCREEN-4 § 8) — the 3 latest rows
+ * for the account currently selected on the dashboard (never a mix of
+ * accounts — the account selector must fully govern what this shows).
+ */
+export function RecentHistory({ accountId }: { accountId: string | null }) {
   const m = useMessages();
   const locale = useLocale() as Locale;
   const router = useRouter();
@@ -28,13 +32,15 @@ export function RecentHistory() {
 
   useEffect(() => {
     let alive = true;
-    apiJson<{ items: TxListItem[] }>("/api/transactions?limit=3")
+    const query = new URLSearchParams({ limit: "3" });
+    if (accountId) query.set("account", accountId);
+    apiJson<{ items: TxListItem[] }>(`/api/transactions?${query.toString()}`)
       .then((r) => alive && setItems(r.items))
       .catch(() => alive && setItems([]));
     return () => {
       alive = false;
     };
-  }, []);
+  }, [accountId]);
 
   if (items === null) {
     return <Skeleton className="h-12 w-full" rounded="rounded-[14px]" />;

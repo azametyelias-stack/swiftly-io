@@ -16,8 +16,13 @@ import { createContext, useContext, type ReactNode } from "react";
 
 export interface TxSurface {
   variant: "page" | "modal";
-  /** present in "modal" — animate the sheet out, then leave the route */
-  close?: () => void;
+  /**
+   * Present in "modal" — animate the sheet out, then leave the route. With no
+   * argument it goes back to wherever the wizard was opened from; pass a path
+   * to force the destination (e.g. the success screen's "Terminé" always
+   * lands on `/dashboard`, regardless of navigation history).
+   */
+  close?: (path?: string) => void;
 }
 
 export const TxSurfaceContext = createContext<TxSurface>({ variant: "page" });

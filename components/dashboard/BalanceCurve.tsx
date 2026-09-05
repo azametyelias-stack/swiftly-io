@@ -27,7 +27,7 @@ import type { Locale } from "@/lib/i18n";
 const W = 343;
 const H = 196;
 const PAD = { top: 16, right: 44, bottom: 22, left: 4 };
-const DRAW_MS = 1400;
+const DRAW_MS = 1800;
 const BUBBLE_MS = 3000;
 
 // The night panel never theme-flips (design system rule) — it's always dark,
@@ -54,6 +54,50 @@ function niceCeil(v: number): number {
 /** Signed compact axis label: `-12 700` → "-13 K", `0` → "0". */
 function axisLabel(v: number): string {
   return v < 0 ? `-${formatCompact(v)}` : formatCompact(v);
+}
+
+/**
+ * A smooth monotone cubic Hermite spline through `(xs[i], ys[i])`, as an SVG
+ * path — rounded peaks/troughs instead of the sharp, angular joins a raw
+ * polyline gives on a series with only a handful of points (Elias: "les pics
+ * et les creux doivent être arrondis"). Tangents are zeroed wherever the slope
+ * changes sign so the curve never overshoots past a local high/low into a
+ * dip that isn't actually in the data — it stays a fair picture of the
+ * balance, just smoothed.
+ */
+function smoothPath(xs: number[], ys: number[]): string {
+  const n = xs.length;
+  if (n === 0) return "";
+  if (n === 1) return `M ${xs[0]!.toFixed(1)} ${ys[0]!.toFixed(1)}`;
+  if (n === 2) {
+    return `M ${xs[0]!.toFixed(1)} ${ys[0]!.toFixed(1)} L ${xs[1]!.toFixed(1)} ${ys[1]!.toFixed(1)}`;
+  }
+
+  const d: number[] = [];
+  for (let i = 0; i < n - 1; i += 1) {
+    const dx = xs[i + 1]! - xs[i]!;
+    d.push(dx === 0 ? 0 : (ys[i + 1]! - ys[i]!) / dx);
+  }
+
+  const slope = new Array<number>(n);
+  slope[0] = d[0]!;
+  slope[n - 1] = d[n - 2]!;
+  for (let i = 1; i < n - 1; i += 1) {
+    const left = d[i - 1]!;
+    const right = d[i]!;
+    slope[i] = left === 0 || right === 0 || (left > 0) !== (right > 0) ? 0 : (left + right) / 2;
+  }
+
+  let path = `M ${xs[0]!.toFixed(1)} ${ys[0]!.toFixed(1)}`;
+  for (let i = 0; i < n - 1; i += 1) {
+    const dx = (xs[i + 1]! - xs[i]!) / 3;
+    const c1x = xs[i]! + dx;
+    const c1y = ys[i]! + slope[i]! * dx;
+    const c2x = xs[i + 1]! - dx;
+    const c2y = ys[i + 1]! - slope[i + 1]! * dx;
+    path += ` C ${c1x.toFixed(1)} ${c1y.toFixed(1)}, ${c2x.toFixed(1)} ${c2y.toFixed(1)}, ${xs[i + 1]!.toFixed(1)} ${ys[i + 1]!.toFixed(1)}`;
+  }
+  return path;
 }
 
 export function BalanceCurve({
@@ -110,9 +154,10 @@ export function BalanceCurve({
   const linePath =
     points.length === 1
       ? `M ${x(0)} ${y(values[0]!)} L ${PAD.left + innerW} ${y(values[0]!)}`
-      : points
-          .map((p, i) => `${i === 0 ? "M" : "L"} ${x(i).toFixed(1)} ${y(p.balance).toFixed(1)}`)
-          .join(" ");
+      : smoothPath(
+          points.map((_, i) => x(i)),
+          points.map((p) => y(p.balance)),
+        );
 
   const areaPath = `${linePath} L ${PAD.left + innerW} ${baseY} L ${PAD.left} ${baseY} Z`;
 

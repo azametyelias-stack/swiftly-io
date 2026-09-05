@@ -14,6 +14,7 @@ import { StepDots } from "@/components/transactions/StepDots";
 import { TxSheet, useTxSurface } from "@/components/transactions/TxSheet";
 import { TxSuccess } from "@/components/transactions/TxSuccess";
 import { apiJson } from "@/lib/http/api";
+import { setLastAccount } from "@/lib/dashboard/lastAccount";
 import { todayISO } from "@/lib/format/date";
 import type { CurrencyCode } from "@/lib/format/money";
 import {
@@ -129,6 +130,11 @@ export function TxWizard({
         transaction: res.transaction,
         warning: res.warning ? { balance: res.warning.balance } : null,
       });
+      // The dashboard must reflect the account this transaction actually moved
+      // money on, not whichever account it happened to be showing before.
+      const usedAccountId =
+        type === "income" ? eff.destinationAccountId : eff.sourceAccountId;
+      if (usedAccountId) setLastAccount(usedAccountId);
       if (launchedTemplateId && !isEdit) void markTemplateUsed(launchedTemplateId);
     } catch {
       setSaveError(t.errors.saveFailed);

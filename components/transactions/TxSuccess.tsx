@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { AlertTriangleIcon, CheckIcon } from "@/components/nav/icons";
 import { SheetButton } from "@/components/transactions/SheetButton";
-import { TxSheet } from "@/components/transactions/TxSheet";
+import { TxSheet, useTxSurface } from "@/components/transactions/TxSheet";
 import { useToast } from "@/components/ui/Toast";
 import { apiJson } from "@/lib/http/api";
 import { formatLongDate } from "@/lib/format/date";
@@ -43,6 +43,7 @@ export function TxSuccess({
   const locale = useLocale() as Locale;
   const router = useRouter();
   const toast = useToast();
+  const { close } = useTxSurface();
 
   const [templating, setTemplating] = useState(false);
   const [templateName, setTemplateName] = useState("");
@@ -53,8 +54,14 @@ export function TxSuccess({
     type === "expense" ? t.success.expense : type === "income" ? t.success.income : t.success.transfer;
 
   const finish = () => {
-    router.push("/historiques");
-    router.refresh();
+    // Always the dashboard (not wherever `back()` would land, nor the
+    // history screen) — the account switch is already persisted (see
+    // TxWizard's save) so it shows up right there.
+    if (close) {
+      close("/dashboard");
+    } else {
+      router.push("/dashboard");
+    }
   };
 
   const saveTemplate = async () => {
