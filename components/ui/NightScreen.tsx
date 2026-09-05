@@ -48,7 +48,11 @@ export function NightScreen({
         }}
       />
 
-      <div className="relative flex flex-none items-center gap-2 px-2 py-2 text-ink-on-surface">
+      {/* pt = safe area: the status bar is translucent, so this row would sit
+          under the clock without it. The two `fixed inset-0` layers above
+          already reach the top edge, so the gradient flows behind the clock —
+          which is the whole point of the translucent bar. */}
+      <div className="relative flex flex-none items-center gap-2 px-2 py-2 pt-[calc(env(safe-area-inset-top)+0.5rem)] text-ink-on-surface">
         <button
           type="button"
           aria-label={m.common.back}

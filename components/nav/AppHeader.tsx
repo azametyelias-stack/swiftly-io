@@ -37,36 +37,52 @@ export function AppHeader({
 
   return (
     <header
-      className={`sticky top-0 z-30 flex h-14 items-center gap-1 px-2 ${
-        tone === "onDark" ? "" : "bg-surface-page"
-      } ${text}`}
+      className={`sticky top-0 z-30 ${tone === "onDark" ? "" : "bg-surface-page"} ${text}`}
     >
-      {atRoot ? (
-        <button type="button" onClick={openMenu} aria-label="Ouvrir le menu" className={btn}>
-          <MenuIcon />
-        </button>
-      ) : (
-        <button
-          type="button"
-          onClick={() => (window.history.length > 1 ? router.back() : router.push("/dashboard"))}
-          aria-label="Retour"
-          className={btn}
-        >
-          <ChevronLeftIcon />
-        </button>
-      )}
+      {/*
+        The status bar is translucent (`black-translucent`), which forces the
+        clock and battery to WHITE and lets the page run under them. Every other
+        screen is on the night gradient there, so white reads fine. This header
+        is the one light top in the app — Paramètres — so it paints the safe area
+        `--brand-deep` rather than letting `bg-surface-page` reach up: white on
+        #EBEBEF would be invisible. On `onDark` the band stays transparent and
+        the gradient flows through, seamlessly.
+      */}
+      <div
+        aria-hidden="true"
+        className={`h-[env(safe-area-inset-top)] ${tone === "onDark" ? "" : "bg-brand-deep"}`}
+      />
 
-      <h1 className="t-screen-title flex-1 truncate text-center">{title}</h1>
-
-      <Link href="/alertes" aria-label="Alertes et notifications" className={btn}>
-        <BellIcon />
-        {unreadCount > 0 && (
-          <span
-            aria-hidden
-            className="absolute right-1.5 top-1.5 size-2 rounded-full bg-semantic-out ring-2 ring-[var(--surface-page)]"
-          />
+      <div className="flex h-14 items-center gap-1 px-2">
+        {atRoot ? (
+          <button type="button" onClick={openMenu} aria-label="Ouvrir le menu" className={btn}>
+            <MenuIcon />
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() =>
+              window.history.length > 1 ? router.back() : router.push("/dashboard")
+            }
+            aria-label="Retour"
+            className={btn}
+          >
+            <ChevronLeftIcon />
+          </button>
         )}
-      </Link>
+
+        <h1 className="t-screen-title flex-1 truncate text-center">{title}</h1>
+
+        <Link href="/alertes" aria-label="Alertes et notifications" className={btn}>
+          <BellIcon />
+          {unreadCount > 0 && (
+            <span
+              aria-hidden
+              className="absolute right-1.5 top-1.5 size-2 rounded-full bg-semantic-out ring-2 ring-[var(--surface-page)]"
+            />
+          )}
+        </Link>
+      </div>
     </header>
   );
 }

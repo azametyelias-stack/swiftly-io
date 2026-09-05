@@ -120,7 +120,8 @@ export function HistoryScreen({
         }}
       />
 
-      <div className="relative flex flex-none items-center justify-between px-2 py-2 text-ink-on-surface">
+      {/* pt = safe area (translucent status bar) — cf. NightScreen. */}
+      <div className="relative flex flex-none items-center justify-between px-2 py-2 pt-[calc(env(safe-area-inset-top)+0.5rem)] text-ink-on-surface">
         <button
           type="button"
           aria-label={m.common.back}

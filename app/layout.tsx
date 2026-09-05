@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { SessionProvider } from "@/components/auth/SessionProvider";
 import { ConsentProvider } from "@/components/privacy/ConsentProvider";
@@ -25,11 +25,41 @@ export const metadata: Metadata = {
   manifest: "/manifest.webmanifest",
   // iOS ignores the manifest's `display` and `theme_color`; these two are how
   // Safari learns the app runs standalone and what to call it on the home screen.
-  appleWebApp: { capable: true, title: PWA.shortName, statusBarStyle: "default" },
+  //
+  // `black-translucent` draws NO status-bar background: the page runs full-bleed
+  // and the night gradient flows under the clock, which is the point (choix
+  // Elias, 2026-09-06). Two consequences that the rest of this change handles:
+  //  - the clock and battery are forced WHITE, so any screen whose top is light
+  //    must still paint something dark behind them — see `AppHeader`;
+  //  - the viewport now extends under the status bar, so every top row needs
+  //    `env(safe-area-inset-top)` or it sits beneath the clock.
+  appleWebApp: {
+    capable: true,
+    title: PWA.shortName,
+    statusBarStyle: "black-translucent",
+  },
   icons: {
     icon: "/icons/icon-192x192.png",
     apple: "/icons/icon-192x192.png",
   },
+};
+
+/**
+ * `viewport-fit=cover` is what makes `env(safe-area-inset-*)` resolve to
+ * anything other than zero — without it the whole safe-area vocabulary is inert.
+ *
+ * Nine places in this codebase were already written against those insets
+ * (`AuthScreen`, `DashboardView`, `MenuDrawer`, the landing, the consent
+ * banner…). They have been dead code until now; this line turns them on, which
+ * is the intended behaviour but worth knowing when reading a diff of one screen
+ * and wondering why its spacing moved.
+ *
+ * No `themeColor` here — see the note below the metadata block.
+ */
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 // No `themeColor` here on purpose: a static value has to pick one palette and be
