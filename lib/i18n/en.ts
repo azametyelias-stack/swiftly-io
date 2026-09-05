@@ -823,6 +823,7 @@ export const en: Messages = {
       noCode: "I don't have a code",
       errorInvalid: "Invalid code. Check it and try again.",
       errorServer: "Server error. Try again.",
+      errorTooMany: "Too many attempts. Try again in {minutes} min.",
       confirmed: "Confirmed",
     },
 

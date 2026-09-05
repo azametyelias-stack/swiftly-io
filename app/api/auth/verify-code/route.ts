@@ -5,7 +5,13 @@ import {
   normalizeInviteCode,
 } from "@/lib/auth/invite-codes";
 import { mintInviteSession } from "@/lib/auth/invite-session";
-import { assertInviteAttemptAllowed, RateLimitError } from "@/lib/auth/rate-limit";
+import {
+  assertInviteAttemptAllowed,
+  isInviteCodeLockedOut,
+  RateLimitError,
+  RateLimitUnavailableError,
+  recordInviteFailure,
+} from "@/lib/auth/rate-limit";
 import { AUTH_INVALID_CODE, AUTH_MESSAGES } from "@/lib/auth/responses";
 import { withMinimumDuration } from "@/lib/auth/timing";
 import { serverEnv } from "@/lib/env/server";
@@ -35,11 +41,23 @@ function clientIp(request: Request): string {
 }
 
 export async function POST(request: Request): Promise<Response> {
+  // Point 3 — gate on the IP before reading the body, so a flood costs the
+  // attacker a connection and costs us one Redis command: no JSON parsing, no
+  // database round-trip.
   try {
     await assertInviteAttemptAllowed(clientIp(request));
   } catch (limitErr) {
     if (limitErr instanceof RateLimitError) {
-      return fail("RATE_LIMITED", limitErr.message, 429);
+      const res = fail("RATE_LIMITED", limitErr.message, 429);
+      // Tells an honest client when to come back; an attacker learns nothing it
+      // could not measure with a clock.
+      res.headers.set("Retry-After", String(limitErr.retryAfterSeconds));
+      return res;
+    }
+    if (limitErr instanceof RateLimitUnavailableError) {
+      // The limiter is the only thing standing between a 6-digit secret and a
+      // brute force. Without it we refuse rather than serve unlimited.
+      return fail("AUTH_UNAVAILABLE", limitErr.message, 503);
     }
     throw limitErr;
   }
@@ -73,6 +91,18 @@ export async function POST(request: Request): Promise<Response> {
       return fail(AUTH_INVALID_CODE, AUTH_MESSAGES.invalidInviteCode, 400);
     }
 
+    const codeHash = inviteCodeHash(code, pepper);
+
+    // Second layer (Point 3): a botnet spreading its guesses over many IPs
+    // slips past the per-IP window but not past the code's own counter. Only
+    // failures feed it, so a valid unused code can never be locked out — it
+    // would have to fail to be counted. The answer is the ordinary
+    // invalid-code message, which at five failures is also the true one.
+    if (await isInviteCodeLockedOut(codeHash)) {
+      log.warn("auth.invite_code_locked_out");
+      return fail(AUTH_INVALID_CODE, AUTH_MESSAGES.invalidInviteCode, 400);
+    }
+
     const nowIso = new Date().toISOString();
 
     // Atomic claim — the WHERE clause is the guard, so the same code can't be
@@ -80,7 +110,7 @@ export async function POST(request: Request): Promise<Response> {
     const { data: claimed, error: claimError } = await db
       .from("invitation_codes")
       .update({ used_at: nowIso })
-      .eq("code_hash", inviteCodeHash(code, pepper))
+      .eq("code_hash", codeHash)
       .is("used_at", null)
       .gt("expires_at", nowIso)
       .select("id")
@@ -91,6 +121,9 @@ export async function POST(request: Request): Promise<Response> {
       return fail("SERVER_ERROR", "Une erreur est survenue.", 500);
     }
     if (!claimed) {
+      // Unknown, spent or expired — all three feed the per-code lockout and the
+      // global alarm. A successful redemption records nothing.
+      await recordInviteFailure(codeHash);
       log.info("auth.invite_code_rejected");
       return fail(AUTH_INVALID_CODE, AUTH_MESSAGES.invalidInviteCode, 400);
     }

@@ -9,6 +9,7 @@ import { AuthScreen } from "@/components/auth/AuthScreen";
 import { CodeInput } from "@/components/auth/CodeInput";
 import { useSession } from "@/components/auth/SessionProvider";
 import { isComplete } from "@/lib/auth/code-input";
+import { interpolate } from "@/lib/i18n";
 import { useMessages } from "@/lib/i18n/useMessages";
 import { getBrowserClient } from "@/lib/supabase/client";
 
@@ -56,11 +57,19 @@ export default function ConnexionCodePage() {
       if (!res.ok || !body?.success) {
         setPhase("idle");
         setCode("");
-        setError(
-          res.status >= 500 || res.status === 429
-            ? m.auth.code.errorServer
-            : m.auth.code.errorInvalid,
-        );
+        if (res.status === 429) {
+          // Point 3 is enforced now, so this is reachable by an honest user who
+          // fumbled six times. Telling them how long to wait is the difference
+          // between a limit and an app that looks broken.
+          const wait = Number(res.headers.get("Retry-After"));
+          setError(
+            interpolate(m.auth.code.errorTooMany, {
+              minutes: Math.max(1, Math.ceil((Number.isFinite(wait) ? wait : 60) / 60)),
+            }),
+          );
+        } else {
+          setError(res.status >= 500 ? m.auth.code.errorServer : m.auth.code.errorInvalid);
+        }
         return;
       }
 

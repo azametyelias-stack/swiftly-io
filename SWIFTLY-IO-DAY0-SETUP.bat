@@ -242,7 +242,7 @@ echo NEXT_PUBLIC_SUPABASE_URL=your_supabase_url_here
 echo NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_key_here
 echo SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
 echo.
-echo # === PAYSTACK (Phase 2) ===
+echo # === PAYSTACK (Phase 2) ===:
 echo PAYSTACK_SECRET_KEY=your_paystack_secret_here
 echo PAYSTACK_PUBLIC_KEY=your_paystack_public_here
 echo.

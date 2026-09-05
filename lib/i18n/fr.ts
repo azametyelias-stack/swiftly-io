@@ -834,6 +834,7 @@ export const fr = {
       noCode: "Je n'ai pas de code",
       errorInvalid: "Code invalide. Vérifiez et réessayez.",
       errorServer: "Erreur serveur. Réessayez.",
+      errorTooMany: "Trop de tentatives. Réessayez dans {minutes} min.",
       confirmed: "Confirmé",
     },
 
