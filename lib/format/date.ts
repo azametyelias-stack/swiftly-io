@@ -24,6 +24,19 @@ export function todayISO(now: Date = new Date()): string {
   return `${y}-${m}-${d}`;
 }
 
+/**
+ * Bénin (UTC+1) hour-of-day as a 0..24 float — independent of the viewing
+ * device's own OS/browser timezone. Places a transaction on the dashboard's
+ * hourly axis (`BalanceCurve`'s `hourFrac`): the axis's day boundaries are
+ * already computed this same fixed-offset way (`todayISO`/`resolvePeriod`),
+ * so the intra-day hour position must agree, or a device set to a different
+ * timezone than Bénin can plot a point on the wrong side of midnight.
+ */
+export function beninHourOfDay(isoTimestamp: string): number {
+  const shifted = new Date(new Date(isoTimestamp).getTime() + BENIN_OFFSET_MS);
+  return shifted.getUTCHours() + shifted.getUTCMinutes() / 60;
+}
+
 export function addDaysISO(iso: string, days: number): string {
   const d = new Date(`${iso}T00:00:00Z`);
   d.setUTCDate(d.getUTCDate() + days);

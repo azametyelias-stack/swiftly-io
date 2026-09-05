@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 
 import {
   addDaysISO,
+  beninHourOfDay,
   formatClock,
   formatLongDate,
   formatMonthYear,
@@ -15,6 +16,16 @@ test("todayISO: Bénin (UTC+1) calendar day, independent of host tz", () => {
   // 23:30 UTC = 00:30 in Bénin — already the next calendar day there.
   assert.equal(todayISO(new Date("2026-09-17T23:30:00Z")), "2026-09-18");
   assert.equal(todayISO(new Date("2026-09-17T22:59:00Z")), "2026-09-17");
+});
+
+test("beninHourOfDay: UTC+1, independent of host tz, wraps correctly near midnight", () => {
+  assert.equal(beninHourOfDay("2026-09-17T11:00:00Z"), 12); // 11:00 UTC = 12:00 Bénin
+  assert.equal(beninHourOfDay("2026-09-17T00:00:00Z"), 1); // just after Bénin midnight
+  // 23:30 UTC = 00:30 the *next* Bénin day — this is why the day boundary
+  // (todayISO) and this hour-of-day must use the same fixed offset: a value
+  // computed the ordinary (host-timezone) way could place this near the
+  // *start* of the wrong day's axis instead of just past midnight.
+  assert.equal(beninHourOfDay("2026-09-17T23:30:00Z"), 0.5);
 });
 
 test("addDaysISO", () => {

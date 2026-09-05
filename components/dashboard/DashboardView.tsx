@@ -255,16 +255,32 @@ export function DashboardView() {
       <div ref={sentinelRef} aria-hidden="true" />
 
       {/* The button — scrolls with the page, then freezes at the top. Opaque
-          only once actually stuck: before that, the night background must
-          show through underneath it. */}
+          only once actually stuck: before that it continues the night photo
+          (same image, bottom-cropped) instead of a flat color patch, and its
+          bottom corners match the panel's radius so no square notch shows
+          through the panel's rounded top corners just below it. */}
       <div
-        className={`sticky top-0 z-20 px-4 pb-3 pt-2 transition-colors duration-200 ${
+        className={`sticky top-0 z-20 overflow-hidden rounded-b-[var(--radius-content-top)] px-4 pb-3 pt-2 transition-colors duration-300 ${
           stuck ? "bg-surface-page" : "bg-brand-deep"
         }`}
       >
+        {!stuck ? (
+          <>
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 bg-cover"
+              style={{ backgroundImage: "url(/brand/nuit.jpg)", backgroundPosition: "center bottom" }}
+            />
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0"
+              style={{ background: "rgba(6,10,60,0.72)" }}
+            />
+          </>
+        ) : null}
         <Link
           href="/transactions/nouvelle"
-          className="flex h-[var(--size-primary-button)] w-full items-center justify-center gap-2 rounded-[var(--radius-pill)] bg-surface-card text-[17px] font-semibold text-text-primary shadow-[0_16px_34px_-6px_rgba(4,6,30,0.44),0_3px_8px_rgba(4,6,30,0.22)]"
+          className="relative z-10 flex h-[var(--size-primary-button)] w-full items-center justify-center gap-2 rounded-[var(--radius-pill)] bg-surface-card text-[17px] font-semibold text-text-primary shadow-[0_16px_34px_-6px_rgba(4,6,30,0.44),0_3px_8px_rgba(4,6,30,0.22)]"
         >
           <PlusIcon width={20} height={20} />
           {m.dashboard.newTransaction}

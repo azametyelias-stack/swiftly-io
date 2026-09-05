@@ -8,7 +8,7 @@ import {
 } from "react";
 
 import { formatBalance, formatCompact, type CurrencyCode } from "@/lib/format/money";
-import { formatClock } from "@/lib/format/date";
+import { beninHourOfDay, formatClock } from "@/lib/format/date";
 import { useLocale } from "@/lib/i18n/useMessages";
 import type { Locale } from "@/lib/i18n";
 
@@ -171,10 +171,11 @@ export function BalanceCurve({
   const baseY = PAD.top + innerH;
 
   // x of point i: hour-placed when it carries `at`, endpoints pinned, else even.
-  const hourFrac = (iso: string) => {
-    const d = new Date(iso);
-    return Math.max(0, Math.min(1, (d.getHours() + d.getMinutes() / 60) / 24));
-  };
+  // Bénin-fixed (not the viewing device's own timezone) — see beninHourOfDay:
+  // the axis's day boundary is computed the same fixed-offset way server-side,
+  // so a point's *position within* the day must agree with that, not with
+  // whatever timezone the phone happens to be set to.
+  const hourFrac = (iso: string) => Math.max(0, Math.min(1, beninHourOfDay(iso) / 24));
   const x = (i: number): number => {
     const p = points[i];
     if (hourAxis && p) {
@@ -201,8 +202,10 @@ export function BalanceCurve({
     yPos: PAD.top + innerH - f * innerH,
   }));
 
+  // "00h" → "23h59", never "0h"/"00h" at both ends — those read as the same
+  // instant looping back on itself (Elias: "ça commence de 0h à 0h").
   const timeLabels = hourAxis
-    ? ["0h", "6h", "12h", "18h", "00h"]
+    ? ["00h", "6h", "12h", "18h", "23h59"]
     : (xLabels ?? []);
 
   // Progressive draw — measured length, animated via a CSS transition on mount.
