@@ -91,3 +91,36 @@ export function buildSecurityHeaders(options: SecurityHeadersOptions = {}): Http
 
 /** Apply to every route. */
 export const SECURITY_HEADERS_SOURCE = "/:path*";
+
+/* ── Service worker ──────────────────────────────────────────────────────────
+   Reference: `docs/4-SETUP (Deployment Guide)/PWA-IMPLEMENTATION.md` § A.7.
+   The three global headers that section lists (nosniff / DENY / Referrer-Policy)
+   were already set for every route by Point 8 above — only the /sw.js block is
+   new, so nothing is stated twice. ------------------------------------------ */
+
+/** The registered worker — `public/sw.js`, served from the root scope. */
+export const SERVICE_WORKER_SOURCE = "/sw.js";
+
+/**
+ * Extra headers for `/sw.js`, on top of `buildSecurityHeaders()` (which already
+ * covers X-Content-Type-Options, X-Frame-Options and Referrer-Policy for every
+ * route — nothing is duplicated here).
+ *
+ * The one that matters is `Cache-Control`. A service worker outlives the page
+ * that installed it: whatever `sw.js` a browser holds keeps deciding what is
+ * cached and what is served offline until it fetches a new one. Cached for a
+ * year by a CDN, a bad worker would be un-fixable by deploying. `no-store` plus
+ * `updateViaCache: "none"` at registration means every visit re-reads this file
+ * from the origin, so a deploy actually reaches installed users.
+ */
+export function buildServiceWorkerHeaders(): HttpHeader[] {
+  return [
+    { key: "Content-Type", value: "application/javascript; charset=utf-8" },
+    { key: "Cache-Control", value: "no-cache, no-store, must-revalidate" },
+    // The worker is scoped to "/" and must be able to fetch the whole origin;
+    // it loads no code of its own, hence `script-src 'self'` with nothing else.
+    { key: "Content-Security-Policy", value: "default-src 'self'; script-src 'self'" },
+    // A worker installed from a foreign scope would control the whole app.
+    { key: "Service-Worker-Allowed", value: "/" },
+  ];
+}

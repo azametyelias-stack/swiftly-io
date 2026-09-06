@@ -2,6 +2,8 @@
 
 import { useSyncExternalStore } from "react";
 
+import { THEME_COLOR } from "@/lib/pwa/config";
+
 /**
  * The one place that owns `<html data-theme>` and its stored choice.
  *
@@ -37,6 +39,25 @@ export function applyThemeChoice(choice: ThemeChoice): void {
   const root = document.documentElement;
   if (choice === "system") delete root.dataset.theme;
   else root.dataset.theme = choice;
+  applyThemeColorMeta(resolvedTheme(choice));
+}
+
+/**
+ * Repoint `<meta name="theme-color">` at the palette now on screen.
+ *
+ * Installed as a PWA, that meta is the phone's status bar. Left on the light
+ * value under a dark app it draws a pale band across the top of a dark screen —
+ * the app looks broken before a single figure is read. `THEME_BOOT_SCRIPT`
+ * creates the tag pre-paint; this keeps it honest afterwards.
+ */
+export function applyThemeColorMeta(resolved: "light" | "dark"): void {
+  let meta = document.head.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+  if (!meta) {
+    meta = document.createElement("meta");
+    meta.name = "theme-color";
+    document.head.appendChild(meta);
+  }
+  meta.content = THEME_COLOR[resolved];
 }
 
 /** Persist + apply + notify every subscriber in the tab. */
@@ -51,9 +72,14 @@ export function setThemeChoice(choice: ThemeChoice): void {
 }
 
 export function subscribeTheme(onChange: () => void): () => void {
+  // The OS counts as a source too: under choice "system" the painted theme
+  // changes without anything in the app writing a thing.
+  const media = window.matchMedia?.("(prefers-color-scheme: dark)");
+  media?.addEventListener("change", onChange);
   window.addEventListener(THEME_CHANGE_EVENT, onChange);
   window.addEventListener("storage", onChange);
   return () => {
+    media?.removeEventListener("change", onChange);
     window.removeEventListener(THEME_CHANGE_EVENT, onChange);
     window.removeEventListener("storage", onChange);
   };

@@ -115,3 +115,53 @@ en Pro. Voir `supabase/BACKUPS.md`.
 **non rejouable** (il ne distingue pas l'ancien défaut `'light'` d'un choix
 délibéré). Appliqué le 2026-09-05. **Supprimer cette ligne** — le reste du
 fichier est idempotent.
+
+### Notifications push (partie B de la PWA)
+
+La PWA MVP livrée le 2026-09-05 s'arrête à l'installation et au hors-ligne.
+Rien de la partie B n'est branché : **pas de clés VAPID, pas de table
+`push_subscriptions`, pas de handler `push` dans `public/sw.js`.**
+
+Ce n'est pas un oubli. Une notification push est un canal sortant : elle suppose
+une décision sur ce qu'on a le droit d'écrire sur l'écran verrouillé de
+quelqu'un — et sur un produit d'argent, « Budget Alimentation dépassé » sur un
+écran verrouillé est une fuite de données devant qui regarde le téléphone.
+Le contenu doit être décidé avant le transport.
+
+L'écran 18 dit déjà « Envoyée aussi en notification push » (`alerts.pushNote`) :
+cette phrase est prête, elle ne s'affiche que pour une alerte qui porte la date
+d'envoi, donc aujourd'hui jamais.
+
+**Déclencheur : quand on veut ramener l'utilisateur dans l'app sans qu'il
+l'ouvre.** Le squelette est dans la doc Next
+(`node_modules/next/dist/docs/01-app/02-guides/progressive-web-apps.md`).
+
+### Le service worker ne met rien en cache hors du shell
+
+`public/sw.js` — décision structurante, pas une limite temporaire.
+
+Le worker ne sert en cache que la sortie de build (`/_next/static/`), les icônes
+et la page `/offline`. **Tout `/api/` est laissé au réseau**, ainsi que les
+charges RSC. Un solde servi depuis un cache périmé n'est pas une expérience
+dégradée, c'est une information fausse sur l'argent de quelqu'un.
+
+Une vraie consultation hors ligne (lire ses transactions sans réseau) est un
+autre produit : il faut un miroir local, une politique de fraîcheur affichée à
+l'écran (« données du 3 septembre »), et une réconciliation au retour du réseau.
+**Déclencheur : une demande explicite d'utilisation hors couverture** — pas
+« ce serait bien si ça marchait dans l'avion ».
+
+### Icônes PWA — vertes, alors que l'identité est navy
+
+`public/icons/` — à trancher avant le déploiement public.
+
+Les trois icônes générées sont sur fond vert `#0D7A47`, une couleur qui
+n'existe nulle part dans le design system : l'identité Swiftly est le navy
+(`--brand-deep #0A1466`, nuit `#05060F`) et le seul vert du système est
+`--ink-in #1DCF02` / `--semantic-in #006B3C`, réservé aux montants positifs.
+
+`PWA-IMPLEMENTATION.md` § A.1 demande lui aussi du navy (« navy foncé Swiftly »).
+Le manifeste a donc été écrit en navy, l'écran de démarrage est navy, et l'icône
+verte s'y détache. Ce n'est pas cassé, c'est incohérent.
+**Déclencheur : la première capture d'écran sur un vrai écran d'accueil.**
+

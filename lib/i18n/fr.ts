@@ -955,4 +955,14 @@ export const fr = {
     seeReport: "Voir le rapport",
   },
 
+  pwa: {
+    title: "Installer Swiftly",
+    body: "Ajoute Swiftly à ton écran d'accueil : ouverture plein écran, sans barre de navigateur.",
+    install: "Ajouter à l'écran d'accueil",
+    later: "Plus tard",
+    iosHow: "Sur iPhone et iPad, l'installation se fait à la main :",
+    iosStep1: "Touche Partager, en bas de Safari.",
+    iosStep2: "Choisis « Sur l'écran d'accueil ».",
+    iosStep3: "Confirme avec « Ajouter ».",
+  },
 };

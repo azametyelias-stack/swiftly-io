@@ -9,6 +9,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "pwa:preview": "next build && next start",
     "lint": "eslint",
     "test": "node --test \"tests/**/*.test.ts\"",
     "scan": "semgrep scan --error --severity=ERROR --metrics=off --disable-version-check --config ./semgrep.yml",

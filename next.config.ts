@@ -1,6 +1,11 @@
 import type { NextConfig } from "next";
 
-import { buildSecurityHeaders, SECURITY_HEADERS_SOURCE } from "./lib/security/headers";
+import {
+  buildSecurityHeaders,
+  buildServiceWorkerHeaders,
+  SECURITY_HEADERS_SOURCE,
+  SERVICE_WORKER_SOURCE,
+} from "./lib/security/headers";
 
 const nextConfig: NextConfig = {
   // Don't advertise the framework (SECURITY MASTERPLAN — Point 8 / Point 14).
@@ -21,6 +26,12 @@ const nextConfig: NextConfig = {
           isDev: process.env.NODE_ENV === "development",
           supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
         }),
+      },
+      // The service worker, after the catch-all above so these win on /sw.js.
+      // Mostly `Cache-Control: no-store` — see buildServiceWorkerHeaders().
+      {
+        source: SERVICE_WORKER_SOURCE,
+        headers: buildServiceWorkerHeaders(),
       },
     ];
   },

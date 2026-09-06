@@ -939,4 +939,14 @@ export const en: Messages = {
     seeReport: "See the report",
   },
 
+  pwa: {
+    title: "Install Swiftly",
+    body: "Add Swiftly to your home screen: it opens full screen, with no browser bar.",
+    install: "Add to Home Screen",
+    later: "Later",
+    iosHow: "On iPhone and iPad, installing is a manual step:",
+    iosStep1: "Tap Share, at the bottom of Safari.",
+    iosStep2: "Pick “Add to Home Screen”.",
+    iosStep3: "Confirm with “Add”.",
+  },
 };

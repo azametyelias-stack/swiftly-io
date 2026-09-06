@@ -4,6 +4,8 @@ import assert from "node:assert/strict";
 import {
   buildSecurityHeaders,
   buildContentSecurityPolicy,
+  buildServiceWorkerHeaders,
+  SERVICE_WORKER_SOURCE,
 } from "../../lib/security/headers.ts";
 
 const get = (headers: { key: string; value: string }[], key: string) =>
@@ -69,4 +71,32 @@ test("CSP: Google Analytics origins are allowed for script/img/connect", () => {
   assert.match(csp, /script-src[^;]*googletagmanager\.com/);
   assert.match(csp, /img-src[^;]*google-analytics\.com/);
   assert.match(csp, /connect-src[^;]*google-analytics\.com/);
+});
+
+/* ── Service worker (PWA MVP, partie A § 6) ──────────────────────────────── */
+
+test("sw.js is never cached — a bad worker must stay fixable by deploying", () => {
+  const v = get(buildServiceWorkerHeaders(), "Cache-Control");
+  assert.ok(v, "Cache-Control missing on /sw.js");
+  assert.match(v!, /no-store/);
+  assert.match(v!, /no-cache/);
+  assert.match(v!, /must-revalidate/);
+});
+
+test("sw.js is served as JavaScript, scoped to the root", () => {
+  const h = buildServiceWorkerHeaders();
+  assert.match(get(h, "Content-Type")!, /application\/javascript/);
+  assert.equal(get(h, "Service-Worker-Allowed"), "/");
+  assert.equal(SERVICE_WORKER_SOURCE, "/sw.js");
+});
+
+test("the sw headers add to the global ones, they do not restate them", () => {
+  const global = buildSecurityHeaders().map((h) => h.key.toLowerCase());
+  for (const { key } of buildServiceWorkerHeaders()) {
+    if (key.toLowerCase() === "content-security-policy") continue; // deliberately stricter
+    assert.ok(
+      !global.includes(key.toLowerCase()),
+      `${key} is already set for every route — do not duplicate it`,
+    );
+  }
 });

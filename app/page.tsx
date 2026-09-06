@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { AuthButton } from "@/components/auth/AuthButton";
@@ -15,20 +15,44 @@ import { useMessages } from "@/lib/i18n/useMessages";
  * Already-signed-in visitors skip straight to the app (SCREEN-2 § 5 — don't
  * re-show onboarding once a session exists).
  */
+
+/**
+ * How long the button stays locked before it will accept a second tap.
+ *
+ * Measured against a production build: the navigation lands in ~1 s online, and
+ * ~1 s offline too (the worker serves `/offline` and this screen unmounts). So
+ * eight seconds is well past "slow" and firmly into "something is wrong".
+ */
+const REARM_AFTER_MS = 8000;
+
 export default function LandingPage() {
   const m = useMessages();
   const router = useRouter();
   const { status } = useSession();
   const [leaving, setLeaving] = useState(false);
+  const rearm = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (status === "authenticated") router.replace("/dashboard");
   }, [status, router]);
 
+  // A pending re-arm must not outlive the screen.
+  useEffect(
+    () => () => {
+      if (rearm.current) clearTimeout(rearm.current);
+    },
+    [],
+  );
+
   const start = () => {
     if (leaving) return;
     setLeaving(true);
     router.push("/connexion");
+    // `router.push` returns nothing and never rejects, and the RSC fetch behind
+    // it has no timeout of its own. On a link that is slow rather than dead,
+    // `leaving` would otherwise stay true for good — and this is the only
+    // button on the only way into the app. Re-arm so a second tap is possible.
+    rearm.current = setTimeout(() => setLeaving(false), REARM_AFTER_MS);
   };
 
   return (
