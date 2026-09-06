@@ -26,7 +26,7 @@ jobs:
     name: Lint · Types · Tests · Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -41,7 +41,7 @@ jobs:
     name: Dependency audit (fail on runtime vuln)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -63,7 +63,7 @@ jobs:
     container:
       image: semgrep/semgrep:1.175.0
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Semgrep scan (fails on any ERROR finding)
         run: |
           semgrep scan \
