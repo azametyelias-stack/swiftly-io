@@ -41,9 +41,9 @@ export function ProjectsScreen() {
           type="button"
           aria-label={t.form.createTitle}
           onClick={() => setCreating(true)}
-          className="grid size-10 place-items-center rounded-full border border-white/20 bg-white/10"
+          className="grid size-11 place-items-center rounded-full border border-white/20 bg-white/10"
         >
-          <PlusIcon width={18} height={18} />
+          <PlusIcon width={26} height={26} />
         </button>
       }
       contentClassName="overflow-hidden"

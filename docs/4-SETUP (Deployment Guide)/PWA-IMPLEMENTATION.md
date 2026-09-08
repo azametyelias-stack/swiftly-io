@@ -201,6 +201,25 @@ self.addEventListener('fetch', (event) => {
 > fraîches — jamais servies depuis un cache périmé. On ne met en cache que l'app shell
 > (structure, icônes, page offline), pas les données sensibles.
 
+> **Amendement du 2026-09-07 (usage réel, Elias).** La règle ci-dessus tient, et le
+> worker n'intercepte toujours pas `/api/`. Deux choses ont changé après une journée
+> d'utilisation avec de vraies dépenses :
+>
+> 1. **Le worker cache aussi le HTML des écrans**, pas seulement `/` et `/offline`.
+>    Les 22 écrans sont des composants client : leur HTML ne contient aucun montant
+>    (`<div aria-busy="true">`), les chiffres arrivent après hydratation par `/api/*`.
+>    Cacher cette coquille, c'est cacher une mise en page, pas de l'argent. Sans ça,
+>    toute route autre que `/` tombait sur « Pas de connexion » — l'app s'ouvrait sans
+>    être utilisable.
+> 2. **Les données ont leur propre cache, un étage plus haut** : `lib/offline/*`,
+>    lu par `apiJson` uniquement quand le réseau a échoué, et toujours accompagné de
+>    sa date à l'écran (« Hors ligne · données du 7 sept., 08:24 »). C'est le point
+>    qui rend l'ensemble honnête, et c'est précisément ce qu'un service worker ne
+>    peut pas faire : il répond sans que l'interface sache d'où vient la réponse.
+>
+> Voir `lib/pwa/config.ts`, `lib/offline/store.ts`, et `tests/pwa/worker.test.ts`,
+> qui exécute le vrai `sw.js` réseau coupé.
+
 ---
 
 ## Étape A.3 — Enregistrer le Service Worker

@@ -13,31 +13,48 @@
  * Pure and import-free, so `node --test` can load it directly.
  */
 
-/** Cache key. BUMP THIS whenever `public/sw.js` or `PRECACHE_URLS` changes. */
-export const SW_CACHE_VERSION = "v2";
+/** Cache key. BUMP THIS whenever `public/sw.js` or the precache lists change. */
+export const SW_CACHE_VERSION = "v3";
 
 /**
- * The one cache the service worker owns (doc § A.2). `activate` deletes every
- * other `swiftly-*` key rather than every other key on the origin — a future
- * feature caching under its own name must not be wiped by a worker update.
+ * Le cache des RESSOURCES : sortie de build, icônes, manifeste, page hors ligne.
+ * Contenu adressé par empreinte ou strictement identitaire — un hit ne peut pas
+ * être faux. `activate` supprime toute autre clé `swiftly-*` (et seulement
+ * celles-là : une future fonctionnalité qui cacherait sous son propre nom ne
+ * doit pas être balayée par une mise à jour du worker).
  */
 export const SW_CACHE_NAME = `swiftly-${SW_CACHE_VERSION}`;
+
+/**
+ * Le cache des COQUILLES d'écran : le HTML des routes de l'app.
+ *
+ * Séparé du précédent parce qu'il ne suit pas les mêmes règles — plafonné,
+ * renouvelé à chaque visite en ligne, et jamais préféré au réseau.
+ *
+ * Pourquoi c'est sans danger alors que la v2 refusait de cacher la moindre
+ * page : les 22 écrans sont des composants client qui vont chercher leurs
+ * chiffres dans `/api/*` APRÈS l'hydratation. Le HTML servi par le serveur ne
+ * contient donc aucun montant — c'est une mise en page vide. Les chiffres, eux,
+ * passent par `lib/offline/*`, qui les date et fait afficher « Hors ligne —
+ * données du … ». Le worker garde la coquille, la couche applicative garde les
+ * chiffres : c'est la seule des deux qui peut dire de quand ils datent.
+ */
+export const SW_PAGES_CACHE_NAME = `swiftly-pages-${SW_CACHE_VERSION}`;
+
+/** Coquilles gardées au maximum, les plus anciennes évincées d'abord. */
+export const SW_MAX_CACHED_PAGES = 24;
 
 /** Served for any navigation that cannot reach the network. */
 export const OFFLINE_URL = "/offline";
 
-/**
- * SCREEN-01. Precached because the doc asks the installed app to *open* without
- * a network ("l'app s'ouvre même quand le réseau coupe — 3G instable"), and the
- * landing is the one page that can honour that: 100 % static, no session, no
- * figure on it (screen doc § 3). It is a fallback for a navigation to "/" only,
- * never preferred over the network.
- */
+/** SCREEN-01, et `start_url` du manifeste : l'app installée s'ouvre ici. */
 export const LANDING_URL = "/";
 
-/** The app shell — structure and identity only. NEVER a balance, never a transaction. */
+/** SCREEN-04 — le premier écran réel, celui qu'on attend en ouvrant l'app. */
+export const DASHBOARD_URL = "/dashboard";
+
+/** Ressources précachées à l'installation. Aucune n'est une page de données. */
 export const PRECACHE_URLS = [
-  LANDING_URL,
   OFFLINE_URL,
   "/manifest.webmanifest",
   "/icons/icon-192x192.png",
@@ -46,9 +63,24 @@ export const PRECACHE_URLS = [
 ] as const;
 
 /**
- * Paths the service worker must never answer for. `/api/` is the important one:
- * this is a fintech app, and a balance served from a stale cache is a lie.
- * Everything under it goes to the network or fails — no third option.
+ * Coquilles précachées à l'installation, pour que le tout premier lancement
+ * hors ligne tombe sur l'app et non sur la page « Pas de connexion ».
+ *
+ * Le worker relit chaque coquille pour y repérer ses `/_next/static/*.js|css`
+ * et les cacher aussi : une coquille sans ses fragments s'affiche figée sur son
+ * squelette, ce qui serait pire que la page hors ligne.
+ *
+ * Les autres écrans arrivent dans ce cache au fil des visites en ligne.
+ */
+export const PRECACHE_PAGES = [LANDING_URL, DASHBOARD_URL] as const;
+
+/**
+ * Paths the service worker must never answer for. `/api/` is the important one,
+ * et il n'a pas bougé d'un pouce en v3 : un worker sert une réponse sans que
+ * l'interface sache d'où elle vient, donc un solde périmé y serait
+ * indiscernable d'un solde frais. Le mode hors ligne des données est monté un
+ * étage plus haut (`lib/offline/*`), là où la date peut remonter jusqu'à
+ * l'écran. Ici : le réseau ou l'échec, pas de troisième option.
  */
 export const SW_NEVER_INTERCEPT = ["/api/", "/sw.js"] as const;
 

@@ -663,6 +663,7 @@ export const fr = {
     noResults: "Aucun template pour ce filtre.",
     createdToast: "Template créé",
     deletedToast: "Template supprimé",
+    menuOpen: "Lancer la transaction",
     loadErrorTitle: "Impossible de charger les templates",
     loadErrorBody: "Vérifiez votre connexion et réessayez.",
     deleteTitle: "Supprimer ce template ?",
@@ -952,6 +953,18 @@ export const fr = {
     seeProject: "Voir le projet",
     seeTransaction: "Voir la transaction",
     seeReport: "Voir le rapport",
+  },
+
+  offline: {
+    /* Le bandeau collant en haut de l'app quand ce qui est affiché n'est pas
+       frais. « données du … » n'est pas une politesse : c'est la seule chose
+       qui distingue un solde d'aujourd'hui d'un solde d'hier. */
+    banner: "Hors ligne",
+    bannerDated: "Hors ligne · données du {date}",
+    staleDated: "Données du {date}",
+    writeBlocked:
+      "Hors ligne — impossible d'enregistrer. Réessaie quand le réseau revient.",
+    readBlocked: "Hors ligne — cette page n'a pas encore été chargée sur cet appareil.",
   },
 
   pwa: {

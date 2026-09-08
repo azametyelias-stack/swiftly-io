@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { PlusIcon } from "@/components/nav/icons";
 import { TemplateFormSheet } from "@/components/templates/TemplateFormSheet";
 import { TemplateListRow } from "@/components/templates/TemplateListRow";
+import { ActionSheet } from "@/components/ui/ActionSheet";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { ManageEmptyState } from "@/components/ui/ManageEmptyState";
 import { NightScreen } from "@/components/ui/NightScreen";
@@ -18,6 +19,7 @@ import {
   TEMPLATE_SORTS,
   matchesKindFilter,
   sortTemplates,
+  templateUpdatePayload,
   type TemplateKindFilter,
   type TemplateListItem,
   type TemplateSort,
@@ -42,6 +44,8 @@ export function TemplatesScreen() {
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState<TemplateListItem | null>(null);
   const [pendingDelete, setPendingDelete] = useState<TemplateListItem | null>(null);
+  /** Ligne dont le menu d'appui long est ouvert (SCREEN-14 § 6). */
+  const [menuFor, setMenuFor] = useState<TemplateListItem | null>(null);
   const [busy, setBusy] = useState(false);
 
   const rows = useMemo(
@@ -52,6 +56,10 @@ export function TemplatesScreen() {
       ),
     [templates, kind, sort],
   );
+
+  /** Tap simple et action « Lancer » du menu mènent au même endroit (doc § 6). */
+  const launch = (tpl: TemplateListItem) =>
+    router.push(`/transactions/nouvelle?template=${tpl.id}`);
 
   const confirmDelete = async () => {
     if (!pendingDelete) return;
@@ -78,9 +86,9 @@ export function TemplatesScreen() {
           type="button"
           aria-label={t.form.createTitle}
           onClick={() => setCreating(true)}
-          className="grid size-10 place-items-center rounded-full border border-white/20 bg-white/10"
+          className="grid size-11 place-items-center rounded-full border border-white/20 bg-white/10"
         >
-          <PlusIcon width={18} height={18} />
+          <PlusIcon width={26} height={26} />
         </button>
       }
       contentClassName="overflow-hidden"
@@ -144,7 +152,8 @@ export function TemplatesScreen() {
                   key={tpl.id}
                   deleteLabel={m.common.delete}
                   onDelete={() => setPendingDelete(tpl)}
-                  onOpen={() => router.push(`/transactions/nouvelle?template=${tpl.id}`)}
+                  onOpen={() => launch(tpl)}
+                  onLongPress={() => setMenuFor(tpl)}
                 >
                   <TemplateListRow template={tpl} onEdit={() => setEditing(tpl)} />
                 </SwipeToDelete>
@@ -181,10 +190,44 @@ export function TemplatesScreen() {
           template={editing}
           onClose={() => setEditing(null)}
           onSubmit={async (payload) => {
-            await updateTemplateRequest(editing.id, payload);
+            // `kind` est immuable côté serveur — voir `templateUpdatePayload`.
+            await updateTemplateRequest(editing.id, templateUpdatePayload(payload));
             toast.show(m.common.savedToast);
             reload();
           }}
+        />
+      ) : null}
+
+      {menuFor ? (
+        <ActionSheet
+          title={menuFor.name}
+          cancelLabel={m.common.cancel}
+          onCancel={() => setMenuFor(null)}
+          actions={[
+            {
+              label: t.menuOpen,
+              onSelect: () => {
+                const tpl = menuFor;
+                setMenuFor(null);
+                launch(tpl);
+              },
+            },
+            {
+              label: m.common.edit,
+              onSelect: () => {
+                setEditing(menuFor);
+                setMenuFor(null);
+              },
+            },
+            {
+              label: m.common.delete,
+              tone: "danger",
+              onSelect: () => {
+                setPendingDelete(menuFor);
+                setMenuFor(null);
+              },
+            },
+          ]}
         />
       ) : null}
 

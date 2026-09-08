@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { AuthButton } from "@/components/auth/AuthButton";
 import { useSession } from "@/components/auth/SessionProvider";
 import { useMessages } from "@/lib/i18n/useMessages";
+import { hasOfflineData } from "@/lib/offline/cache";
+import { useOfflineState } from "@/lib/offline/status";
 
 /**
  * SCREEN-1 — Landing. Full-bleed night hero, content bottom-aligned, one button.
@@ -29,12 +31,23 @@ export default function LandingPage() {
   const m = useMessages();
   const router = useRouter();
   const { status } = useSession();
+  const { online } = useOfflineState();
   const [leaving, setLeaving] = useState(false);
   const rearm = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    if (status === "authenticated") router.replace("/dashboard");
-  }, [status, router]);
+    if (status === "authenticated") {
+      router.replace("/dashboard");
+      return;
+    }
+    // `start_url` du manifeste vaut "/", donc l'app installée s'ouvre ici. Hors
+    // ligne le jeton peut être expiré sans pouvoir être rafraîchi : la session
+    // ressort `null` alors que l'appareil a bien des données. Ouvrir sur la
+    // Landing serait faux — c'est le dashboard qu'on attend, daté par le bandeau.
+    if (status === "unauthenticated" && !online && hasOfflineData()) {
+      router.replace("/dashboard");
+    }
+  }, [status, online, router]);
 
   // A pending re-arm must not outlive the screen.
   useEffect(

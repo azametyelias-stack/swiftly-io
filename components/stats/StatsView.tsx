@@ -42,9 +42,9 @@ export function StatsView() {
         <Link
           href="/transactions/nouvelle"
           aria-label={t.newTransaction}
-          className="grid size-10 place-items-center rounded-full border border-white/20 bg-white/10 text-ink-on-surface"
+          className="grid size-11 place-items-center rounded-full border border-white/20 bg-white/10 text-ink-on-surface"
         >
-          <PlusIcon width={18} height={18} />
+          <PlusIcon width={26} height={26} />
         </Link>
       }
       contentClassName="p-4 gap-3"

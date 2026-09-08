@@ -12,6 +12,14 @@ import {
 import { usePathname } from "next/navigation";
 
 import { MenuDrawer } from "@/components/nav/MenuDrawer";
+import {
+  NAV_EDGE_BAND,
+  NAV_INTENT,
+  NAV_OPEN_ZONE,
+  shouldBlockSystemSwipe,
+} from "@/lib/nav/gesture";
+import { haptic } from "@/lib/ui/haptics";
+import { OfflineBanner } from "@/components/offline/OfflineBanner";
 import { NavShellContext, type NavShellValue } from "@/components/nav/useNavShell";
 
 /**
@@ -22,12 +30,14 @@ import { NavShellContext, type NavShellValue } from "@/components/nav/useNavShel
  * `prefers-reduced-motion` (instant, no slide).
  */
 
-/** Visible sliver of the pushed screen when the menu is open. */
-const EDGE_BAND = 52;
-/** A swipe that starts within this many px of the left edge can open the menu. */
-const OPEN_ZONE = 28;
-/** Horizontal travel before we treat the gesture as a drawer drag, not a scroll. */
-const INTENT = 10;
+/*
+ * Les trois seuils du geste vivent dans `lib/nav/gesture.ts`, avec la règle qui
+ * neutralise le « retour arrière » du système — elle s'en sert des mêmes, et un
+ * module pur se teste sous `node --test`.
+ */
+const EDGE_BAND = NAV_EDGE_BAND;
+const OPEN_ZONE = NAV_OPEN_ZONE;
+const INTENT = NAV_INTENT;
 
 export function NavShell({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
@@ -61,6 +71,69 @@ export function NavShell({ children }: { children: ReactNode }) {
     () => (typeof window === "undefined" ? 320 : window.innerWidth - EDGE_BAND),
     [],
   );
+
+  /*
+   * ---- garde contre le geste système ----
+   *
+   * Le balayage « retour arrière » depuis le bord (iOS ≥ 16, app installée
+   * comprise ; Chrome Android) part du même endroit que l'ouverture du menu, et
+   * c'est lui qui gagne : le navigateur reconnaît son geste avant que nos
+   * évènements pointeur ne servent à quoi que ce soit. Le seul moyen de le lui
+   * retirer est un `preventDefault()` sur `touchmove`, donc un écouteur non
+   * passif — que React ne sait pas poser en JSX (`onTouchMove` est passif).
+   *
+   * `preventDefault()` doit tomber sur le PREMIER mouvement : après, iOS a
+   * engagé sa transition et ne la rend plus. D'où la décision précoce de
+   * `shouldBlockSystemSwipe`, qui rend la main au défilement dès que le vertical
+   * domine de quelques pixels.
+   */
+  const surfaceRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const surface = surfaceRef.current;
+    if (!surface) return;
+
+    let touch: { id: number; x: number; y: number } | null = null;
+
+    const onTouchStart = (e: TouchEvent) => {
+      const first = e.changedTouches[0];
+      if (!first || e.touches.length > 1) {
+        touch = null; // pincement, zoom : ce n'est pas notre geste
+        return;
+      }
+      touch = { id: first.identifier, x: first.clientX, y: first.clientY };
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (!touch) return;
+      const current = Array.from(e.touches).find((t) => t.identifier === touch!.id);
+      if (!current) return;
+      const block = shouldBlockSystemSwipe({
+        startX: touch.x,
+        dx: current.clientX - touch.x,
+        dy: current.clientY - touch.y,
+        open,
+      });
+      // `cancelable` retombe à false une fois que le navigateur s'est engagé —
+      // appeler quand même ne ferait qu'un avertissement en console.
+      if (block && e.cancelable) e.preventDefault();
+    };
+
+    const onTouchEnd = () => {
+      touch = null;
+    };
+
+    surface.addEventListener("touchstart", onTouchStart, { passive: true });
+    surface.addEventListener("touchmove", onTouchMove, { passive: false });
+    surface.addEventListener("touchend", onTouchEnd, { passive: true });
+    surface.addEventListener("touchcancel", onTouchEnd, { passive: true });
+    return () => {
+      surface.removeEventListener("touchstart", onTouchStart);
+      surface.removeEventListener("touchmove", onTouchMove);
+      surface.removeEventListener("touchend", onTouchEnd);
+      surface.removeEventListener("touchcancel", onTouchEnd);
+    };
+  }, [open]);
 
   // ---- gesture ----
   const gesture = useRef<{
@@ -99,6 +172,9 @@ export function NavShell({ children }: { children: ReactNode }) {
         return;
       }
       g.active = true;
+      // Le geste est reconnu : un tic, pour que la main sache que le tiroir a
+      // pris le doigt — y compris si on le relâche avant d'aller au bout.
+      haptic();
       (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
     }
 
@@ -143,7 +219,7 @@ export function NavShell({ children }: { children: ReactNode }) {
           `position: sticky` inside the screens (the dashboard's pinned
           "+ Nouvelle transaction" button just scrolled away). `clip` hides the
           same overflow without creating a scroll container. */}
-      <div className="relative min-h-dvh overflow-x-clip bg-brand-deep">
+      <div ref={surfaceRef} className="relative min-h-dvh overflow-x-clip bg-brand-deep">
         <MenuDrawer />
 
         <div
@@ -168,6 +244,10 @@ export function NavShell({ children }: { children: ReactNode }) {
               className="absolute inset-y-0 left-0 z-20 w-14 cursor-pointer bg-transparent"
             />
           )}
+          {/* En tête du flux, pas en `fixed` : hors ligne le bandeau prend une
+              vraie place au lieu de recouvrir le titre de l'écran. Il ne rend
+              rien tant que tout est frais. */}
+          <OfflineBanner />
           {children}
         </div>
       </div>

@@ -126,17 +126,17 @@ export function HistoryScreen({
           type="button"
           aria-label={m.common.back}
           onClick={() => (window.history.length > 1 ? router.back() : router.push("/dashboard"))}
-          className="grid size-10 place-items-center rounded-full border border-white/20 bg-white/10"
+          className="grid size-11 place-items-center rounded-full border border-white/20 bg-white/10"
         >
-          <ChevronLeftIcon width={18} height={18} />
+          <ChevronLeftIcon width={26} height={26} />
         </button>
         <span className="t-screen-title">{t.list.title}</span>
         <Link
           href="/transactions/nouvelle"
           aria-label={t.list.newTransaction}
-          className="grid size-10 place-items-center rounded-full border border-white/20 bg-white/10"
+          className="grid size-11 place-items-center rounded-full border border-white/20 bg-white/10"
         >
-          <PlusIcon width={18} height={18} />
+          <PlusIcon width={26} height={26} />
         </Link>
       </div>
 

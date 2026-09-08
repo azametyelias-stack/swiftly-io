@@ -7,6 +7,7 @@ import {
   curveTicks,
   niceCeil,
   smoothPath,
+  SMOOTH_MAX_HANDLE,
 } from "../../lib/dashboard/curve.ts";
 import { formatCompact } from "../../lib/format/money.ts";
 
@@ -115,29 +116,88 @@ test("smoothPath: bounded — the drawn curve never leaves the plot area", () =>
   assert.ok(hi <= bottom + 0.001, `curve went below the plot area: ${hi} > ${bottom}`);
 });
 
-test("smoothPath: an asymmetric peak arcs past the point, it doesn't land flat", () => {
-  // A monotone (Fritsch–Carlson) spline forces the tangent to 0 at every local
-  // extremum, so the curve arrives flat and the peak reads as an angular shelf.
-  // The design calls for a rounded arc, i.e. a little overshoot past the point.
+/*
+ * ─── Renversement assumé, 2026-09-07 ────────────────────────────────────────
+ * Deux tests vivaient ici et disaient l'inverse des deux suivants : le sommet
+ * devait « dépasser le point pour faire rond », et un palier devait « s'incurver
+ * vers la montée ». Elias a photographié le résultat sur son dashboard du
+ * 7 septembre : un sommet en angle. La cause était la longueur des poignées
+ * (`dx/3` sur un long segment étale la courbure au lieu de la concentrer sur la
+ * jointure), pas la tangente. `SMOOTH_MAX_HANDLE` corrige ça, et rend la
+ * tangente horizontale aux extrema à nouveau tenable — c'est elle qui fait le
+ * dôme. Rendu vérifié sur trois séries avant d'écrire ces tests.
+ * ────────────────────────────────────────────────────────────────────────────
+ */
+
+test("smoothPath: un sommet est un dome dont le point culminant est la donnee", () => {
   const xs = [0, 40, 100];
-  const ys = [100, 20, 60]; // y is inverted in SVG: index 1 is a peak
+  const ys = [100, 20, 60]; // y est inversé en SVG : l'index 1 est un sommet
   const drawn = sampleYs(smoothPath(xs, ys, { top: 0, bottom: 120 }));
-  assert.ok(Math.min(...drawn) < 20, "peak should arc past the data point");
-  assert.ok(Math.min(...drawn) > 0, "…but stay inside the plot area");
+
+  // Ni au-dessus du sommet, ni en dessous du plus bas des deux voisins : la
+  // courbe ne dessine jamais un solde qui n'a pas existé.
+  assert.ok(Math.min(...drawn) >= 20 - 0.001, "le trace ne doit pas depasser le sommet");
+  assert.ok(Math.max(...drawn) <= 100 + 0.001, "ni descendre sous le point de depart");
+
+  // Et c'est bien un dôme, pas un angle : juste avant et juste après le sommet,
+  // la courbe est déjà retombée nettement moins vite qu'une droite ne le ferait.
+  // Sur un angle, les deux échantillons voisins suivent les pentes brutes.
+  const apex = drawn.indexOf(Math.min(...drawn));
+  const before = drawn[apex - 8]!;
+  const after = drawn[apex + 8]!;
+  assert.ok(before - 20 < 8, `l'approche du sommet doit s'aplatir (${before})`);
+  assert.ok(after - 20 < 8, `la sortie du sommet aussi (${after})`);
 });
 
-test("smoothPath: eases out of a flat run instead of shelving into the rise", () => {
-  // The real shape of balance data: flat, then a transaction jumps it. A
-  // monotone spline zeroes the tangent at every point next to a flat segment,
-  // producing flat shelves joined by steep S-bends — the look Elias rejected.
-  // Here the flat run must already be bowing towards the rise.
-  const drawn = sampleYs(smoothPath([0, 30, 60, 90], [100, 100, 40, 40], { top: 0, bottom: 120 }));
-  const firstSegment = drawn.slice(1, 102); // the 0→30 span
-  const deviation = Math.max(...firstSegment.map((v) => Math.abs(v - 100)));
-  assert.ok(deviation > 0.5, "the flat run should bend into the rise, not shelve into it");
-  // The bend is a gentle wind-up, not a spike — and bounded like everything else.
-  assert.ok(deviation < 12);
-  assert.ok(Math.max(...drawn) <= 120.001);
+test("smoothPath: les poignees sont plafonnees, donc une longue portee reste droite", () => {
+  // C'est LA correction du 2026-09-07. Sans plafond, la poignée d'un segment de
+  // 270 px mesurerait 90 px et la courbure s'étalerait sur toute la portée.
+  const path = smoothPath([0, 270, 300], [100, 20, 40], { top: 0, bottom: 120 });
+  const first = /C ([\d.]+) [\d.]+, ([\d.]+) /.exec(path);
+  assert.ok(first, "le premier segment doit etre une cubique");
+  assert.ok(
+    Number(first[1]) - 0 <= SMOOTH_MAX_HANDLE + 0.05,
+    `poignee de sortie trop longue : ${first[1]}`,
+  );
+  assert.ok(
+    270 - Number(first[2]) <= SMOOTH_MAX_HANDLE + 0.05,
+    `poignee d'entree trop longue : ${first[2]}`,
+  );
+});
+
+test("smoothPath: un palier reste plat, l'arrondi se fait dans le virage", () => {
+  // La forme la plus courante d'un solde : plat entre deux transactions. Le
+  // tracé ne doit RIEN inventer sur le palier — ni creux sous le palier, ni
+  // renflement au-dessus — et arrondir seulement le coin.
+  const drawn = sampleYs(smoothPath([0, 120, 130, 280], [40, 40, 100, 100], { top: 0, bottom: 120 }));
+  assert.ok(Math.max(...drawn) <= 100 + 0.001, "aucun creux sous le palier bas");
+  assert.ok(Math.min(...drawn) >= 40 - 0.001, "aucun renflement au-dessus du palier haut");
+
+  // Le palier reste plat sur TOUTE sa longueur. C'est le point d'honnetete :
+  // entre deux transactions le solde n'a pas bouge, la courbe non plus. La
+  // version d'avant l'incurvait vers la transaction suivante, ce qui dessinait
+  // un mouvement d'argent qui n'a jamais eu lieu.
+  for (const v of drawn.slice(1, 102)) {
+    assert.ok(Math.abs(v - 40) < 0.001, `le palier doit rester plat (${v})`);
+  }
+
+  // L'arrondi se fait donc entierement dans le segment de la transaction : il
+  // quitte le palier a l'horizontale au lieu de partir droit. Une droite serait
+  // a 46 au dixieme du segment ; la courbe doit etre nettement en dessous.
+  const rise = drawn.slice(102, 203); // la portee 120→130
+  assert.ok(rise[10]! < 44, `la sortie du palier doit s'arrondir (${rise[10]})`);
+  assert.ok(rise.at(-1)! > 99, "et rejoindre le palier haut");
+});
+
+test("smoothPath: une serie dense reste lisse et ne depasse jamais", () => {
+  // La vue « mois » : 30 points serrés qui montent et descendent. Ici dx/3 est
+  // sous le plafond, donc le plafond ne joue pas — ce test garde le cas où
+  // l'ancien comportement doit être préservé tel quel.
+  const xs = Array.from({ length: 30 }, (_, i) => i * 10);
+  const ys = Array.from({ length: 30 }, (_, i) => 60 + (i % 3 === 0 ? -25 : i % 3 === 1 ? 20 : 5));
+  const drawn = sampleYs(smoothPath(xs, ys, { top: 0, bottom: 120 }));
+  assert.ok(Math.min(...drawn) >= Math.min(...ys) - 0.001, "pas de depassement vers le haut");
+  assert.ok(Math.max(...drawn) <= Math.max(...ys) + 0.001, "pas de depassement vers le bas");
 });
 
 test("smoothPath: a flat series stays flat (no invented wobble)", () => {

@@ -93,6 +93,37 @@ export function DashboardView() {
     // page like everything above it, then freezes at the top the moment it
     // gets there, and the white panel keeps scrolling underneath it.
     <div className="relative min-h-[100dvh] bg-surface-page">
+      {/*
+        Le cadre de la barre d'état.
+
+        Invisible tant qu'on est en haut de la page : la coquille de nuit, qui
+        vient juste après et qui est opaque, le recouvre — le dégradé passe donc
+        toujours sous l'horloge, comme voulu. Il n'apparaît que lorsque la page a
+        défilé et que le bouton s'est figé : l'heure et la batterie sont blanches
+        (barre translucide) et il leur faut un fond sombre, sinon les deux
+        affichages se mêlent.
+
+        `sticky` et non `fixed` : NavShell translate en permanence le calque de
+        l'écran, et un ancêtre transformé enferme un `fixed` dans son cadre — il
+        défilerait avec la page. La marge négative lui reprend la place qu'il
+        occuperait dans le flux : il ne pousse rien.
+      */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none sticky top-0 z-0"
+        style={{
+          height: "var(--sf-safe-top)",
+          marginBottom: "calc(-1 * var(--sf-safe-top))",
+          // La MÊME matière que la bande du bouton — photo de nuit sous le même
+          // voile — et non un aplat. Un `--brand-deep` plat, plus clair que la
+          // bande, laissait une couture nette juste sous l'horloge.
+          backgroundImage:
+            "linear-gradient(rgba(6,10,60,0.72), rgba(6,10,60,0.72)), url(/brand/nuit.jpg)",
+          backgroundSize: "cover",
+          backgroundPosition: "center bottom",
+        }}
+      />
+
       {/* Night hero — natural height, holds the header/balance/curve/summary. */}
       <div className="relative overflow-hidden text-ink-on-surface">
         <div aria-hidden="true" className="pointer-events-none absolute inset-0">
@@ -110,22 +141,32 @@ export function DashboardView() {
         </div>
 
         <div className="relative z-10">
+          {/*
+            Les deux pastilles de tête. Elles portent des glyphes de 26 dans un
+            disque de 44 — comme `AppHeader`, et pour les mêmes deux raisons.
+            Elles sont blanches sur une PHOTO : un trait fin s'y dissout là où il
+            tiendrait sur un aplat, et un contour de 18 px se lisait mal en plein
+            jour (retour terrain du 2026-09-08). Et 44, c'est la cible tactile
+            minimale du handoff (§ Accessibilité) — ces deux-là, contrairement à
+            celles d'`AppHeader`, n'avaient aucune zone d'appui étendue pour
+            rattraper leurs 40.
+          */}
           <div className="flex h-14 items-center justify-between px-2" style={{ marginTop: "env(safe-area-inset-top)" }}>
             <button
               type="button"
               onClick={openMenu}
               aria-label={m.common.menu}
-              className="grid size-10 place-items-center rounded-full border border-white/20 bg-white/10"
+              className="grid size-11 place-items-center rounded-full border border-white/20 bg-white/10"
             >
-              <MenuIcon width={18} height={18} />
+              <MenuIcon width={26} height={26} />
             </button>
             <span className="font-logo text-[19px] tracking-[-0.01em]">Swiftly.io</span>
             <Link
               href="/alertes"
               aria-label={m.common.notifications}
-              className="grid size-10 place-items-center rounded-full border border-white/20 bg-white/10"
+              className="grid size-11 place-items-center rounded-full border border-white/20 bg-white/10"
             >
-              <BellIcon width={18} height={18} />
+              <BellIcon width={26} height={26} />
             </Link>
           </div>
 
@@ -233,12 +274,21 @@ export function DashboardView() {
         </div>
       </div>
 
-      {/* The button — scrolls with the page, then freezes at the top and stays
-          in view. Per the design artboard it is ALWAYS a band of the night
-          background (photo + the gradient's own tail tint), never a light strip
-          and never rounded: the rounded edge in the design belongs to the white
-          panel below, which cuts its corners out of this dark band. */}
-      <div className="sticky top-0 z-20 overflow-hidden px-4 pb-4 pt-3">
+      {/* The button — scrolls with the page, then freezes and stays in view. Per
+          the design artboard it is ALWAYS a band of the night background (photo
+          + the gradient's own tail tint), never a light strip and never rounded:
+          the rounded edge in the design belongs to the white panel below, which
+          cuts its corners out of this dark band.
+
+          Il se fige SOUS la barre d'état, pas contre le haut de l'écran : c'est
+          `top` qui règle ça, sans rien changer à sa taille ni au flux, donc sans
+          le moindre sursaut au moment où il s'accroche. Quand le bandeau hors
+          ligne est là, il est déjà le haut de l'écran et peint lui-même
+          l'encoche — le `max()` s'efface alors devant lui. */}
+      <div
+        className="sticky z-20 overflow-hidden"
+        style={{ top: "max(var(--sf-safe-top), var(--sf-offline-bar, 0px))" }}
+      >
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 bg-cover"
@@ -249,21 +299,48 @@ export function DashboardView() {
           className="pointer-events-none absolute inset-0"
           style={{ background: "rgba(6,10,60,0.72)" }}
         />
-        <Link
-          href="/transactions/nouvelle"
-          className="relative z-10 flex h-[var(--size-primary-button)] w-full items-center justify-center gap-2 rounded-[var(--radius-pill)] bg-surface-card text-[17px] font-semibold text-text-primary shadow-[0_16px_34px_-6px_rgba(4,6,30,0.44),0_3px_8px_rgba(4,6,30,0.22)]"
-        >
-          <PlusIcon width={20} height={20} />
-          {m.dashboard.newTransaction}
-        </Link>
+        <div className="relative z-10 px-4 pb-4 pt-3">
+          <Link
+            href="/transactions/nouvelle"
+            className="flex h-[var(--size-primary-button)] w-full items-center justify-center gap-2 rounded-[var(--radius-pill)] bg-surface-card text-[17px] font-semibold text-text-primary shadow-[0_16px_34px_-6px_rgba(4,6,30,0.44),0_3px_8px_rgba(4,6,30,0.22)]"
+          >
+            <PlusIcon width={20} height={20} />
+            {m.dashboard.newTransaction}
+          </Link>
+        </div>
+
+        {/*
+          La lèvre : le haut arrondi de la feuille blanche, épinglé avec le
+          bouton. C'est ce qui manquait — la feuille défilait sous le bouton et
+          ses deux angles disparaissaient, laissant une arête droite. Ici les
+          arrondis restent posés sous le bouton et le contenu passe derrière :
+          on lit un défilement interne, sans imbriquer de conteneur défilant
+          (deux zones de défilement se voleraient le doigt).
+
+          Sa hauteur EST le rayon, pour que l'arc s'achève exactement sur son
+          bord. Le fond sombre est celui qui portait déjà les angles. Et elle
+          vient après le bouton dans le DOM, donc elle recouvre l'ombre de
+          celui-ci : la coupure nette d'avant est conservée.
+        */}
+        <div className="relative z-10 bg-brand-deep">
+          <div className="h-[var(--radius-content-top)] rounded-t-[var(--radius-content-top)] bg-surface-card" />
+        </div>
       </div>
 
-      {/* White panel — flows right after the button, same page scroll. The dark
-          wrapper is what shows through the panel's rounded top corners, so the
-          radius reads against the night blue as in the design (a light-on-light
-          corner would just look like a square edge). */}
-      <div className="relative z-10 bg-brand-deep">
-        <div className="rounded-t-[var(--radius-content-top)] bg-surface-card px-4 pb-24 pt-4 text-text-primary">
+      {/* White panel — flows right after the button, same page scroll. Son haut
+          arrondi est porté par la lèvre ci-dessus : ici le bord est droit et
+          vient s'y aboucher, sans couture (même blanc, même largeur).
+
+          Ce bloc n'est plus positionné, et c'est volontaire. Il défile sous la
+          barre d'état : s'il restait en `z-10`, son blanc passerait AU-DESSUS du
+          cadre sombre et l'heure redeviendrait illisible — le bug d'origine,
+          déplacé. Un élément non positionné se peint sous tout ce qui l'est,
+          donc sous le cadre ; l'ordre est réglé une fois pour toutes, sans
+          empiler des z-index qui se contredisent. Il n'avait besoin de rien
+          d'autre : aucun de ses descendants ne s'y accroche en `absolute` (le
+          seul de l'écran est le menu déroulant, et il vit dans la coquille). */}
+      <div className="bg-brand-deep">
+        <div className="bg-surface-card px-4 pb-24 pt-0 text-text-primary">
           <div className="flex flex-col gap-3">
           <RotatingBanner items={[]} />
 

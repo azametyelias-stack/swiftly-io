@@ -653,6 +653,7 @@ export const en: Messages = {
     noResults: "No template for this filter.",
     createdToast: "Template created",
     deletedToast: "Template deleted",
+    menuOpen: "Start the transaction",
     loadErrorTitle: "Couldn't load your templates",
     loadErrorBody: "Check your connection and try again.",
     deleteTitle: "Delete this template?",
@@ -936,6 +937,14 @@ export const en: Messages = {
     seeProject: "See the project",
     seeTransaction: "See the transaction",
     seeReport: "See the report",
+  },
+
+  offline: {
+    banner: "Offline",
+    bannerDated: "Offline · data from {date}",
+    staleDated: "Data from {date}",
+    writeBlocked: "Offline — nothing can be saved. Try again once the network is back.",
+    readBlocked: "Offline — this page has never been loaded on this device.",
   },
 
   pwa: {

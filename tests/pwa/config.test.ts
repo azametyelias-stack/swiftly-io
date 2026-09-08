@@ -4,9 +4,13 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 import {
+  DASHBOARD_URL,
   LANDING_URL,
   OFFLINE_URL,
+  PRECACHE_PAGES,
   PRECACHE_URLS,
+  SW_MAX_CACHED_PAGES,
+  SW_PAGES_CACHE_NAME,
   PWA,
   SW_CACHE_NAME,
   SW_CACHE_VERSION,
@@ -48,22 +52,62 @@ test("sw.js precaches exactly the declared app shell", () => {
   }
 });
 
-test("the landing is the only page precached, and it carries no data", () => {
-  // Doc § A.2 lists "/" so the installed app opens without a network. SCREEN-01
-  // is 100 % static — no session, no figure. Any OTHER page in the precache
-  // would be a page about someone's money, served from a stale cache.
-  const pages = PRECACHE_URLS.filter((u) => !u.startsWith("/icons/") && u !== "/manifest.webmanifest");
-  assert.deepEqual([...pages].sort(), [LANDING_URL, OFFLINE_URL].sort());
+test("les deux caches sont nommes et versionnes ensemble", () => {
+  // v3 : les coquilles d'ecran vivent dans un cache a part, plafonne et
+  // renouvele a chaque visite, la ou les ressources sont immuables.
+  assert.equal(SW_PAGES_CACHE_NAME, `swiftly-pages-${SW_CACHE_VERSION}`);
+  assert.ok(sw.includes(`const PAGES_CACHE_NAME = "${SW_PAGES_CACHE_NAME}";`));
+  assert.ok(sw.includes(`const MAX_CACHED_PAGES = ${SW_MAX_CACHED_PAGES};`));
+  // `activate` doit garder les DEUX, sinon chaque mise a jour vide les coquilles.
+  const activate = sw.slice(sw.indexOf('addEventListener("activate"'), sw.indexOf('addEventListener("fetch"'));
+  assert.match(activate, /\[CACHE_NAME, PAGES_CACHE_NAME\]/);
 });
 
-test("the cached landing is a fallback, never preferred over the network", () => {
-  const nav = sw.slice(sw.indexOf("async function navigateOrFallback"), sw.indexOf("async function cacheFirst"));
+test("seules des coquilles sont precachees — aucune ne porte de chiffre", () => {
+  // v2 ne precachait que la Landing : toute autre page aurait ete « une page
+  // sur l'argent de quelqu'un, servie depuis un cache perime ». v3 en cache
+  // d'autres, et l'argument tient toujours — mais autrement : ces pages sont
+  // des composants client dont le HTML ne contient aucun montant. Les chiffres
+  // passent par lib/offline/*, qui les date. Ce que ce test garde, c'est que
+  // rien de precache ici ne puisse etre une reponse de donnees.
+  for (const url of [...PRECACHE_URLS, ...PRECACHE_PAGES]) {
+    assert.ok(!url.startsWith("/api/"), `${url} ne doit jamais etre precache`);
+  }
+  assert.deepEqual([...PRECACHE_PAGES], [LANDING_URL, DASHBOARD_URL]);
+  for (const page of PRECACHE_PAGES) {
+    assert.ok(sw.includes(`"${page}"`), `sw.js doit precacher la coquille ${page}`);
+  }
+  // Une seule page dans le cache de ressources : /offline, le repli ultime.
+  const documents = PRECACHE_URLS.filter(
+    (u) => !u.startsWith("/icons/") && u !== "/manifest.webmanifest",
+  );
+  assert.deepEqual([...documents], [OFFLINE_URL]);
+});
+
+test("une coquille est un repli, jamais preferee au reseau", () => {
+  const nav = sw.slice(sw.indexOf("async function navigateOrFallback"), sw.indexOf("function isCacheableDocument"));
   assert.ok(nav, "sw.js must define navigateOrFallback");
   assert.ok(
-    nav.indexOf("fetch(event.request)") < nav.indexOf("caches.match"),
+    nav.indexOf("fetch(event.request)") < nav.indexOf("caches.open(PAGES_CACHE_NAME)"),
     "the network attempt must come before any cache lookup",
   );
-  assert.match(nav, /LANDING_URL \? LANDING_URL : OFFLINE_URL/);
+  // Le repli est celui de CETTE route, sinon /offline — jamais la coquille
+  // d'un autre ecran, qui afficherait une mise en page qu'on n'a pas demandee.
+  assert.match(nav, /pages\.match\(url\.pathname\)/);
+  assert.ok(
+    nav.indexOf("pages.match(url.pathname)") < nav.indexOf("OFFLINE_URL"),
+    "the requested route's shell must win over the offline page",
+  );
+});
+
+test("une coquille n'est rangee que depuis la branche navigation", () => {
+  // storeShell est le seul chemin d'ecriture du cache de pages. S'il devenait
+  // atteignable depuis la branche generique, une reponse /api/ pourrait y
+  // entrer — c'est exactement ce que la REGLE N°1 interdit.
+  const handler = sw.slice(sw.indexOf('addEventListener("fetch"'), sw.indexOf("async function navigateOrFallback"));
+  assert.ok(!handler.includes("storeShell"), "le gestionnaire fetch ne doit pas ranger de coquille lui-meme");
+  const callers = sw.split("storeShell(").length - 1;
+  assert.equal(callers, 3, "storeShell : sa definition, precachePage, et navigateOrFallback");
 });
 
 test("the precached shell holds no financial data", () => {

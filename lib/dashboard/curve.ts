@@ -60,27 +60,57 @@ export function axisLabel(v: number, formatCompact: (n: number) => string): stri
 }
 
 /**
+ * Longueur maximale d'une poignée de Bézier, en unités du viewBox (les deux
+ * graphiques partagent une zone de tracé d'environ 295 × 158 et 292 × 130).
+ *
+ * C'est la pièce qui manquait aux tentatives précédentes. La longueur standard
+ * d'une poignée Hermite→Bézier est `dx/3` : sur un segment court c'est
+ * parfait, mais sur un long segment — une journée avec quatre transactions —
+ * elle atteint 90 px, et la courbure se répartit sur toute la longueur au lieu
+ * de se concentrer là où il y a un angle. Résultat : des segments quasi droits
+ * réunis par des virages secs, exactement ce qu'Elias voit au sommet de sa
+ * courbe du 7 septembre. Plafonner la poignée transforme chaque jointure en
+ * congé d'arrondi de taille constante : les longues portées restent droites
+ * (leur pente est une information vraie), et les sommets s'arrondissent.
+ */
+export const SMOOTH_MAX_HANDLE = 24;
+
+/**
  * A smooth spline through `(xs[i], ys[i])` as an SVG path — the rounded peaks
  * and troughs of the reference artboard, not the angular joins of a polyline.
  *
- * Tangents are the *wide secant* through each point's two neighbours,
- * `(y[i+1] - y[i-1]) / (x[i+1] - x[i-1])` (a Catmull-Rom tangent). Two earlier
- * attempts are deliberately not used here:
- *  - averaging the two adjacent segment slopes — a short steep segment's slope
- *    dominates and the curve shoots off the chart (this actually shipped once);
- *  - Fritsch–Carlson monotone cubic — provably bounded, but it forces the
- *    tangent to 0 at every local extremum, which lands the curve flat onto each
- *    peak and trough. That is what made the result read as angular shelves
- *    rather than the round arcs of the design.
- * The wide secant is naturally moderate on uneven spacing (our hour axis bunches
- * several transactions together and leaves long gaps) and lets the curve arc
- * slightly past a peak, which is precisely what makes it look round.
+ * Deux règles seulement, et la seconde n'a de sens qu'avec `SMOOTH_MAX_HANDLE` :
  *
- * Safety is handled geometrically instead: every Bézier control point is
- * clamped into `bounds`. A cubic Bézier always stays inside the convex hull of
- * its four control points, and the two endpoints are data points already inside
- * the plot area — so clamping the two handles guarantees the drawn curve can
- * never leave the plot area, whatever the data does.
+ * 1. **Sur une portée monotone, la sécante large** `(y[i+1] - y[i-1]) /
+ *    (x[i+1] - x[i-1])`, bornée à `3 × min(|pente gauche|, |pente droite|)` —
+ *    la condition de monotonie de Fritsch–Carlson, qui empêche la courbe de
+ *    dépasser entre deux points. Deux variantes antérieures sont volontairement
+ *    écartées : la moyenne des deux pentes adjacentes (un segment court et
+ *    raide domine, la courbe part hors du cadre — ça a été livré une fois), et
+ *    la sécante large non bornée (même problème, en plus discret).
+ * 2. **Partout où la pente change de sens ou s'annule, tangente horizontale.**
+ *    Un sommet, un creux, l'entrée ou la sortie d'un palier. C'est ce qui fait
+ *    le dôme : sans ça la courbe arrive au sommet en pleine montée et doit
+ *    pivoter d'un coup — l'angle qu'Elias a photographié le 7 septembre.
+ *
+ * La règle 2 avait déjà été essayée (Fritsch–Carlson) et rejetée : le sommet
+ * s'étalait en plateau et les paliers se joignaient par des marches. Le rejet
+ * portait en réalité sur la LONGUEUR DES POIGNÉES, pas sur la tangente. Avec
+ * `dx/3` sur un segment d'une heure, une tangente nulle tient le tracé à plat
+ * sur un tiers du segment ; plafonnée à `SMOOTH_MAX_HANDLE`, elle ne le tient
+ * que quelques pixels et produit un congé d'arrondi. Vérifié en rendant le
+ * module sur trois séries (journée réelle, mois à 30 points, paliers).
+ *
+ * Effet de bord voulu : le point culminant du dôme est la donnée elle-même. La
+ * courbe ne dessine jamais un solde plus haut — ni plus bas — que celui qui a
+ * existé, alors que la version d'avant dépassait volontairement le point pour
+ * « faire rond ».
+ *
+ * Filet de sécurité géométrique en plus : chaque point de contrôle est ramené
+ * dans `bounds`. Une Bézier cubique reste toujours dans l'enveloppe convexe de
+ * ses quatre points de contrôle, et les deux extrémités sont des points de
+ * données déjà dans la zone de tracé — donc borner les deux poignées garantit
+ * que le tracé ne peut pas en sortir, quelles que soient les données.
  */
 export function smoothPath(
   xs: number[],
@@ -97,25 +127,39 @@ export function smoothPath(
     ? (v: number) => Math.min(bounds.bottom, Math.max(bounds.top, v))
     : (v: number) => v;
 
-  // Tangent (dy/dx) at each point.
-  const m = new Array<number>(n);
-  for (let i = 0; i < n; i += 1) {
-    const prev = i === 0 ? 0 : i - 1;
-    const next = i === n - 1 ? n - 1 : i + 1;
-    const dx = xs[next]! - xs[prev]!;
-    m[i] = dx === 0 ? 0 : (ys[next]! - ys[prev]!) / dx;
+  // Pente de chaque segment.
+  const d = new Array<number>(n - 1);
+  for (let i = 0; i < n - 1; i += 1) {
+    const dx = xs[i + 1]! - xs[i]!;
+    d[i] = dx === 0 ? 0 : (ys[i + 1]! - ys[i]!) / dx;
   }
 
-  // 1/3 of the segment is the standard Hermite→Bézier handle length; TENSION
-  // shortens it slightly so the arcs stay elegant instead of ballooning.
-  const TENSION = 0.86;
+  // Tangente (dy/dx) en chaque point — voir les trois règles ci-dessus.
+  const m = new Array<number>(n);
+  m[0] = d[0]!;
+  m[n - 1] = d[n - 2]!;
+  for (let i = 1; i < n - 1; i += 1) {
+    const left = d[i - 1]!;
+    const right = d[i]!;
+    if (left * right <= 0) {
+      // Règle 2 — sommet, creux, entrée ou sortie de palier.
+      m[i] = 0;
+    } else {
+      // Règle 1 — sécante large, bornée.
+      const dx = xs[i + 1]! - xs[i - 1]!;
+      const wide = dx === 0 ? 0 : (ys[i + 1]! - ys[i - 1]!) / dx;
+      const limit = 3 * Math.min(Math.abs(left), Math.abs(right));
+      m[i] = Math.sign(wide) * Math.min(Math.abs(wide), limit);
+    }
+  }
+
   let path = `M ${at(0)}`;
   for (let i = 0; i < n - 1; i += 1) {
-    const h = (xs[i + 1]! - xs[i]!) / 3;
+    const h = Math.min((xs[i + 1]! - xs[i]!) / 3, SMOOTH_MAX_HANDLE);
     const c1x = xs[i]! + h;
-    const c1y = clampY(ys[i]! + m[i]! * h * TENSION);
+    const c1y = clampY(ys[i]! + m[i]! * h);
     const c2x = xs[i + 1]! - h;
-    const c2y = clampY(ys[i + 1]! - m[i + 1]! * h * TENSION);
+    const c2y = clampY(ys[i + 1]! - m[i + 1]! * h);
     path += ` C ${c1x.toFixed(1)} ${c1y.toFixed(1)}, ${c2x.toFixed(1)} ${c2y.toFixed(1)}, ${at(i + 1)}`;
   }
   return path;

@@ -32,6 +32,7 @@ import {
 } from "@/lib/settings/model";
 import { useProfile } from "@/lib/settings/useProfile";
 import { getBrowserClient } from "@/lib/supabase/client";
+import { clearOfflineData } from "@/lib/offline/cache";
 
 /**
  * SCREEN-22 — Paramètres. The last screen of the MVP, and the artboard's own
@@ -97,6 +98,9 @@ export function SettingsScreen() {
 
   const logout = async () => {
     setLoggingOut(true);
+    // Avant tout le reste : le cache hors ligne garde de vrais montants sur
+    // l'appareil (lib/offline/cache.ts). Se déconnecter doit les emporter.
+    clearOfflineData();
     await getBrowserClient()?.auth.signOut();
     // Full navigation, not router.push: the session is gone, so every mounted
     // client component still holding the old user must be torn down

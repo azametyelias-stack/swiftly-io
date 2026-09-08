@@ -30,14 +30,24 @@ export function AppHeader({
   const atRoot = isRootPath(pathname);
 
   const text = tone === "onDark" ? "text-ink-on-surface" : "text-text-primary";
+  /*
+   * 44 px, glyphe de 26. Le handoff décrivait des boutons de 40 « à zone d'appui
+   * étendue » : la cible était bonne, le dessin restait petit — et un pseudo-
+   * élément n'agrandit pas ce qu'on voit. Retour terrain du 2026-09-08 : on ne
+   * les distingue pas assez. Le bouton porte donc ses 44 pour de vrai, ce qui
+   * rend l'`after` inutile (à 44 + inset-1 il mordrait sur le titre).
+   */
   const btn =
-    "relative grid size-10 place-items-center rounded-[var(--radius-pill)] " +
-    "transition-transform active:scale-[0.975] motion-reduce:active:scale-100 " +
-    "after:absolute after:-inset-1 after:content-['']"; // extends the tap target to 44
+    "relative grid size-11 place-items-center rounded-[var(--radius-pill)] " +
+    "transition-transform active:scale-[0.975] motion-reduce:active:scale-100";
 
   return (
     <header
-      className={`sticky top-0 z-30 ${tone === "onDark" ? "" : "bg-surface-page"} ${text}`}
+      className={`sticky z-30 ${tone === "onDark" ? "" : "bg-surface-page"} ${text}`}
+      // `--sf-offline-bar` n'est posée que pendant que le bandeau hors ligne est
+      // affiché (components/offline/OfflineBanner). Sans elle : top: 0, soit le
+      // comportement d'origine.
+      style={{ top: "var(--sf-offline-bar, 0px)" }}
     >
       {/*
         The status bar is translucent (`black-translucent`), which forces the
@@ -56,7 +66,7 @@ export function AppHeader({
       <div className="flex h-14 items-center gap-1 px-2">
         {atRoot ? (
           <button type="button" onClick={openMenu} aria-label="Ouvrir le menu" className={btn}>
-            <MenuIcon />
+            <MenuIcon width={26} height={26} />
           </button>
         ) : (
           <button
@@ -67,18 +77,18 @@ export function AppHeader({
             aria-label="Retour"
             className={btn}
           >
-            <ChevronLeftIcon />
+            <ChevronLeftIcon width={26} height={26} />
           </button>
         )}
 
         <h1 className="t-screen-title flex-1 truncate text-center">{title}</h1>
 
         <Link href="/alertes" aria-label="Alertes et notifications" className={btn}>
-          <BellIcon />
+          <BellIcon width={26} height={26} />
           {unreadCount > 0 && (
             <span
               aria-hidden
-              className="absolute right-1.5 top-1.5 size-2 rounded-full bg-semantic-out ring-2 ring-[var(--surface-page)]"
+              className="absolute right-2 top-2 size-2 rounded-full bg-semantic-out ring-2 ring-[var(--surface-page)]"
             />
           )}
         </Link>

@@ -175,6 +175,29 @@ export interface TemplatePayload {
   is_favorite: boolean;
 }
 
+/**
+ * Ce qu'une MODIFICATION a le droit d'envoyer.
+ *
+ * `kind` en est absent, et c'est volontaire des deux côtés : `templateUpdateSchema`
+ * est `.strict()` et ne le déclare pas, parce qu'un template qui basculerait de
+ * dépense à revenu changerait de sens sans changer de nom — les transactions
+ * déjà créées à partir de lui deviendraient incohérentes. `TemplateFormSheet`
+ * masque d'ailleurs le sélecteur de type en édition.
+ *
+ * Bug du 2026-09-08 : le formulaire envoyait quand même le payload de création,
+ * `kind` compris, et Zod rejetait la clé en trop. Toute modification échouait,
+ * sans exception, avec « Une erreur est survenue ». `budgetDraftToPayload` avait
+ * déjà ce garde-fou (son `isEdit` retire `category_id`) ; ici il manquait.
+ */
+export type TemplateUpdatePayload = Omit<TemplatePayload, "kind">;
+
+/** Retire les champs immuables avant un PATCH. */
+export function templateUpdatePayload(payload: TemplatePayload): TemplateUpdatePayload {
+  const { kind: _immutable, ...updatable } = payload;
+  void _immutable;
+  return updatable;
+}
+
 export function templateDraftToPayload(draft: TemplateDraft): TemplatePayload {
   const amount = parsePositive(draft.amount);
   if (amount === null) throw new Error("template amount invalid");

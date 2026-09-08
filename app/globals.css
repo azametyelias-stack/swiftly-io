@@ -89,6 +89,20 @@
   --size-primary-button: 56px;
   --row-setting: 56px;
   --tap-min: 44px;
+  /*
+   * La hauteur de la barre d'état, nommée.
+   *
+   * La barre est translucide (`black-translucent`) : la page court dessous, et
+   * l'heure et la batterie s'y affichent en BLANC. Tout ce qui vient s'y coller
+   * doit donc soit lui laisser cette bande, soit la peindre en sombre — sinon
+   * les deux affichages se mêlent (retour terrain du 2026-09-08 : le bouton
+   * blanc du dashboard figé sous l'horloge).
+   *
+   * Passer par une variable plutôt que par `env()` en ligne a deux vertus :
+   * l'intention est nommée, et une page de test peut la forcer pour reproduire
+   * une encoche sur une machine qui n'en a pas.
+   */
+  --sf-safe-top: env(safe-area-inset-top, 0px);
   --switch-w: 50px;
   --switch-h: 30px;
   --switch-knob: 24px;
@@ -304,10 +318,21 @@
 /* ============================================================================
    Base
    ========================================================================== */
+/* Le second verrou contre la navigation par balayage, pour les moteurs qui la
+   declenchent par sur-defilement horizontal (Chrome Android). iOS, lui, a un
+   geste de bord au niveau systeme que seul un `preventDefault()` arrete : voir
+   `lib/nav/gesture.ts`. Les deux sont necessaires, aucun ne suffit.
+   `overscroll-behavior-y` reste `auto` : on ne touche pas au tire-pour-
+   rafraichir ni au rebond vertical. */
+html {
+  overscroll-behavior-x: none;
+}
+
 body {
   background: var(--surface-page);
   color: var(--text-primary);
   font-family: var(--font-sans);
+  overscroll-behavior-x: none;
 }
 
 /* Under prefers-reduced-motion, translations and progressive drawing become a

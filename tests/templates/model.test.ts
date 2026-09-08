@@ -8,8 +8,11 @@ import {
   templateDraftToPayload,
   templateFormErrors,
   templateToDraft,
+  templateToFormDraft,
+  templateUpdatePayload,
   type TemplateListItem,
 } from "../../lib/templates/model.ts";
+import { templateUpdateSchema } from "../../lib/validation/schemas.ts";
 
 const tpl = (o: Partial<TemplateListItem>): TemplateListItem => ({
   id: "t",
@@ -95,4 +98,69 @@ test("templateDraftToPayload strips a half-filled linked-to and trims text", () 
   assert.equal(p.linked_to_type, null);
   assert.equal(p.linked_to_id, null);
   assert.equal(p.recurrence, "monthly");
+});
+
+/*
+ * ─── Regression du 2026-09-08 ───────────────────────────────────────────────
+ * Toute modification de template echouait, sans exception : le formulaire
+ * envoyait le payload de CREATION, `kind` compris, et `templateUpdateSchema`
+ * est `.strict()` sans cette cle. L'utilisateur voyait « Une erreur est
+ * survenue. Reessayez. » et rien d'autre.
+ *
+ * Le test qui compte est le dernier : il confronte la sortie reelle du
+ * formulaire au schema reel du serveur. C'est le seul qui aurait attrape le
+ * bug — les deux precedents auraient pu passer avec un payload encore invalide.
+ * ────────────────────────────────────────────────────────────────────────────
+ */
+
+test("templateUpdatePayload retire `kind`, et rien d'autre", () => {
+  const full = templateDraftToPayload({
+    ...emptyTemplateDraft(),
+    name: "Nourriture bouillir du matin",
+    amount: "300",
+    kind: "expense",
+  });
+  const update = templateUpdatePayload(full);
+
+  assert.ok(!("kind" in update), "`kind` est immuable cote serveur");
+  for (const key of Object.keys(full).filter((k) => k !== "kind")) {
+    assert.deepEqual(
+      (update as Record<string, unknown>)[key],
+      (full as Record<string, unknown>)[key],
+      `${key} doit traverser intact`,
+    );
+  }
+});
+
+test("le payload de creation, lui, est REJETE par le schema de mise a jour", () => {
+  // La preuve que le bug etait bien la, et qu'il revient si on retire l'appel.
+  const full = templateDraftToPayload({
+    ...emptyTemplateDraft(),
+    name: "Transport pour le boulot",
+    amount: "200",
+  });
+  assert.equal(
+    templateUpdateSchema.safeParse(full).success,
+    false,
+    "un payload contenant `kind` doit etre refuse",
+  );
+});
+
+test("ce que le formulaire d'edition envoie passe le schema du serveur", () => {
+  // Le cas exact de la capture : un template existant, ouvert, confirme tel quel.
+  const existing = tpl({
+    name: "Nourriture bouillir du matin",
+    amount: 300,
+    kind: "expense",
+    recurrence: "daily",
+    is_favorite: true,
+  });
+  const payload = templateDraftToPayload(templateToFormDraft(existing));
+  const parsed = templateUpdateSchema.safeParse(templateUpdatePayload(payload));
+
+  assert.equal(
+    parsed.success,
+    true,
+    parsed.success ? "" : JSON.stringify(parsed.error.issues),
+  );
 });

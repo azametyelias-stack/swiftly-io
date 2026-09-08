@@ -136,20 +136,30 @@ d'envoi, donc aujourd'hui jamais.
 l'ouvre.** Le squelette est dans la doc Next
 (`node_modules/next/dist/docs/01-app/02-guides/progressive-web-apps.md`).
 
-### Le service worker ne met rien en cache hors du shell
+### ~~Le service worker ne met rien en cache hors du shell~~ — fait le 2026-09-07
 
-`public/sw.js` — décision structurante, pas une limite temporaire.
+Le déclencheur annoncé ici (« une demande explicite d'utilisation hors
+couverture ») s'est produit : première journée d'usage réel, Elias ouvre l'app
+sans réseau et tombe sur « Pas de connexion ».
 
-Le worker ne sert en cache que la sortie de build (`/_next/static/`), les icônes
-et la page `/offline`. **Tout `/api/` est laissé au réseau**, ainsi que les
-charges RSC. Un solde servi depuis un cache périmé n'est pas une expérience
-dégradée, c'est une information fausse sur l'argent de quelqu'un.
+Livré comme la note le prévoyait, dans l'ordre qu'elle donnait :
 
-Une vraie consultation hors ligne (lire ses transactions sans réseau) est un
-autre produit : il faut un miroir local, une politique de fraîcheur affichée à
-l'écran (« données du 3 septembre »), et une réconciliation au retour du réseau.
-**Déclencheur : une demande explicite d'utilisation hors couverture** — pas
-« ce serait bien si ça marchait dans l'avion ».
+- **un miroir local** — `lib/offline/store.ts` + `cache.ts`, les réponses
+  `GET /api/*` déjà reçues, plafonnées, effacées à la déconnexion et au
+  changement de compte, mortes au bout de 7 jours ;
+- **une politique de fraîcheur affichée à l'écran** — `OfflineBanner`,
+  « Hors ligne · données du 7 sept., 08:24 », suivie par chemin pour qu'une
+  route fraîche ne fasse pas disparaître la date d'une route périmée ;
+- **le worker cache aussi les coquilles d'écran** (`swiftly-pages-v3`), sinon
+  l'app s'ouvrait sans être utilisable. `/api/` reste hors de sa portée : il
+  répond sans que l'interface sache d'où vient la réponse, donc il ne peut pas
+  dater ce qu'il sert. C'est la couche applicative qui garde les chiffres.
+
+**Ce qui reste différé : la réconciliation au retour du réseau.** Une saisie
+hors ligne échoue avec un message net, elle n'est pas mise en file. Rejouer une
+dépense plus tard, c'est un doublon ou un solde faux, et ça ne se répare pas
+tout seul. **Déclencheur : une demande de saisie hors couverture**, pas de
+lecture — et elle appelle un vrai travail de conflits, pas une file d'attente.
 
 ### Icônes PWA — vertes, alors que l'identité est navy
 
