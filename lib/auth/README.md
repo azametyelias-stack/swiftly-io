@@ -211,6 +211,42 @@ D5). Session issuing = **OTP / magic-link exchange** (Elias, 2026-09-02):
 `verifyOtp({ type: "magiclink", token_hash })`. **Still missing before prod:**
 Point 3 rate-limiting (`lib/auth/rate-limit.ts` is a no-op placeholder).
 
+### Le code rouvre son compte — décision d'Elias, 2026-09-08
+
+**Un code consommé n'est plus refusé : il rouvre le compte qu'il a ouvert.**
+
+Ce qui l'impose : un compte de bêta n'a **ni mot de passe ni vraie adresse**
+(e-mail synthétique `invite-<id>@…`, créé confirmé). La session posée dans le
+navigateur était donc le **seul** chemin vers les données. Désinstaller la PWA —
+ou vider les données du site — rendait le compte **définitivement inaccessible**,
+ses lignes toujours en base, sans recours pour personne, opérateur compris.
+Elias l'a découvert au moment de déployer, avec des dépenses réelles déjà
+saisies.
+
+Ce que ça change, sans détour : **six chiffres deviennent un secret permanent**.
+Avant, un code dépensé ne valait plus rien ; maintenant il ouvre un compte. Toute
+la charge repose sur Point 3 (`rate-limit.ts`) — 5 essais / 15 min par IP,
+blocage du code après 5 échecs, fermeture si le limiteur est indisponible. Le
+raisonnement du blocage par code tient toujours : **seuls les échecs comptent, et
+un code valide ne peut pas échouer**, donc personne ne peut verrouiller le compte
+d'autrui. Mais un balayage réparti sur de nombreuses IP reste hors de portée du
+limiteur : **le durcissement durable est un code plus long**
+(`INVITE_CODE_LENGTH`), ou le passage à une vraie identité (e-mail ou téléphone),
+qui est de toute façon le plan de la Phase 2.
+
+Deux garde-fous qui ne doivent pas bouger :
+
+- **`expires_at` ne joue pas** sur une reconnexion. Elle borne la durée pendant
+  laquelle une invitation reste *offerte*, pas la vie du compte créé.
+- **Un échec de session ne relâche jamais `used_at`** sur une reconnexion. Le
+  remettre à `null` rendrait le code réclamable à neuf : le suivant à le taper
+  repartirait sur un compte vierge et l'ancien serait perdu.
+
+`tests/auth/reentry.test.ts` verrouille les deux, plus le fait que la destination
+après connexion se décide sur l'existence du **profil** (quelqu'un qui a
+abandonné à SCREEN-3 doit reprendre son inscription) et non sur « le code a-t-il
+déjà servi ».
+
 ### Code format — 6 digits (SCREEN-2), with a hard rate-limit dependency
 
 **Decision (2026-09-02, Elias): 6-digit code**, matching SCREEN-2's six-box UI and

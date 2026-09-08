@@ -23,7 +23,14 @@ import { getServiceClient } from "@/lib/supabase/server";
  * POST /api/auth/verify-code — closed-beta sign-in (SCREEN-2, MASTERPLAN Point 19).
  *
  * Body: `{ code: "123456" }`. On success returns a magic-link handoff the
- * browser exchanges for a Supabase session (`verifyOtp`).
+ * browser exchanges for a Supabase session (`verifyOtp`), plus `returning` —
+ * `true` quand le compte est déjà installé, pour que le client saute
+ * l'onboarding.
+ *
+ * Deux chemins depuis le 2026-09-08 : un code neuf ouvre un compte (201), un
+ * code déjà utilisé ROUVRE le sien (200). Un compte de bêta n'ayant ni mot de
+ * passe ni vraie adresse, le code est le seul chemin de retour après une
+ * désinstallation — voir le bloc « Retour au compte » plus bas.
  *
  * Point 16: ONE generic message for unknown / used / expired — the differentiated
  * SCREEN-2 copy ("Code expiré", …) only comes back once Point 3 rate-limiting is
@@ -120,30 +127,111 @@ export async function POST(request: Request): Promise<Response> {
       log.error("auth.verify_code_failed", { reason: claimError.message });
       return fail("SERVER_ERROR", "Une erreur est survenue.", 500);
     }
-    if (!claimed) {
-      // Unknown, spent or expired — all three feed the per-code lockout and the
-      // global alarm. A successful redemption records nothing.
+
+    let invitationId = (claimed?.id as string | undefined) ?? undefined;
+    /** Le code avait déjà été utilisé : on rouvre son compte au lieu de refuser. */
+    let reentry = false;
+    /** L'utilisateur derrière une invitation déjà consommée (`used_by`). */
+    let knownUserId: string | null = null;
+
+    if (!invitationId) {
+      /*
+       * Retour au compte (décision d'Elias, 2026-09-08).
+       *
+       * Un compte de bêta n'a ni mot de passe ni vraie adresse : la session
+       * posée sur l'appareil était le SEUL chemin vers les données. Désinstaller
+       * l'app — ou vider les données du navigateur — rendait le compte
+       * définitivement inaccessible, ses lignes toujours en base. Le code cesse
+       * donc d'être une invitation à usage unique une fois consommé : il devient
+       * la clé du compte qu'il a ouvert.
+       *
+       * `expires_at` n'entre pas dans cette recherche, et c'est délibéré : la
+       * date de péremption borne la durée pendant laquelle une invitation reste
+       * OFFERTE, pas la durée de vie du compte qu'elle a créé. La faire jouer
+       * ici enfermerait quelqu'un dehors trente jours après son inscription.
+       *
+       * Ce que ça coûte, en clair : six chiffres deviennent un secret permanent.
+       * Ce sont les limites de `rate-limit.ts` qui portent maintenant toute la
+       * charge (5 essais / 15 min par IP, blocage du code après 5 échecs,
+       * fermeture en cas d'indisponibilité). L'invariant du blocage par code
+       * tient toujours — seuls les ÉCHECS comptent, et un code valide ne peut
+       * plus échouer, donc personne ne peut verrouiller le compte d'un autre.
+       * Le vrai durcissement reste un code plus long (`INVITE_CODE_LENGTH`).
+       */
+      const { data: spent, error: spentError } = await db
+        .from("invitation_codes")
+        .select("id, used_by")
+        .eq("code_hash", codeHash)
+        .not("used_at", "is", null)
+        .maybeSingle();
+
+      if (spentError) {
+        log.error("auth.verify_code_failed", { reason: spentError.message });
+        return fail("SERVER_ERROR", "Une erreur est survenue.", 500);
+      }
+      if (spent) {
+        invitationId = spent.id as string;
+        // L'identité vient de la base, pas d'une recherche : c'est ce qui rend
+        // le retour au compte sûr même avec beaucoup d'inscrits.
+        knownUserId = (spent.used_by as string | null) ?? null;
+        reentry = true;
+      }
+    }
+
+    if (!invitationId) {
+      // Inconnu ou périmé sans avoir jamais servi — les deux nourrissent le
+      // blocage par code et l'alarme globale. Une redemption réussie n'enregistre
+      // rien.
       await recordInviteFailure(codeHash);
       log.info("auth.invite_code_rejected");
       return fail(AUTH_INVALID_CODE, AUTH_MESSAGES.invalidInviteCode, 400);
     }
 
-    const invitationId = claimed.id as string;
-
     let handoff;
     try {
-      handoff = await mintInviteSession(db, invitationId);
+      handoff = await mintInviteSession(db, invitationId, knownUserId);
     } catch (mintErr) {
-      // Release the claim so a transient failure doesn't consume the code.
-      await db.from("invitation_codes").update({ used_at: null }).eq("id", invitationId);
-      log.error("auth.invite_session_mint_failed", { err: mintErr });
+      /*
+       * On ne relâche QUE ce qu'on vient de prendre. Remettre `used_at` à null
+       * sur une reconnexion rendrait le code réclamable à neuf — et le premier
+       * à le retaper repartirait sur un compte vierge, l'ancien devenant
+       * inaccessible pour de bon. C'est exactement le sinistre qu'on est en
+       * train d'éviter.
+       */
+      if (!reentry) {
+        await db.from("invitation_codes").update({ used_at: null }).eq("id", invitationId);
+      }
+      log.error("auth.invite_session_mint_failed", { err: mintErr, reentry });
       return fail("SERVER_ERROR", "Une erreur est survenue.", 500);
     }
 
-    log.info("auth.verify_code_ok", { invitation: invitationId });
+    /*
+     * Où renvoyer la personne. La question n'est pas « ce code a-t-il déjà
+     * servi ? » mais « ce compte a-t-il déjà un profil ? » — quelqu'un qui a
+     * abandonné à l'écran du prénom a un code consommé et rien derrière : il
+     * doit reprendre là où il s'était arrêté, pas atterrir sur un tableau de
+     * bord sans nom ni compte principal.
+     */
+    const profile = await db
+      .from("users")
+      .select("id")
+      .eq("id", handoff.userId)
+      .maybeSingle();
+    if (profile.error) {
+      log.error("auth.verify_code_profile_lookup_failed", { reason: profile.error.message });
+    }
+    const returning = Boolean(profile.data);
+
+    log.info(reentry ? "auth.verify_code_reentry" : "auth.verify_code_ok", {
+      invitation: invitationId,
+    });
     return ok(
-      { verification: { email: handoff.email, tokenHash: handoff.tokenHash } },
-      { status: 201 },
+      {
+        verification: { email: handoff.email, tokenHash: handoff.tokenHash },
+        /** `true` = ce compte est déjà installé ; le client saute l'onboarding. */
+        returning,
+      },
+      { status: reentry ? 200 : 201 },
     );
   });
 }

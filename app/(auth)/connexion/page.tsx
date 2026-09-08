@@ -50,7 +50,14 @@ export default function ConnexionCodePage() {
         body: JSON.stringify({ code }),
       });
       const body = (await res.json().catch(() => null)) as
-        | { success: true; data: { verification: { email: string; tokenHash: string } } }
+        | {
+            success: true;
+            data: {
+              verification: { email: string; tokenHash: string };
+              /** Compte déjà installé : on saute l'écran du prénom. */
+              returning?: boolean;
+            };
+          }
         | { success: false; code?: string }
         | null;
 
@@ -93,7 +100,14 @@ export default function ConnexionCodePage() {
       }
 
       setPhase("done");
-      window.setTimeout(() => router.replace("/connexion/nom"), 240);
+      /*
+       * Quelqu'un qui revient sur son compte ne doit pas repasser par « quel est
+       * ton prénom ? » : cet écran écraserait le nom déjà enregistré, et la
+       * question n'a aucun sens pour lui. Le serveur dit lequel des deux cas
+       * c'est — il est le seul à pouvoir le savoir.
+       */
+      const next = body.data.returning ? "/dashboard" : "/connexion/nom";
+      window.setTimeout(() => router.replace(next), 240);
     } catch {
       setPhase("idle");
       setCode("");
