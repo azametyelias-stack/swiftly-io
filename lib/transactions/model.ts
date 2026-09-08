@@ -343,12 +343,15 @@ export function stepErrors(draft: TxDraft, step: number): string[] {
         errs.push("same-account");
       return errs;
     }
+    // La catégorie est exigée des deux côtés (décision d'Elias, 2026-09-08) :
+    // une dépense sans catégorie ne pèse dans aucune statistique et n'entre
+    // dans aucun budget — elle disparaît de tout ce que l'app sait raconter.
+    if (!draft.categoryId) errs.push("category");
     if (draft.type === "income") {
-      if (!draft.categoryId) errs.push("category");
       if (!draft.linkedToType || !draft.linkedToId) errs.push("linked-to");
       return errs;
     }
-    // expense — category optional, "lié à" optional but must be complete
+    // expense — "lié à" reste facultatif, mais doit être complet
     if ((draft.linkedToType == null) !== (draft.linkedToId == null))
       errs.push("linked-to");
     return errs;

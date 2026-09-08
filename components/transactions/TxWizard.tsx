@@ -325,12 +325,12 @@ export function TxWizard({
 
         {step === 2 && type !== "transfer" ? (
           <>
-            <Field label={t.fields.category}>
+            <Field label={t.fields.category} hint={t.fields.required} hintTone="required">
               <SelectField
                 ariaLabel={t.fields.category}
                 value={eff.categoryId}
                 placeholder={t.fields.selectCategory}
-                invalid={type === "income" && errs.includes("category")}
+                invalid={errs.includes("category")}
                 options={ref.categories.map((c) => ({
                   value: c.id,
                   label: c.name,
@@ -499,10 +499,13 @@ function sourceAccount(
 function Field({
   label,
   hint,
+  hintTone = "muted",
   children,
 }: {
   label: string;
   hint?: string;
+  /** "required" reprend le rouge de « Lié à », pour que les deux se lisent pareil. */
+  hintTone?: "muted" | "required";
   children: React.ReactNode;
 }) {
   return (
@@ -510,7 +513,15 @@ function Field({
       <div className="flex items-center justify-between gap-2">
         <span className="text-[13px] font-semibold">{label}</span>
         {hint ? (
-          <span className="text-[12px] text-text-tertiary">{hint}</span>
+          <span
+            className={`text-[12px] ${
+              hintTone === "required"
+                ? "font-semibold text-semantic-out"
+                : "text-text-tertiary"
+            }`}
+          >
+            {hint}
+          </span>
         ) : null}
       </div>
       {children}

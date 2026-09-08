@@ -107,12 +107,18 @@ test("stepErrors: expense wizard", () => {
   d.amount = "15000";
   d.sourceAccountId = "acc-1";
   assert.deepEqual(stepErrors(d, 1), []);
-  // step 2: category optional, "lié à" must be complete
+  // step 2 : la catégorie est obligatoire en dépense aussi (2026-09-08), et
+  // « lié à » reste facultatif mais doit être complet quand il est entamé.
+  assert.deepEqual(stepErrors(d, 2), ["category"]);
+  d.categoryId = "cat-1";
   assert.deepEqual(stepErrors(d, 2), []);
   d.linkedToType = "person";
   assert.deepEqual(stepErrors(d, 2), ["linked-to"]);
   d.linkedToId = "p-1";
   assert.deepEqual(stepErrors(d, 2), []);
+  // et on ne peut pas repartir sans catégorie en la vidant
+  d.categoryId = null;
+  assert.deepEqual(stepErrors(d, 2), ["category"]);
 });
 
 test("stepErrors: income requires category + linked, transfer requires distinct accounts", () => {

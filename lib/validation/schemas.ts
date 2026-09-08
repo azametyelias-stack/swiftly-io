@@ -148,7 +148,15 @@ export const accountUpdateSchema = z
   .strict();
 
 // ── people ("Lié à" — person side) ──────────────────────────────────────────
-export const personCreateSchema = z.object({ name: shortLabel }).strict();
+/*
+ * `kind` sépare deux carnets d'adresses qui n'ont rien à voir : qui m'a payé
+ * (revenu) et à qui j'ai payé (dépense). Il reste optionnel à la création pour
+ * qu'un client déjà installé (PWA en cache) continue de fonctionner — la route
+ * retombe alors sur 'expense', le défaut de la colonne.
+ */
+export const personCreateSchema = z
+  .object({ name: shortLabel, kind: categoryKind.optional() })
+  .strict();
 
 // ── categories (user-defined) ───────────────────────────────────────────────
 export const categoryCreateSchema = z
@@ -167,8 +175,17 @@ export const categoryListQuerySchema = z
   .object({ kind: categoryKind.optional() })
   .strict();
 
-/** GET /api/people, GET /api/projects — "Lié à" pickers. No params for now. */
+/** GET /api/projects — "Lié à" côté projet. Pas de paramètre pour l'instant. */
 export const linkedListQuerySchema = z.object({}).strict();
+
+/**
+ * GET /api/people?kind= — le picker « Lié à » (SCREEN-8/9 § 2). Sans `kind`,
+ * la route rend tout le carnet : c'est le comportement d'avant, gardé pour un
+ * client servi depuis le cache du service worker.
+ */
+export const peopleListQuerySchema = z
+  .object({ kind: categoryKind.optional() })
+  .strict();
 
 // ── transactions (SCREEN-8/9/10) ────────────────────────────────────────────
 const expenseTx = z

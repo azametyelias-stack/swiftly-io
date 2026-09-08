@@ -90,7 +90,9 @@ export function useTxRefData(type: TxType): TxRefData {
       type === "transfer"
         ? Promise.resolve({ categories: [] as RefCategory[] })
         : apiJson<{ categories: RefCategory[] }>(`/api/categories?kind=${kind}`),
-      apiJson<{ people: RefNamed[] }>("/api/people"),
+      // Le carnet est scindé par type : les personnes saisies pendant un
+      // revenu (« qui m'a payé ») n'ont rien à faire dans une dépense.
+      apiJson<{ people: RefNamed[] }>(`/api/people?kind=${kind}`),
       apiJson<{ projects: RefNamed[] }>("/api/projects?scope=picker"),
     ]).then((res) => {
       if (!alive) return;
@@ -104,21 +106,28 @@ export function useTxRefData(type: TxType): TxRefData {
     };
   }, [type]);
 
-  const createPerson = useCallback(async (name: string) => {
-    try {
-      const { person } = await apiJson<{ person: RefNamed }>("/api/people", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ name }),
-      });
-      setPeople((prev) =>
-        [...prev, person].sort((a, b) => a.name.localeCompare(b.name, "fr")),
-      );
-      return person;
-    } catch {
-      return null;
-    }
-  }, []);
+  const createPerson = useCallback(
+    async (name: string) => {
+      try {
+        const { person } = await apiJson<{ person: RefNamed }>("/api/people", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          // …et une personne créée ici n'appartient qu'au carnet ouvert.
+          body: JSON.stringify({
+            name,
+            kind: type === "income" ? "income" : "expense",
+          }),
+        });
+        setPeople((prev) =>
+          [...prev, person].sort((a, b) => a.name.localeCompare(b.name, "fr")),
+        );
+        return person;
+      } catch {
+        return null;
+      }
+    },
+    [type],
+  );
 
   const createProject = useCallback(async (name: string) => {
     try {
