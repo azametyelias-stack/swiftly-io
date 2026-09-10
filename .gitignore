@@ -42,8 +42,16 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # env files — never commit real secrets (SECURITY MASTERPLAN Point 2)
-.env
-.env.*
+#
+# Elargi le 2026-09-10 : `.env.*` exigeait un point apres « env », donc
+# `.envrc` (direnv), `.env-prod` et `.environment` passaient au travers.
+# `.env*` les prend tous ; `*.env` prend `secrets.env` et consorts.
+# Un nom qu'aucun motif n'anticipe (`env.local`, sans le point de tete) reste
+# possible : c'est tests/env/secrets-never-committed.test.ts qui l'attrape,
+# en refusant tout fichier d'environnement VISIBLE par git. On ne met pas
+# `env.*` ici — il avalerait lib/env/*.ts et scripts/db/env.ts.
+.env*
+*.env
 # ...but DO commit the documented template
 !.env.example
 

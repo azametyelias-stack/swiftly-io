@@ -1,15 +1,32 @@
 # Supabase — database migrations
 
+> **Two databases since 2026-09-09.** `.env.local` points at the **dev**
+> project, `.env.prod` at **production**, and no script touches production
+> without `--target prod` plus a typed confirmation. Read
+> [`../scripts/db/README.md`](../scripts/db/README.md) before applying anything.
+
 ## Applying migrations
 
-**Option A — Supabase CLI** (recommended once the CLI is set up):
+**Option A — the repo's runner** (recommended):
 
 ```bash
-supabase db push
+npm run db:status                     # what is applied where
+npm run db:migrate                    # apply what is missing (dev)
+npm run db:migrate -- --only 0007     # one migration
 ```
 
-**Option B — SQL editor** (no CLI): open the Supabase dashboard →
-_SQL Editor_ → paste the contents of each file in `migrations/` in order and run.
+It keeps a `public.schema_migrations` ledger, applies each file in a single
+transaction, and refuses to replay a migration that has already run. That last
+point matters: `0002` (system-category seed, no unique index to conflict on),
+`0006` (`update users set theme …`) and `0007` (`update people set kind …`) all
+corrupt data when replayed.
+
+**Option B — SQL editor** (no direct connection): `npm run db:bundle` writes a
+single transactional file to `supabase/.temp/` — paste it into the dashboard's
+_SQL Editor_ and run.
+
+**Option C — Supabase CLI** (not installed here): `supabase db push`. Note it
+does not know about the ledger above.
 
 ## Migrations
 
@@ -20,11 +37,17 @@ _SQL Editor_ → paste the contents of each file in `migrations/` in order and r
 | `0003_invitation_codes.sql` | `public.invitation_codes` (closed-beta sign-in, SECURITY MASTERPLAN Point 19). HMAC-peppered hash at rest, RLS deny-all (server-write-only via service role). Redeemed by `POST /api/auth/verify-code` (Lot 1, SCREEN-2). Phase 2 drops this table. |
 | `0004_lot5_recurrence_fees.sql` | Lot 5 (D2). `transactions.recurrence_key` (+ partial UNIQUE index) for cron idempotency; `templates.next_run_on`/`last_run_on`; `accounts.last_fee_on`; "Frais bancaires" system category; `public.account_balance()` **rewritten** to net project allocations against project-linked spending (🔎 LAYER 3, no double-counting); `public.allocate_to_project()` (atomic allocation with an insufficient-funds guard, D4). Driven by `POST /api/cron/run` (Vercel Cron). |
 
+| `0005_lot6_alerts.sql` | Lot 6. `alerts.value` / `tone` / `facts` (the chip and the detail screen of SCREEN-18) + `alerts.dedup_key` with a partial UNIQUE index, so the daily cron cannot write the same budget alert twice under a race. |
+| `0006_theme_system.sql` | `users.theme` accepts `'system'` and defaults to it. Contains a **one-time, non-replayable** `update … where theme = 'light'` — see the file's own warning. |
+| `0007_people_kind.sql` | `people.kind` (`expense` \| `income`) + `(user_id, kind)` index, so the "Lié à" picker stops mixing the two address books. Back-fills existing rows from real usage — **rewrites data, not replayable**. Test procedure: [`../scripts/db/README.md`](../scripts/db/README.md) § « La procédure 0007 ». |
+| `0008_rls_auto_enable.sql` | Event trigger `ensure_rls` → `public.rls_auto_enable()`: forces `ENABLE ROW LEVEL SECURITY` on every `CREATE TABLE` in `public`, whether the author remembered it or not. Point 4 is a human discipline; this is the engine enforcing it. Was posted **by hand on production only** and found on 2026-09-10 by the dev ↔ prod comparison — this file exists so a rebuilt environment gets the same net. Replayable (`create or replace` + `drop … if exists`). |
+
 Not a migration:
 
 | File | Purpose |
 | --- | --- |
 | `rls-core-tables.sql` | **Superseded by `0002_core_schema.sql`** (which writes the same policies inline). Kept for reference only. |
+| `public.schema_migrations` | Created by `scripts/db/migrate.ts`, not by a numbered file: it is tooling, not app schema. RLS on, no policies. Excluded from the dev ↔ prod schema comparison for that reason. |
 
 ## Backups & disaster recovery (SECURITY MASTERPLAN — Point 20)
 
