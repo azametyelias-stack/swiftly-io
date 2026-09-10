@@ -43,6 +43,11 @@ const versionList = selected.map((m) => lit(m.version)).join(", ");
 
 const parts: string[] = [];
 
+// Ce fichier ÉCRIT du SQL, il n'en exécute aucun : sa sortie est un .sql qu'un
+// humain relit puis colle dans le SQL Editor. Tout ce qui est interpolé vient
+// des fichiers du dépôt (version, nom, empreinte), et les littéraux passent
+// par `lit()`.
+// nosemgrep: swiftly-sql-string-interpolation
 parts.push(`-- ============================================================================
 -- Swiftly.io — lot de migrations généré par scripts/db/bundle.ts
 -- ${new Date().toISOString()}
@@ -92,6 +97,10 @@ $swiftly_guard$;
 `);
 
 for (const m of selected) {
+  // Même raison qu'au-dessus : génération de texte, `m.sql` est le contenu
+  // littéral d'une migration du dépôt et les trois valeurs du INSERT passent
+  // par `lit()`.
+  // nosemgrep: swiftly-sql-string-interpolation
   parts.push(`
 -- ============================================================================
 -- ▼▼▼  ${m.filename}

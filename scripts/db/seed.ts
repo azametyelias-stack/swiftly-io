@@ -34,6 +34,9 @@
  * base de dev, que `env.ts` empêche d'être la production.
  */
 import type pg from "pg";
+// `pg` n'est importé que comme type ci-dessus ; escapeIdentifier est une vraie
+// valeur, il lui faut son propre import.
+import { escapeIdentifier } from "pg";
 
 import { parseArgs, resolveTarget, describeTarget, loadEnvFile, type Target } from "./env.ts";
 import { openClient } from "./client.ts";
@@ -80,12 +83,20 @@ async function insertId(
   table: string,
   row: Record<string, unknown>,
 ): Promise<string> {
-  const cols = Object.keys(row);
+  // Les VALEURS passent par $1..$n — jamais dans le texte SQL. Restent la table
+  // et les colonnes : SQL n'accepte pas de paramètre à la place d'un
+  // identifiant, il faut donc les écrire dans la requête. `escapeIdentifier`
+  // les met entre guillemets et double ceux qu'ils contiennent, ce qui rend la
+  // sortie inerte même si un jour un nom venait d'ailleurs que d'un littéral
+  // de ce fichier.
+  const cols = Object.keys(row).map((c) => escapeIdentifier(c));
   const holes = cols.map((_, i) => `$${i + 1}`);
-  const { rows } = await client.query<{ id: string }>(
-    `insert into public.${table} (${cols.join(", ")}) values (${holes.join(", ")}) returning id`,
-    Object.values(row),
-  );
+  const target = `public.${escapeIdentifier(table)}`;
+  // Identifiants échappés ci-dessus, valeurs paramétrées : la règle regex ne
+  // sait pas lire la différence entre les deux.
+  // nosemgrep: swiftly-sql-string-interpolation
+  const sql = `insert into ${target} (${cols.join(", ")}) values (${holes.join(", ")}) returning id`;
+  const { rows } = await client.query<{ id: string }>(sql, Object.values(row));
   return rows[0]!.id;
 }
 
