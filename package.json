@@ -17,6 +17,7 @@
     "db:seed": "node --no-warnings scripts/db/seed.ts",
     "db:schema": "node --no-warnings scripts/db/schema.ts",
     "db:check-0007": "node --no-warnings scripts/db/check-0007.ts",
+    "db:check-espaces": "node --no-warnings scripts/db/check-espaces.ts",
     "lint": "eslint",
     "test": "node --test \"tests/**/*.test.ts\"",
     "scan": "semgrep scan --error --severity=ERROR --metrics=off --disable-version-check --config ./semgrep.yml",

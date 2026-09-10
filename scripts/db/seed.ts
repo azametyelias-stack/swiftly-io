@@ -109,10 +109,15 @@ async function columnExists(client: pg.Client, table: string, column: string): P
   return (rowCount ?? 0) > 0;
 }
 
-async function tableExists(client: pg.Client, table: string): Promise<boolean> {
+/** `schema` par défaut « public » — `core` depuis que les espaces existent. */
+async function tableExists(
+  client: pg.Client,
+  table: string,
+  schema = "public",
+): Promise<boolean> {
   const { rows } = await client.query<{ ok: boolean }>(
-    `select to_regclass('public.' || $1) is not null as ok`,
-    [table],
+    `select to_regclass($1 || '.' || $2) is not null as ok`,
+    [schema, table],
   );
   return rows[0]?.ok === true;
 }
@@ -193,7 +198,7 @@ interface Profile {
  */
 const PROFILES: readonly Profile[] = [
   { slug: "awa",   code: "111111", name: "Awa Traoré",   blurb: "usage perso, 3 mois d'historique", currency: "XOF", language: "fr", theme: "light" },
-  { slug: "koffi", code: "222222", name: "Koffi Mensah", blurb: "usage pro, gros montants",         currency: "XOF", language: "fr", theme: "dark" },
+  { slug: "koffi", code: "222222", name: "Koffi Mensah", blurb: "DEUX univers : perso + boutique",   currency: "XOF", language: "fr", theme: "dark" },
   { slug: "nina",  code: "333333", name: "Nina Okonkwo", blurb: "le cas limite : rien dedans",      currency: "EUR", language: "en", theme: "light" },
 ];
 
@@ -485,6 +490,280 @@ async function seedUser(
   }
 }
 
+/* ── le second univers de Koffi : sa boutique ─────────────────────────────── */
+
+/**
+ * Les identifiants créés pour la boutique, pour pouvoir les rattacher à leur
+ * espace quand le modèle existera.
+ */
+interface Boutique {
+  readonly accounts: string[];
+  readonly transactions: string[];
+  readonly people: string[];
+  readonly categories: string[];
+  readonly projects: string[];
+  readonly budgets: string[];
+  readonly templates: string[];
+  readonly reports: string[];
+}
+
+/**
+ * Koffi tient une boutique EN PLUS de sa vie personnelle : deux univers
+ * financiers distincts dans les mêmes données, chez le même propriétaire.
+ *
+ * C'est le cas de figure le plus important du jeu, et le seul qui n'existera
+ * JAMAIS en production le jour de la bascule — là-bas, chaque utilisateur reçoit
+ * un espace personnel et un seul. Or les tests B et C du contrôle 4
+ * (MIGRATION-CONTROLES-VALIDATION.md) portent précisément sur deux espaces d'un
+ * même propriétaire : sans ce cas fabriqué à la main, le contrôle le plus
+ * important du document n'est jamais joué.
+ *
+ * Les montants sont volontairement d'un autre ordre de grandeur que ceux de la
+ * vie personnelle de Koffi : une fuite d'un univers vers l'autre se voit alors
+ * dans un total, pas seulement dans un compte de lignes.
+ *
+ * ── deux contraintes d'aujourd'hui limitent ce qu'on peut poser ────────────
+ *
+ * `accounts_one_primary_per_user` et `unique (user_id, period_type,
+ * period_start)` sur `reports` sont cadrées sur l'UTILISATEUR (décision B). Tant
+ * qu'elles n'ont pas basculé « par espace », la boutique ne peut ni avoir son
+ * propre compte principal, ni ses propres rapports mensuels — les périodes sont
+ * déjà prises par la vie personnelle. Le script le détecte et le dit, plutôt que
+ * d'échouer sur une violation de contrainte.
+ *
+ * Le budget de la boutique, lui, porte sur sa PROPRE catégorie : il passe donc
+ * dans les deux mondes, avant comme après la décision B.
+ */
+async function seedBoutique(
+  client: pg.Client,
+  user: AuthUser,
+  hasPeopleKind: boolean,
+  scoped: boolean,
+): Promise<Boutique> {
+  const b: Boutique = {
+    accounts: [], transactions: [], people: [], categories: [],
+    projects: [], budgets: [], templates: [], reports: [],
+  };
+
+  const add = async (table: string, row: Record<string, unknown>, bucket: string[]) => {
+    const id = await insertId(client, table, { user_id: user.id, ...row });
+    bucket.push(id);
+    return id;
+  };
+
+  /* comptes ---------------------------------------------------------------- */
+  const caisse = await add("accounts", {
+    name: "Caisse boutique", type: "cash",
+    initial_balance: 180_000, currency: "XOF",
+    // Le compte principal de la boutique — dès que la contrainte le permet.
+    is_primary: scoped,
+  }, b.accounts);
+
+  const waveBoutique = await add("accounts", {
+    name: "Wave Boutique", type: "mobile",
+    initial_balance: 640_000, currency: "XOF", provider: "Wave",
+  }, b.accounts);
+  tally.accounts += 2;
+
+  /* catégorie propre à la boutique ----------------------------------------- */
+  // Sa propre catégorie, et pas « Alimentation » : `budgets` impose encore
+  // unique (user_id, category_id), donc réutiliser une catégorie déjà budgétée
+  // côté personnel échouerait. Après la décision B, ce sera un choix, plus une
+  // obligation.
+  const catMarchandises = await add("categories", {
+    name: "Marchandises", kind: "expense", color: "#B45309", axis: "investment",
+  }, b.categories);
+  tally.categories++;
+
+  const catAutreIncome = await systemCategory(client, "Autre", "income");
+  const catTransport = await systemCategory(client, "Transport", "expense");
+
+  /* personnes de la boutique ------------------------------------------------ */
+  const kindCol = (k: string) => (hasPeopleKind ? { kind: k } : {});
+
+  const cliente = await add("people", {
+    name: "Cliente Adjo", ...kindCol("income"),
+  }, b.people);
+  const grossiste = await add("people", {
+    name: "Grossiste Adawlato", ...kindCol("expense"),
+  }, b.people);
+  tally.people += 2;
+
+  /* projet de la boutique --------------------------------------------------- */
+  // Le test exigé par la décision C : ce projet est en boutique, son compte est
+  // un compte de boutique, et il ne doit JAMAIS puiser dans le compte personnel.
+  const vitrine = await add("projects", {
+    name: "Vitrine réfrigérée",
+    description: "Conservation des boissons — saison sèche",
+    category: "equipment",
+    target_amount: 1_800_000,
+    allocated_amount: 420_000,
+    start_date: monthStart(-2),
+    status: "active",
+    account_id: caisse,
+  }, b.projects);
+  tally.projects++;
+
+  /* transactions ------------------------------------------------------------ */
+  const addTx = async (row: Record<string, unknown>) => {
+    await add("transactions", row, b.transactions);
+    tally.transactions++;
+  };
+
+  for (const offset of [-2, -1, 0]) {
+    // les recettes du comptoir
+    await addTx({
+      type: "income", amount: 780_000 + offset * 40_000, occurred_on: monthDay(offset, 28),
+      category_id: catAutreIncome,
+      destination_account_id: waveBoutique,
+      linked_to_type: "person", linked_to_id: cliente,
+      note: "Recettes du mois", status: "received",
+    });
+    // le réassort chez le grossiste
+    await addTx({
+      type: "expense", amount: 430_000, occurred_on: monthDay(offset, 9),
+      category_id: catMarchandises, scoring_axis: "investment",
+      source_account_id: waveBoutique,
+      linked_to_type: "person", linked_to_id: grossiste,
+      note: "Réassort", status: "done",
+    });
+    // les livraisons
+    await addTx({
+      type: "expense", amount: 22_000, occurred_on: monthDay(offset, 15),
+      category_id: catTransport, scoring_axis: "consumption",
+      source_account_id: caisse, note: "Livraison", status: "done",
+    });
+  }
+
+  // dépense rattachée au projet de la boutique, tirée sur un compte de boutique.
+  // C'est cette ligne que `account_balance()` doit netter contre l'allocation du
+  // projet — et jamais contre un compte personnel (décision C).
+  await addTx({
+    type: "expense", amount: 260_000, occurred_on: monthDay(0, 12),
+    category_id: catMarchandises, scoring_axis: "investment",
+    source_account_id: caisse,
+    linked_to_type: "project", linked_to_id: vitrine,
+    note: "Acompte vitrine", status: "done",
+  });
+
+  // virement INTERNE à la boutique : les deux comptes sont de la boutique.
+  // Après la migration, aucun virement ne doit relier deux espaces.
+  await addTx({
+    type: "transfer", amount: 150_000, occurred_on: monthDay(0, 14),
+    source_account_id: waveBoutique, destination_account_id: caisse,
+    note: "Alimentation de la caisse", status: "done",
+  });
+
+  /* budget ------------------------------------------------------------------ */
+  await add("budgets", {
+    category_id: catMarchandises, allocated_amount: 500_000,
+  }, b.budgets);
+  tally.budgets++;
+
+  /* modèle ------------------------------------------------------------------ */
+  await add("templates", {
+    name: "Réassort grossiste", description: "Le 9 de chaque mois",
+    kind: "expense", amount: 430_000, category_id: catMarchandises,
+    linked_to_type: "person", linked_to_id: grossiste,
+    account_id: waveBoutique, recurrence: "monthly", usage_count: 3,
+    next_run_on: monthDay(1, 9), last_run_on: monthDay(0, 9),
+  }, b.templates);
+  tally.templates++;
+
+  /* rapports ---------------------------------------------------------------- */
+  if (scoped) {
+    for (const offset of [-2, -1]) {
+      await add("reports", {
+        period_type: "monthly", period_start: monthStart(offset),
+        payload: JSON.stringify({
+          income: 780_000 + offset * 40_000,
+          expense: 452_000,
+          score: 68,
+          top_category: "Marchandises",
+        }),
+        read: false,
+      }, b.reports);
+      tally.reports++;
+    }
+  }
+
+  return b;
+}
+
+/**
+ * Rattache les lignes à leur espace — inerte tant que `core.spaces` n'existe pas.
+ *
+ * Écrit maintenant pour une raison précise : le jour où le Temps 1 pose la table
+ * et les colonnes, `npm run db:seed -- --reset` suffit à armer les tests B et C
+ * du contrôle 4. Sans ça, il faudrait se souvenir de revenir écrire ce bout-là
+ * au pire moment — au milieu de la migration.
+ *
+ * La règle est simple et sans ambiguïté : l'espace personnel reçoit TOUT, puis
+ * les lignes de la boutique sont déplacées vers le sien. Une ligne ne peut donc
+ * jamais rester sans espace.
+ */
+async function attachSpaces(
+  client: pg.Client,
+  user: AuthUser,
+  displayName: string,
+  boutique: Boutique | null,
+): Promise<void> {
+  const { rows } = await client.query<{ id: string }>(
+    `insert into core.spaces (owner_id, type, name)
+     values ($1, 'personal', $2)
+     returning id`,
+    [user.id, displayName],
+  );
+  const personal = rows[0]!.id;
+
+  for (const table of SCOPED_TABLES) {
+    const from = `public.${escapeIdentifier(table)}`;
+    // Identifiant échappé ci-dessus ; les deux valeurs sont paramétrées.
+    // nosemgrep: swiftly-sql-string-interpolation
+    await client.query(`update ${from} set space_id = $1 where user_id = $2`, [personal, user.id]);
+  }
+  // Les catégories système restent globales : seules les personnalisées descendent.
+  await client.query(
+    `update public.categories set space_id = $1 where user_id = $2`,
+    [personal, user.id],
+  );
+
+  if (!boutique) return;
+
+  const { rows: shop } = await client.query<{ id: string }>(
+    `insert into core.spaces (owner_id, type, name)
+     values ($1, 'business', 'Ma boutique')
+     returning id`,
+    [user.id],
+  );
+  const business = shop[0]!.id;
+
+  const moves: ReadonlyArray<readonly [string, readonly string[]]> = [
+    ["accounts", boutique.accounts],
+    ["transactions", boutique.transactions],
+    ["people", boutique.people],
+    ["categories", boutique.categories],
+    ["projects", boutique.projects],
+    ["budgets", boutique.budgets],
+    ["templates", boutique.templates],
+    ["reports", boutique.reports],
+  ];
+
+  for (const [table, ids] of moves) {
+    if (ids.length === 0) continue;
+    const from = `public.${escapeIdentifier(table)}`;
+    // Identifiant échappé ; la liste d'ids est paramétrée.
+    // nosemgrep: swiftly-sql-string-interpolation
+    await client.query(`update ${from} set space_id = $1 where id = any($2)`, [business, [...ids]]);
+  }
+}
+
+/** Les huit tables qui descendent entièrement dans l'espace (categories à part). */
+const SCOPED_TABLES = [
+  "accounts", "transactions", "budgets", "projects",
+  "templates", "people", "alerts", "reports",
+] as const;
+
 /* ── exécution ────────────────────────────────────────────────────────────── */
 
 console.log(`\n  base : ${describeTarget(target)}\n`);
@@ -561,6 +840,19 @@ try {
   }
 
   const hasPeopleKind = await columnExists(client, "people", "kind");
+
+  /*
+   * Le modèle d'espaces est-il en place ? Une seule sonde pour trois questions,
+   * parce que les trois basculent ensemble au Temps 1 : la colonne `space_id`,
+   * le compte principal par espace et l'unicité des rapports par espace
+   * (décisions B et F). Tant qu'elle répond non, la boutique de Koffi existe
+   * comme données mais sans conteneur — c'est exactement l'état d'avant.
+   */
+  const scoped = await columnExists(client, "accounts", "space_id");
+  const spacesReady = scoped && (await tableExists(client, "spaces", "core"));
+  console.log(
+    `    core.spaces ${spacesReady ? "existe → les espaces seront créés et rattachés" : "absente → un seul univers par utilisateur en base"}`,
+  );
   console.log(
     `    people.kind ${hasPeopleKind ? "existe → la base est à 0007 ou au-delà" : "absente → la base est à 0006 ou avant"}\n`,
   );
@@ -606,6 +898,19 @@ try {
         [invitationId, user.id],
       );
       await seedUser(client, user, profile, hasPeopleKind);
+
+      // Koffi, et lui seul, tient une boutique en plus de sa vie personnelle.
+      // C'est le cas à deux espaces d'un même propriétaire — celui sur lequel
+      // portent les tests B et C du contrôle 4.
+      const boutique =
+        profile.slug === "koffi"
+          ? await seedBoutique(client, user, hasPeopleKind, scoped)
+          : null;
+
+      if (spacesReady) {
+        await attachSpaces(client, user, profile.name, boutique);
+      }
+
       await client.query("commit");
     } catch (cause) {
       await client.query("rollback");
@@ -630,6 +935,26 @@ try {
       `\n  ${target.envFile}. Le mot de passe (${SEED_PASSWORD}) ne sert à rien dans` +
       `\n  l'application — l'identité, ici, c'est le code.\n`,
   );
+
+  console.log("  Koffi tient DEUX univers financiers :\n");
+  console.log("    personnel  Espèces · Wave · Ecobank         salaire, loyer, marché, taxi");
+  console.log("    boutique   Caisse boutique · Wave Boutique  recettes, réassort, livraisons\n");
+
+  if (!spacesReady) {
+    console.log("  Ils ne sont pas encore rattachés à un espace — `core.spaces` n'existe pas.");
+    console.log("  Les tests B et C de `npm run db:check-espaces` restent donc en attente ;");
+    console.log("  ils s'arment d'eux-mêmes au Temps 1, après un `db:seed -- --reset`.\n");
+  }
+
+  if (!scoped) {
+    console.log("  Deux choses n'ont pas pu être posées, faute de la décision B :\n");
+    console.log("    · le compte principal de la boutique — `accounts_one_primary_per_user`");
+    console.log("      n'autorise qu'un seul compte principal par UTILISATEUR ;");
+    console.log("    · les rapports mensuels de la boutique — `unique (user_id, period_type,");
+    console.log("      period_start)` : les périodes sont déjà prises par la vie personnelle.\n");
+    console.log("  C'est la démonstration en acte de la décision B : ces deux contraintes");
+    console.log("  interdisent le deuxième espace avant même qu'il existe.\n");
+  }
 } finally {
   await client.end();
 }

@@ -148,8 +148,40 @@ remplir des tables :
 | code | compte | profil | ce qu'il couvre |
 |---|---|---|---|
 | `111111` | Awa Traoré | usage personnel, XOF | le cas courant, 3 mois d'historique |
-| `222222` | Koffi Mensah | usage professionnel, XOF | le futur espace « business », gros montants |
+| `222222` | Koffi Mensah | **deux univers**, XOF | perso **+ boutique** — le cas à deux espaces d'un même propriétaire |
 | `333333` | Nina Okonkwo | EUR, en | **le cas limite** : un compte, rien dedans |
+
+### Les deux univers de Koffi
+
+Koffi tient une boutique **en plus** de sa vie personnelle : deux ensembles de
+comptes, de transactions, de personnes et de catégories, chez le même
+propriétaire.
+
+| univers | comptes | ce qu'on y trouve |
+|---|---|---|
+| personnel | Espèces · Wave · Ecobank | salaire, loyer, marché, taxi, projet « Ordinateur portable » |
+| boutique | Caisse boutique · Wave Boutique | recettes du comptoir, réassort grossiste, livraisons, projet « Vitrine réfrigérée » |
+
+C'est le cas de figure le plus important du jeu, et **le seul qui n'existera
+jamais en production** le jour de la bascule : là-bas, chaque utilisateur reçoit
+un espace personnel et un seul. Or les tests B et C du contrôle 4 portent
+précisément sur deux espaces d'un même propriétaire. Sans ce cas fabriqué à la
+main, le contrôle le plus important du document n'est jamais joué.
+
+Les montants de la boutique sont d'un autre ordre de grandeur que ceux de la vie
+personnelle : une fuite d'un univers vers l'autre se voit dans un **total**, pas
+seulement dans un compte de lignes.
+
+**Deux choses attendent la décision B** (`DECISIONS-MULTI-ESPACES.md`) et le seed
+le dit à chaque exécution : la boutique n'a pas encore son propre compte
+principal (`accounts_one_primary_per_user` n'en autorise qu'un par utilisateur),
+ni ses rapports mensuels (`unique (user_id, period_type, period_start)` — les
+périodes sont déjà prises). C'est la décision B démontrée en acte : ces deux
+contraintes interdisent le deuxième espace avant même qu'il existe.
+
+Le seed sait déjà créer les espaces et y rattacher les lignes ; ce code est
+inerte tant que `core.spaces` n'existe pas. Au Temps 1, un
+`npm run db:seed -- --reset` suffit à armer les tests B et C.
 
 On les tape sur l'écran 2 (`npm run dev`). Ils ne valent que sur cette base :
 un code est stocké haché avec `INVITE_CODE_PEPPER`, lu dans le même fichier
@@ -233,6 +265,60 @@ réinitialiserait les thèmes.
 Si `--after` passe, `people_backup_0007` peut être supprimée — mais rien ne
 presse, elle ne coûte que quelques kilo-octets.
 
+## Les contrôles de la migration multi-espaces
+
+`npm run db:check-espaces` porte les quatre contrôles Go / No-Go de
+[`MIGRATION-CONTROLES-VALIDATION.md`](<../../docs/2-ARCHITECTURE (Technical Specs et Security)/MIGRATION-CONTROLES-VALIDATION.md>) :
+aucune donnée orpheline, totaux identiques, un seul espace personnel par
+utilisateur, isolation. Il ne fait que lire — l'instantané part sur le disque,
+dans `supabase/.temp/`, qui est ignoré par git.
+
+**La mesure d'avant n'a pas de seconde chance.** Une fois `space_id` rempli,
+l'état d'avant n'est plus observable nulle part ; `--before` refuse d'ailleurs
+de tourner si une ligne porte déjà un `space_id`. Elle se prend donc avant le
+Temps 2, sur chaque base :
+
+```bash
+npm run db:check-espaces -- --before                  # dev
+npm run db:check-espaces -- --before --target prod    # production
+```
+
+Puis, après le remplissage (Temps 2) et après la bascule (Temps 3), sur la même
+base :
+
+```bash
+npm run db:check-espaces -- --after
+```
+
+Trois verdicts possibles :
+
+| sortie | signification |
+|---|---|
+| `✓ GO` | les contrôles applicables passent tous |
+| `○ en attente` | le modèle d'espaces n'existe pas encore — critère d'acceptation en attente de son objet, pas un succès |
+| `✗ NO-GO` (code 1) | retour arrière immédiat, sans discussion |
+
+### Ce qu'il prouve, et ce qu'il ne prouve pas
+
+Il endosse réellement le rôle `authenticated` avec les claims JWT d'un
+utilisateur (`request.jwt.claims`), donc il éprouve les **politiques RLS** — ce
+qu'aucun des 453 tests ne fait, puisqu'aucun n'ouvre de connexion.
+
+Mais 24 des 26 routes passent par `getServiceClient()`, qui contourne la RLS :
+à l'exécution, ce qui isole est le code applicatif. Le **test B** — « la boutique
+ne lit pas le restaurant » — se joue donc au goulot applicatif (en-tête
+`X-Space-Id`), pas dans la base. Ici on prouve la précondition : que les données
+sont partitionnables et qu'aucune clé étrangère ne traverse deux espaces. La
+vérification que l'API applique le filtre demande un harnais HTTP, à écrire avec
+le goulot.
+
+### Le semis doit fabriquer le cas à deux espaces
+
+Le test B et le test C restent sans objet tant qu'aucun utilisateur n'a **deux
+espaces**. Ce cas n'existera jamais en production le jour de la bascule : il doit
+être fabriqué dans `seed.ts`, sinon le contrôle le plus important du document
+n'est jamais joué.
+
 ## Vercel
 
 | environnement | base | pourquoi |
@@ -272,6 +358,8 @@ npm run db:schema -- --snapshot         # empreinte du schéma
 npm run db:schema -- --diff dev prod    # comparaison
 npm run db:check-0007 -- --before       # avant la migration
 npm run db:check-0007 -- --after        # après
+npm run db:check-espaces -- --before    # multi-espaces : la mesure d'avant
+npm run db:check-espaces -- --after     # les 4 contrôles Go / No-Go
 ```
 
 Le `--` avant les options est obligatoire avec npm : il sépare les options du
