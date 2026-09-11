@@ -107,7 +107,7 @@
   --switch-h: 30px;
   --switch-knob: 24px;
 
-  /* — Motion: four durations, two curves (§ Motion) — */
+  /* — Motion: four durations, three curves (§ Motion) — */
   --dur-tap: 120ms; /* response at contact — keypad key, filter pill */
   --dur-toggle: 180ms; /* switch / checkbox / button press (160–180) */
   --dur-sheet: 280ms; /* modal sheet, side drawer (260–280) */
@@ -115,6 +115,11 @@
   --ease-out: ease-out; /* contact response */
   --ease-standard: cubic-bezier(0.23, 1, 0.32, 1); /* toggle / press */
   --ease-emphasized: cubic-bezier(0.32, 0.72, 0, 1); /* sheet / drawer / curve */
+  /* Arrivée en butée du calque écran (menu à glissement) : la seule courbe qui
+     dépasse sa cible — ~7 % — avant d'y retomber. Le petit choc qu'on sent
+     quand la page arrive au bout de sa course. Réservée à ça : partout
+     ailleurs, un dépassement lit comme une erreur de calcul. */
+  --ease-bounce: cubic-bezier(0.34, 1.45, 0.64, 1);
 }
 
 /* ---- Tailwind theme: expose tokens as utilities ------------------------------

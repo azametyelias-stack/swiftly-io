@@ -4,8 +4,16 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 import {
+  NAV_CARD_RADIUS,
+  NAV_CARD_SCALE,
+  NAV_EDGE_BAND,
   NAV_OPEN_ZONE,
+  NAV_STACK_PEEK,
   NAV_VERTICAL_RELEASE,
+  navCardShape,
+  navMaxShift,
+  navProgress,
+  navStackShape,
   shouldBlockSystemSwipe,
 } from "../../lib/nav/gesture.ts";
 
@@ -96,4 +104,159 @@ test("le tic haptique part quand le glissement est reconnu", () => {
   assert.ok(active > -1);
   const after = NAV_SHELL.slice(active, active + 400);
   assert.match(after, /haptic\(\)/, "un tic au moment ou le tiroir prend le doigt");
+});
+
+/* ── la carte : forme, pile, rebond ──────────────────────────────────────────
+ *
+ * Le menu n'est plus un tiroir sous une page qui glisse : la page DEVIENT une
+ * carte — elle rétrécit, s'arrondit, rebondit en butée, et un second calque se
+ * détache derrière elle. Trois choses s'y cassent en silence, donc trois
+ * familles de tests : la géométrie (ici, elle est pure), l'invariant qui
+ * garantit que le paquet de cartes ne dépasse pas avant l'heure, et le
+ * branchement, qui ne se lit que dans la source.
+ */
+
+test("la course ne depend pas de l'echelle : la bande visible reste la bande", () => {
+  // Tout tient a l'origine `0 50%` : la carte retrecit vers son bord GAUCHE,
+  // qui reste donc pose a `translateX`. C'est ce qui permet d'ajouter l'echelle
+  // sans retoucher au calcul de course du geste, teste plus haut.
+  assert.equal(navMaxShift(390), 390 - NAV_EDGE_BAND);
+  assert.equal(navMaxShift(0), 0, "avant le premier `window`, pas de course");
+  assert.equal(navMaxShift(40), 0, "jamais de course negative");
+});
+
+test("l'avancement est borne, et nul tant qu'on ne connait pas la fenetre", () => {
+  assert.equal(navProgress(0, 390), 0);
+  assert.equal(navProgress(290, 390), 1);
+  assert.equal(navProgress(9999, 390), 1, "borne haute");
+  assert.equal(navProgress(-50, 390), 0, "borne basse");
+  // Rendu serveur : largeur inconnue. Rendre 0 laisse la carte pleine page,
+  // c'est-a-dire l'etat de depart — donc aucun ecart d'hydratation.
+  assert.equal(navProgress(100, 0), 0);
+});
+
+test("ferme, la carte est exactement ce qu'elle a toujours ete", () => {
+  // La regression qui couterait le plus cher : une echelle ou un rayon qui
+  // traine a l'etat de repos deformerait les 22 ecrans en permanence.
+  const at_rest = navCardShape(0);
+  assert.equal(at_rest.scale, 1);
+  assert.equal(at_rest.radius, 0);
+});
+
+test("ouverte, la carte porte l'echelle et le rayon pleins", () => {
+  const open = navCardShape(1);
+  assert.equal(open.scale, NAV_CARD_SCALE);
+  assert.equal(open.radius, NAV_CARD_RADIUS);
+  // Et entre les deux, ca suit le doigt sans a-coup.
+  assert.ok(navCardShape(0.5).scale > open.scale);
+  assert.ok(navCardShape(0.5).scale < 1);
+});
+
+test("le paquet de cartes est INVISIBLE tant qu'il n'est pas sorti", () => {
+  // L'invariant du glissement. Range, le second calque doit porter exactement
+  // la transformation de la carte : au moindre ecart, un liseré clair
+  // depasserait a gauche pendant toute la course, au lieu de sortir apres le
+  // rebond comme il est cense le faire.
+  for (const p of [0, 0.25, 0.5, 0.75, 1]) {
+    const card = navCardShape(p);
+    const stack = navStackShape(p, false);
+    assert.equal(stack.scale, card.scale, `echelle a ${p}`);
+    assert.equal(stack.radius, card.radius, `rayon a ${p}`);
+    assert.equal(stack.peek, 0, `depassement a ${p}`);
+    assert.equal(stack.opacity, 0, `opacite a ${p}`);
+  }
+});
+
+test("sorti, il depasse a gauche et il est plus petit", () => {
+  const card = navCardShape(1);
+  const stack = navStackShape(1, true);
+  assert.equal(stack.peek, NAV_STACK_PEEK);
+  assert.ok(stack.opacity > 0);
+  assert.ok(stack.scale < card.scale, "plus petit, sinon on ne lit pas qu'il est derriere");
+});
+
+/**
+ * La source debarrassee de ses commentaires.
+ *
+ * Les deux tests qui suivent disent ce que le code NE fait PAS — et le mot en
+ * question apparait justement dans l'explication ecrite juste a cote. Sans ce
+ * nettoyage, ils echouent sur leur propre justification.
+ */
+const CODE = NAV_SHELL.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+
+/* ── le branchement du rebond ─────────────────────────────────────────────── */
+
+test("le tic du rebond part au CONTACT, pas a la fin de l'animation", () => {
+  // `transitionend` serait le reflexe : il tombe trop tard (la carte est deja
+  // retombee) et ne tombe pas du tout si le doigt reprend la main en cours de
+  // route — le paquet de cartes resterait alors dehors pour toujours.
+  assert.match(
+    NAV_SHELL,
+    /setTimeout\(\s*\(\) => haptic\(NAV_BOUNCE_HAPTIC_MS\),\s*reduced \? 0 : NAV_BOUNCE_AT/,
+    "le tic doit etre programme sur NAV_BOUNCE_AT",
+  );
+  assert.ok(
+    !/transitionend/.test(CODE),
+    "pas de transitionend : il ne tombe pas quand le geste reprend la main",
+  );
+});
+
+test("le rebond ne sert qu'a l'ouverture", () => {
+  // A la fermeture, un depassement tirerait la carte AU-DELA du bord gauche et
+  // laisserait voir le menu a droite pendant quelques images.
+  assert.match(NAV_SHELL, /open \? "var\(--ease-bounce/);
+  const css = readFileSync(
+    fileURLToPath(new URL("../../app/globals.css", import.meta.url)),
+    "utf8",
+  );
+  assert.match(css, /--ease-bounce:\s*cubic-bezier/);
+});
+
+test("la carte retrecit vers son bord gauche, aux deux calques", () => {
+  const origines = NAV_SHELL.match(/transformOrigin: "0 50%"/g) ?? [];
+  assert.equal(origines.length, 2, "la carte ET le paquet, sinon ils se decalent");
+});
+
+test("le rognage n'est pose que pendant que le menu se montre", () => {
+  // Un `overflow` permanent couperait ce qui deborde legitimement d'un ecran —
+  // les menus deroulants ouverts par-dessus le contenu (regle du 2026-09-04).
+  // Et `clip`, jamais `hidden`, qui ferait de la carte un conteneur de
+  // defilement et tuerait les `sticky` des ecrans.
+  assert.match(NAV_SHELL, /overflow: stage === "idle" \? undefined : "clip"/);
+  assert.ok(!/overflow-hidden|overflow: "hidden"/.test(CODE), "hidden tuerait les sticky");
+});
+
+test("le paquet de cartes ne prend jamais le doigt", () => {
+  assert.match(NAV_SHELL, /pointer-events-none[\s\S]{0,80}z-\[5\]/);
+});
+
+/* ── le menu, devenu le sol ──────────────────────────────────────────────── */
+
+const DRAWER = readFileSync(
+  fileURLToPath(new URL("../../components/nav/MenuDrawer.tsx", import.meta.url)),
+  "utf8",
+);
+
+test("le menu porte la photo de nuit, pas une surface claire", () => {
+  // Menu ouvert, c'est cette couleur-la que la barre d'etat surplombe : iOS y
+  // peint ses glyphes en BLANC (`black-translucent`). Un fond clair les rendait
+  // illisibles.
+  assert.match(DRAWER, /url\(\/brand\/nuit\.jpg\)/);
+  assert.match(DRAWER, /bg-brand-deep/);
+  assert.ok(!/bg-surface-page/.test(DRAWER), "la surface claire d'avant a disparu");
+});
+
+test("la marge du menu suit la bande, elle n'est pas recopiee", () => {
+  // Les deux valeurs doivent bouger ensemble : une bande elargie sans marge
+  // elargie, et les libelles passent sous la carte.
+  assert.match(DRAWER, /NAV_EDGE_BAND/);
+  assert.ok(!/\b52px\b/.test(DRAWER), "plus de 52 code en dur");
+});
+
+test("l'entree courante se signale par un point et l'opacite", () => {
+  // Decision d'Elias (2026-09-11) : plus de pilules. Sur une photo, un contour
+  // par entree fait une grille de cages.
+  assert.match(DRAWER, /aria-current=\{isActive \? "page" : undefined\}/);
+  assert.match(DRAWER, /opacity-55/);
+  assert.ok(!/border border-surface-divider/.test(DRAWER), "les pilules sont parties");
 });
