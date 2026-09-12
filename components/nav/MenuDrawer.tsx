@@ -23,11 +23,14 @@ import { useUnreadAlerts } from "@/components/nav/useUnreadAlerts";
  *
  * Trois choses, toutes voulues :
  *
- *  - un bandeau `--brand-deep` derrière la barre d'état, et lui seul. iOS peint
- *    l'heure et la batterie en BLANC (`black-translucent`) : sur un menu blanc
- *    elles disparaîtraient purement et simplement. C'est exactement la parade
- *    d'`AppHeader` sur Paramètres, l'autre écran clair de l'app — la même, pas
- *    une qui lui ressemble ;
+ *  - le blanc va jusqu'en haut, barre d'état comprise. J'avais posé là le
+ *    bandeau `--brand-deep` d'`AppHeader`, parce qu'en `black-translucent` iOS
+ *    peint l'heure et la batterie en BLANC, en dur — il n'adapte la couleur des
+ *    glyphes au fond que dans Safari, jamais en app installée. Elias l'a
+ *    tranché le 2026-09-12 en connaissance de cause : il préfère le menu d'un
+ *    seul tenant. **Ne pas le remettre de sa propre initiative** ; si l'heure
+ *    manque un jour, c'est la contrepartie assumée, et le bandeau tient en une
+ *    ligne ;
  *  - pas de pilules. L'entrée courante se signale par un point et une opacité
  *    pleine, les autres s'effacent à 55 % : un contour par entrée ferait une
  *    grille de cages ;
@@ -63,15 +66,6 @@ export function MenuDrawer() {
       // recopié — les deux valeurs DOIVENT bouger ensemble.
       style={{ paddingRight: `calc(${NAV_EDGE_BAND}px + var(--margin-screen, 16px))` }}
     >
-      {/* Le bandeau de la barre d'état. Sans lui, l'heure et la batterie —
-          blanches, barre translucide — tomberaient sur le blanc du menu et
-          seraient invisibles. `inset-x-0` couvre bien toute la largeur : un
-          élément absolu se positionne sur la boîte de REMPLISSAGE, marge de
-          droite comprise, et la carte n'arrive que plus bas. */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 h-[env(safe-area-inset-top)] bg-brand-deep"
-      />
 
       <div className="relative flex flex-none items-center justify-between px-4 pb-4 pt-[calc(env(safe-area-inset-top)+20px)]">
         <Link

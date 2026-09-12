@@ -308,15 +308,18 @@ test("le menu est blanc, et la carte reste lisible dessus", () => {
   assert.ok(!/bg-surface-page/.test(DRAWER), "le menu ne prend pas la couleur de la carte");
 });
 
-test("la barre d'etat garde un fond sombre au-dessus du menu blanc", () => {
-  // iOS peint l'heure et la batterie en BLANC (`black-translucent`) : sans ce
-  // bandeau elles disparaitraient. Meme parade qu'`AppHeader` sur Parametres.
-  assert.match(
-    DRAWER,
-    /h-\[env\(safe-area-inset-top\)\] bg-brand-deep/,
-    "le bandeau d'encoche, et lui seul, reste en --brand-deep",
-  );
-  assert.equal((DRAWER.match(/bg-brand-deep/g) ?? []).length, 1, "le reste du menu est blanc");
+test("le blanc va jusqu'en haut, barre d'etat comprise", () => {
+  // J'avais pose la le bandeau `--brand-deep` d'`AppHeader` : en
+  // `black-translucent`, iOS peint l'heure et la batterie en BLANC, en dur (il
+  // n'adapte les glyphes au fond que dans Safari, jamais en app installee).
+  // Elias l'a tranche le 2026-09-12 en connaissance de cause — il prefere le
+  // menu d'un seul tenant, et assume l'heure eventuellement illisible.
+  //
+  // Ce test existe pour que personne ne le « repare » : c'est une decision,
+  // pas un oubli.
+  assert.ok(!/bg-brand-deep/.test(DRAWER), "aucun bandeau sombre dans le menu");
+  // La marge d'encoche reste, elle : c'est elle qui degage le contenu.
+  assert.match(DRAWER, /pt-\[calc\(env\(safe-area-inset-top\)\+20px\)\]/);
 });
 
 test("la marge du menu suit la bande, elle n'est pas recopiee", () => {
