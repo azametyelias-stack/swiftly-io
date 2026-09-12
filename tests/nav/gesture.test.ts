@@ -201,6 +201,21 @@ test("le tic du rebond part au CONTACT, pas a la fin de l'animation", () => {
   );
 });
 
+test("le controle haptique d'iOS est monte au repos, pas pendant le geste", () => {
+  // Le creer au premier tic revenait a demander a WebKit d'animer un element
+  // qu'il n'a pas encore pose : pas de rendu, pas d'animation, pas de tic. Et
+  // c'est le PREMIER qu'on perdait — justement celui qu'on sent.
+  //
+  // (Le chemin lui-meme ne vaut plus que pour iOS 17.4 a 26.4 et pour Android :
+  // iOS 26.5 a ferme le declenchement programme. Voir lib/ui/haptics.ts.)
+  assert.match(NAV_SHELL, /primeHaptics\(\);/);
+  const HAPTICS = readFileSync(
+    fileURLToPath(new URL("../../lib/ui/haptics.ts", import.meta.url)),
+    "utf8",
+  );
+  assert.match(HAPTICS, /export function primeHaptics/);
+});
+
 test("le rebond ne sert qu'a l'ouverture", () => {
   // A la fermeture, un depassement tirerait la carte AU-DELA du bord gauche et
   // laisserait voir le menu a droite pendant quelques images.
@@ -217,13 +232,59 @@ test("la carte retrecit vers son bord gauche, aux deux calques", () => {
   assert.equal(origines.length, 2, "la carte ET le paquet, sinon ils se decalent");
 });
 
-test("le rognage n'est pose que pendant que le menu se montre", () => {
-  // Un `overflow` permanent couperait ce qui deborde legitimement d'un ecran —
+/* ── la carte est une carte, meme sur une page longue ─────────────────────── */
+
+test("la carte est ramenee a la hauteur de l'ecran pendant que le menu se montre", () => {
+  // C'etait le defaut signale par Elias le 2026-09-12 : sur le dashboard et les
+  // statistiques, le calque fait la hauteur du CONTENU — deux ou trois mille
+  // pixels. Reduit de 16 % autour de son propre centre, il deborde encore en
+  // haut comme en bas : on voyait une page decalee, jamais une carte. Les
+  // ecrans courts, eux, en formaient une parfaitement.
+  assert.match(NAV_SHELL, /height: showing \? "100dvh" : undefined/);
+  assert.match(NAV_SHELL, /overflow: showing \? "hidden" : undefined/);
+});
+
+test("ni hauteur figee ni rognage au repos", () => {
+  // Une carte figee a la hauteur de l'ecran ne defilerait plus, et un
+  // `overflow` permanent couperait ce qui deborde legitimement d'un ecran —
   // les menus deroulants ouverts par-dessus le contenu (regle du 2026-09-04).
-  // Et `clip`, jamais `hidden`, qui ferait de la carte un conteneur de
-  // defilement et tuerait les `sticky` des ecrans.
-  assert.match(NAV_SHELL, /overflow: stage === "idle" \? undefined : "clip"/);
-  assert.ok(!/overflow-hidden|overflow: "hidden"/.test(CODE), "hidden tuerait les sticky");
+  // Les deux sont donc portes par `showing`, jamais poses en dur.
+  assert.ok(!/overflow-hidden/.test(CODE), "pas de rognage permanent par classe");
+  // Une seule occurrence, donc celle du test precedent — qui est conditionnelle.
+  assert.equal((CODE.match(/100dvh/g) ?? []).length, 1);
+});
+
+test("le gel rend la page ou elle en etait, et sans animation", () => {
+  // `<html>` porte `scroll-smooth` : sans `instant`, la remise en place
+  // s'ANIMERAIT — la page se remettrait a defiler toute seule sous les yeux,
+  // une demi-seconde apres la fermeture.
+  assert.match(CODE, /card\.scrollTop = y/);
+  const rendus = CODE.match(/behavior: "instant"/g) ?? [];
+  assert.equal(rendus.length, 2, "au gel comme au degel");
+});
+
+test("le defilement gele n'est jamais rendu a un autre ecran", () => {
+  // On tape une entree du menu : la carte est encore gelee quand le nouvel
+  // ecran s'y rend. Lui appliquer le defilement de l'ancien l'ouvrirait en son
+  // milieu.
+  assert.match(CODE, /was\.path === pathname/);
+  assert.match(CODE, /before\.path === pathname \? before\.y : 0/);
+});
+
+test("le defilement est lu AVANT le gel, dans un gestionnaire", () => {
+  // Une fois le rendu du gel passe, le document s'est raccourci et `scrollY`
+  // est deja retombe a zero : il n'y a plus rien a lire.
+  const down = CODE.indexOf("const onPointerDown");
+  assert.ok(down > 0);
+  assert.match(CODE.slice(down, down + 400), /rememberScroll\(\)/);
+  assert.match(CODE, /const openMenu = useCallback\(\(\) => \{\s*rememberScroll\(\);/);
+});
+
+test("le voile de fermeture suit la carte gelee", () => {
+  // La carte est alors un conteneur de defilement cale plus bas dans son
+  // contenu : un `absolute inset-0` se poserait sur le HAUT de ce contenu,
+  // donc hors de l'ecran, et plus rien ne refermerait au toucher.
+  assert.match(CODE, /className="fixed inset-0 z-20 cursor-pointer/);
 });
 
 test("le paquet de cartes ne prend jamais le doigt", () => {
@@ -237,13 +298,25 @@ const DRAWER = readFileSync(
   "utf8",
 );
 
-test("le menu porte la photo de nuit, pas une surface claire", () => {
-  // Menu ouvert, c'est cette couleur-la que la barre d'etat surplombe : iOS y
-  // peint ses glyphes en BLANC (`black-translucent`). Un fond clair les rendait
-  // illisibles.
-  assert.match(DRAWER, /url\(\/brand\/nuit\.jpg\)/);
-  assert.match(DRAWER, /bg-brand-deep/);
-  assert.ok(!/bg-surface-page/.test(DRAWER), "la surface claire d'avant a disparu");
+test("le menu est blanc, et la carte reste lisible dessus", () => {
+  // Choix d'Elias, 2026-09-12 : plus de photo de nuit sous le menu. C'est
+  // `--surface-elev` (#FFFFFF), le jeton dit « modal sheets, drawer », et non
+  // `--surface-page` (#EBEBEF) qui est la couleur de la CARTE — les deux au
+  // meme gris, il n'y aurait plus de carte, juste une ombre portee.
+  assert.match(DRAWER, /bg-surface-elev/);
+  assert.ok(!/nuit\.jpg/.test(DRAWER), "la photo de nuit est partie");
+  assert.ok(!/bg-surface-page/.test(DRAWER), "le menu ne prend pas la couleur de la carte");
+});
+
+test("la barre d'etat garde un fond sombre au-dessus du menu blanc", () => {
+  // iOS peint l'heure et la batterie en BLANC (`black-translucent`) : sans ce
+  // bandeau elles disparaitraient. Meme parade qu'`AppHeader` sur Parametres.
+  assert.match(
+    DRAWER,
+    /h-\[env\(safe-area-inset-top\)\] bg-brand-deep/,
+    "le bandeau d'encoche, et lui seul, reste en --brand-deep",
+  );
+  assert.equal((DRAWER.match(/bg-brand-deep/g) ?? []).length, 1, "le reste du menu est blanc");
 });
 
 test("la marge du menu suit la bande, elle n'est pas recopiee", () => {
@@ -258,5 +331,8 @@ test("l'entree courante se signale par un point et l'opacite", () => {
   // par entree fait une grille de cages.
   assert.match(DRAWER, /aria-current=\{isActive \? "page" : undefined\}/);
   assert.match(DRAWER, /opacity-55/);
-  assert.ok(!/border border-surface-divider/.test(DRAWER), "les pilules sont parties");
+  // Portee a la LIGNE du menu, pas au fichier : les deux boutons de tete, eux,
+  // ont bien un contour — c'est la pastille commune a toute l'app.
+  const ligne = DRAWER.slice(DRAWER.indexOf("aria-current"), DRAWER.indexOf('].join(" ")'));
+  assert.ok(ligne.length > 0 && !/border/.test(ligne), "les pilules sont parties");
 });

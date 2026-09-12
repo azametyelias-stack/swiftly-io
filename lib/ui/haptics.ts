@@ -18,6 +18,27 @@
  * Ce second chemin est un détournement, pas une API. Il est isolé ici, derrière
  * une détection de fonctionnalité, et le jour où Apple change quelque chose la
  * seule conséquence est l'absence de vibration — jamais une erreur.
+ *
+ * ---- ce jour est arrivé (constaté le 2026-09-12) ----
+ *
+ * Elias ne sentait rien sur son iPhone. Ce n'est pas un bug d'ici : iOS 26.5 a
+ * fermé le chemin PROGRAMMÉ. Le tic ne part plus que si le doigt tombe pour de
+ * vrai sur l'interrupteur (`isTrusted`), ce qui exclut par construction tout
+ * retour différé — le nôtre arrive 115 ms après le relâchement, sur le rebond.
+ * Toutes les bibliothèques du domaine documentent la même chose : iOS 17.4 →
+ * 26.4 d'accord, 26.5 et au-delà, un seul tic et seulement sous le doigt.
+ *   https://haptics.kushagragolash.dev/ · https://github.com/tijnjh/ios-haptics
+ *
+ * On garde donc ce chemin — il sert encore les iPhone restés en deçà de 26.5,
+ * et Android ne l'a jamais emprunté — mais on ne lui demande plus l'impossible.
+ * Deux choses en dépendaient vraiment et ont été corrigées :
+ *
+ *  - le contrôle était créé au PREMIER besoin, c'est-à-dire au milieu du geste.
+ *    Créer un élément et le cliquer dans la même image ne laisse pas à WebKit
+ *    le temps de le poser : pas de rendu, pas d'animation, donc pas de tic. Il
+ *    est désormais monté à l'avance (`primeHaptics`), au repos ;
+ *  - si rien ne vibre nulle part, c'est d'abord à vérifier côté téléphone :
+ *    Réglages → Sons et retour haptique → « Retour haptique du système ».
  */
 
 /** Durée du tic sur les plateformes qui prennent une durée. Court : un accusé, pas une alerte. */
@@ -77,6 +98,23 @@ function iosSwitch(): HTMLLabelElement | null {
 
   switchLabel = label;
   return label;
+}
+
+/**
+ * Monte le contrôle iOS à l'avance, hors de tout geste.
+ *
+ * À appeler une fois, au montage de la coquille. Le créer au premier tic
+ * revenait à demander à WebKit d'animer un élément qu'il n'a pas encore posé :
+ * le tout premier retour était perdu, et c'est justement celui-là qu'on sent.
+ * Sans effet là où la Vibration API existe, et sans effet deux fois.
+ */
+export function primeHaptics(): void {
+  if (typeof window === "undefined") return;
+  try {
+    iosSwitch();
+  } catch {
+    /* rien à préparer sur cette plateforme */
+  }
 }
 
 /**

@@ -3,6 +3,7 @@
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -24,7 +25,7 @@ import {
   navStackShape,
   shouldBlockSystemSwipe,
 } from "@/lib/nav/gesture";
-import { haptic } from "@/lib/ui/haptics";
+import { haptic, primeHaptics } from "@/lib/ui/haptics";
 import { OfflineBanner } from "@/components/offline/OfflineBanner";
 import { NavShellContext, type NavShellValue } from "@/components/nav/useNavShell";
 
@@ -73,15 +74,61 @@ const INTENT = NAV_INTENT;
  */
 type Stage = "idle" | "moving" | "settled";
 
+/*
+ * Le gel doit tomber AVANT la peinture — c'est tout son intérêt : rendre la
+ * carte à sa place sans qu'une seule image ne montre la page revenue en haut.
+ * `useLayoutEffect` ne tourne pas au rendu serveur et React le dit en console ;
+ * l'alias évite l'avertissement sans rien changer dans le navigateur.
+ */
+const useBeforePaint = typeof window === "undefined" ? useEffect : useLayoutEffect;
+
 export function NavShell({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [dragX, setDragX] = useState<number | null>(null); // px, during a drag
   const [stage, setStage] = useState<Stage>("idle");
   const pathname = usePathname();
 
-  const openMenu = useCallback(() => setOpen(true), []);
+  /*
+   * ---- le gel de la carte ----
+   *
+   * Une carte, c'est quatre coins visibles. Le calque écran fait la hauteur de
+   * son CONTENU : sur le dashboard ou les statistiques, deux ou trois mille
+   * pixels. Réduit de 16 % autour de son propre centre, il dépasse encore très
+   * largement en haut comme en bas — on ne voyait donc qu'une page décalée,
+   * jamais une carte (retour d'Elias, 2026-09-12), alors que les écrans courts
+   * en formaient une parfaitement.
+   *
+   * Pendant que le menu se montre, le calque est donc ramené à la hauteur de
+   * l'écran et devient son propre conteneur de défilement, calé à l'endroit
+   * exact où la page en était (`scrollTop`). Ce qui dépasse est tronqué —
+   * c'est le choix d'Elias, et c'est de toute façon ce que fait une carte.
+   *
+   * Le prix à payer est le défilement de la PAGE, qui retombe à zéro quand le
+   * document se raccourcit. D'où les deux repères ci-dessous : la position
+   * d'avant le gel, et la route sur laquelle elle a été prise — on ne rend pas
+   * un défilement à un écran qui a changé entre-temps.
+   */
+  const cardRef = useRef<HTMLDivElement>(null);
+  const restY = useRef(0);
+  const frozen = useRef<{ y: number; path: string } | null>(null);
+
+  /*
+   * À n'appeler que depuis un gestionnaire d'évènement : une fois le rendu du
+   * gel passé, le document s'est déjà raccourci et `scrollY` ne vaut plus rien.
+   */
+  const rememberScroll = useCallback(() => {
+    if (!frozen.current) restY.current = window.scrollY;
+  }, []);
+
+  const openMenu = useCallback(() => {
+    rememberScroll();
+    setOpen(true);
+  }, [rememberScroll]);
   const closeMenu = useCallback(() => setOpen(false), []);
-  const toggleMenu = useCallback(() => setOpen((v) => !v), []);
+  const toggleMenu = useCallback(() => {
+    rememberScroll();
+    setOpen((v) => !v);
+  }, [rememberScroll]);
 
   // Close on navigation, without a setState-in-effect: React's "adjust state when
   // a prop changes during render" pattern. The menu's links also call closeMenu()
@@ -91,6 +138,12 @@ export function NavShell({ children }: { children: ReactNode }) {
     setSeenPath(pathname);
     setOpen(false);
   }
+
+  // Le contrôle qui joue les tics sur iOS est monté ici, au repos : le créer
+  // pendant le geste revenait à perdre le premier retour (voir lib/ui/haptics).
+  useEffect(() => {
+    primeHaptics();
+  }, []);
 
   // Lock body scroll while open.
   useEffect(() => {
@@ -181,6 +234,9 @@ export function NavShell({ children }: { children: ReactNode }) {
 
   const onPointerDown = (e: ReactPointerEvent) => {
     if (e.pointerType === "mouse" && e.button !== 0) return;
+    // Le doigt vient de se poser : c'est le dernier instant où l'on peut lire
+    // le défilement de la page avant que le geste ne la gèle.
+    rememberScroll();
     gesture.current = {
       id: e.pointerId,
       startX: e.clientX,
@@ -282,6 +338,40 @@ export function NavShell({ children }: { children: ReactNode }) {
     };
   }, [open, dragging]);
 
+  /** Le menu se montre : la carte est gelée au format de l'écran. */
+  const showing = stage !== "idle";
+
+  /*
+   * Geler, dégeler. Les deux mouvements sont l'exact inverse l'un de l'autre et
+   * doivent tomber avant la peinture, sinon on voit la page sauter en haut.
+   *
+   * `behavior: "instant"` n'est pas un détail : `<html>` porte `scroll-smooth`,
+   * et sans lui la remise en place s'ANIMERAIT — la page se remettrait à
+   * défiler toute seule sous les yeux, une demi-seconde après la fermeture.
+   */
+  useBeforePaint(() => {
+    const card = cardRef.current;
+    if (!card) return;
+
+    if (showing) {
+      const before = frozen.current;
+      // Une navigation sous la carte gelée (on tape une entrée du menu) : le
+      // nouvel écran se lit depuis son début, pas au défilement de l'ancien.
+      const y = before ? (before.path === pathname ? before.y : 0) : restY.current;
+      frozen.current = { y, path: pathname };
+      card.scrollTop = y;
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+      return;
+    }
+
+    const was = frozen.current;
+    frozen.current = null;
+    card.scrollTop = 0;
+    if (was && was.path === pathname && was.y > 0) {
+      window.scrollTo({ top: was.y, left: 0, behavior: "instant" });
+    }
+  }, [showing, pathname]);
+
   /*
    * La translation reste une expression CSS (`calc(100vw − bande)`) au repos :
    * une valeur en pixels figée au rendu ne survivrait pas à une rotation
@@ -341,6 +431,7 @@ export function NavShell({ children }: { children: ReactNode }) {
         />
 
         <div
+          ref={cardRef}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={endGesture}
@@ -353,12 +444,23 @@ export function NavShell({ children }: { children: ReactNode }) {
             // vertical, lui, donne les marges haute et basse.
             transformOrigin: "0 50%",
             borderRadius: `${card.radius}px`,
-            // Rogner, sinon les fonds des écrans (la photo de nuit, la bande
-            // d'encoche des en-têtes) repeignent par-dessus les coins arrondis.
-            // `clip` et pas `hidden`, pour la raison donnée sur la coquille
-            // ci-dessus. Et seulement quand le menu se montre : posé en
-            // permanence, il couperait ce qui déborde légitimement d'un écran.
-            overflow: stage === "idle" ? undefined : "clip",
+            // Les deux lignes qui font une CARTE et non une page décalée : la
+            // hauteur de l'écran, et le rognage de tout ce qui dépasse.
+            //
+            // `hidden` et non `clip`, à l'inverse de la coquille ci-dessus, et
+            // c'est voulu : `hidden` fait de la carte un conteneur de
+            // défilement, donc une boîte dont on peut poser le `scrollTop` —
+            // c'est ce qui la cale sur ce qu'on regardait au lieu de la
+            // ramener en haut de page. Les `sticky` des écrans n'y perdent
+            // rien, au contraire : ils s'accrochent alors au haut de la carte,
+            // c'est-à-dire exactement là où on les voyait.
+            //
+            // Rien de tout cela au repos : une carte figée à la hauteur de
+            // l'écran ne défilerait plus, et un `overflow` permanent couperait
+            // ce qui déborde légitimement d'un écran (les menus déroulants
+            // ouverts par-dessus le contenu, règle du 2026-09-04).
+            height: showing ? "100dvh" : undefined,
+            overflow: showing ? "hidden" : undefined,
             transition: dragging
               ? "none"
               : [
@@ -375,11 +477,19 @@ export function NavShell({ children }: { children: ReactNode }) {
             // Toute la carte referme, plus seulement le liseré : c'est le geste
             // naturel une fois qu'on reconnaît la page qu'on a quittée, et ça
             // évite d'appuyer par mégarde sur un bouton de l'écran d'en dessous.
+            //
+            // `fixed` et non `absolute` : la carte est alors un conteneur de
+            // défilement calé plus bas dans son contenu, et un `absolute
+            // inset-0` se poserait sur le HAUT de ce contenu — donc hors de
+            // l'écran. La carte étant transformée, elle est le cadre de
+            // référence de ce `fixed`, et elle fait exactement la taille de
+            // l'écran pendant tout le temps où ce bouton existe : les deux
+            // coïncident au pixel.
             <button
               type="button"
               aria-label="Fermer le menu"
               onClick={closeMenu}
-              className="absolute inset-0 z-20 cursor-pointer bg-transparent"
+              className="fixed inset-0 z-20 cursor-pointer bg-transparent"
             />
           )}
           {/* En tête du flux, pas en `fixed` : hors ligne le bandeau prend une
