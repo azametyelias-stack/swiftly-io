@@ -211,6 +211,76 @@ export function groupByPeriod<T extends DatedRow>(
   return [...groups.values()].sort((a, b) => (a.sortKey < b.sortKey ? 1 : -1));
 }
 
+// ── pagination par keyset (SCREEN-6) ──────────────────────────────────────
+
+/**
+ * Le curseur de page de `/api/transactions`.
+ *
+ * Il porte les TROIS clés de tri, dans l'ordre du tri : `occurred_on`, puis
+ * `created_at`, puis `id`. C'était `occurred_on|id` jusqu'ici, et c'est ce qui
+ * rendait l'historique récent du Dashboard incompréhensible : `occurred_on` est
+ * une DATE, sans heure, donc deux transactions du même jour étaient départagées
+ * par leur `id` — un uuid v4, c'est-à-dire au hasard. La capture d'Elias du
+ * 2026-09-13 montre le résultat : 18 h 56, puis 20 h 52, puis 10 h 22.
+ *
+ * Un curseur doit énumérer exactement les mêmes colonnes que le ORDER BY, sans
+ * quoi une page peut sauter des lignes : si le tri change et pas le curseur, des
+ * lignes situées « après » selon le tri se retrouvent « avant » selon le
+ * curseur, et disparaissent de la pagination.
+ *
+ * Les trois morceaux sont validés à la lecture. Ils finissent interpolés dans un
+ * filtre PostgREST, où une virgule ouvrirait une branche de `or(...)` ; ces
+ * expressions rationnelles sont ce qui garantit qu'ils n'en contiennent pas.
+ */
+const CURSOR_DATE = /^\d{4}-\d{2}-\d{2}$/;
+const CURSOR_TIMESTAMP =
+  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})$/;
+const CURSOR_UUID =
+  /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+
+export interface ListCursor {
+  occurredOn: string;
+  /**
+   * `null` pour un curseur à l'ancien format (`occurred_on|id`), émis par une
+   * page restée ouverte pendant le déploiement. On sait encore le lire, avec
+   * l'ancienne règle : sans ça la page suivante repartait du début et
+   * réaffichait des lignes déjà listées.
+   */
+  createdAt: string | null;
+  id: string;
+}
+
+export function encodeCursor(row: {
+  occurred_on: string;
+  created_at: string;
+  id: string;
+}): string {
+  return `${row.occurred_on}|${row.created_at}|${row.id}`;
+}
+
+/** `null` si le curseur est absent, malformé, ou contient autre chose que les trois clés attendues. */
+export function parseCursor(raw: string | undefined | null): ListCursor | null {
+  if (!raw) return null;
+  const parts = raw.split("|");
+
+  if (parts.length === 3) {
+    const [occurredOn, createdAt, id] = parts as [string, string, string];
+    if (!CURSOR_DATE.test(occurredOn)) return null;
+    if (!CURSOR_TIMESTAMP.test(createdAt)) return null;
+    if (!CURSOR_UUID.test(id)) return null;
+    return { occurredOn, createdAt, id };
+  }
+
+  if (parts.length === 2) {
+    const [occurredOn, id] = parts as [string, string];
+    if (!CURSOR_DATE.test(occurredOn)) return null;
+    if (!CURSOR_UUID.test(id)) return null;
+    return { occurredOn, createdAt: null, id };
+  }
+
+  return null;
+}
+
 // ── filter + sort (SCREEN-6 § 4) ──────────────────────────────────────────
 
 export type TypeFilter = "all" | TxType;

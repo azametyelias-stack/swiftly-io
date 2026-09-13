@@ -136,6 +136,27 @@ export function FilterIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+/**
+ * Les trois points verticaux — le menu d'options d'une carte ou d'une section
+ * (SCREEN-4 § 8 et § 10 : « icône 3 points en haut à droite OU appui long »).
+ *
+ * Des disques PLEINS, donc `fill` et pas de trait : à 18 px, trois anneaux de
+ * 1,7 px d'épaisseur se referment en taches sales. C'est le seul glyphe du jeu
+ * qui ne se dessine pas au trait, d'où le `stroke="none"` explicite — sans lui
+ * il hériterait du trait du `Svg` parent et grossirait d'un tiers.
+ */
+export function MoreVerticalIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Svg {...props}>
+      <g fill="currentColor" stroke="none">
+        <circle cx="12" cy="5" r="1.7" />
+        <circle cx="12" cy="12" r="1.7" />
+        <circle cx="12" cy="19" r="1.7" />
+      </g>
+    </Svg>
+  );
+}
+
 export function ArrowDownLeftIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <Svg {...props}>

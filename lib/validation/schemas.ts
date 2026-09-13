@@ -265,8 +265,23 @@ export const transactionListQuerySchema = z
     account: uuid.optional(),
     linked_to_type: linkedToType.optional(),
     linked_to_id: uuid.optional(),
-    /** opaque cursor from the previous page: "<occurred_on>|<id>" */
-    cursor: z.string().max(80).optional(),
+    /**
+     * Fenêtre sur `occurred_on` — la période du Dashboard (SCREEN-4 § 3).
+     * `from` inclus, `to` EXCLU, comme `PeriodRange` (`lib/dashboard/period.ts`).
+     */
+    from: isoDate.optional(),
+    to: isoDate.optional(),
+    /**
+     * Curseur opaque de la page précédente :
+     * "<occurred_on>|<created_at>|<id>".
+     *
+     * 120 et non 80 : les trois clés de tri font 10 + 32 + 36 caractères plus
+     * deux séparateurs, soit tout juste 80 — l'ancienne borne rejetait le
+     * curseur qu'on vient d'émettre. Le contenu, lui, est revalidé morceau par
+     * morceau par `parseCursor` avant de toucher la base ; cette borne-ci ne
+     * fait que couper court aux valeurs absurdes.
+     */
+    cursor: z.string().max(120).optional(),
     limit: z.coerce.number().int().min(1).max(100).default(50),
   })
   .strict();

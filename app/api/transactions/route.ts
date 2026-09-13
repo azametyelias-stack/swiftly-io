@@ -24,7 +24,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export const GET = withAuth(async (request, { user }) => {
-  const { type, account, linked_to_type, linked_to_id, cursor, limit } =
+  const { type, account, linked_to_type, linked_to_id, from, to, cursor, limit } =
     parseParams(
       Object.fromEntries(new URL(request.url).searchParams),
       transactionListQuerySchema,
@@ -42,6 +42,8 @@ export const GET = withAuth(async (request, { user }) => {
       account,
       linkedToType: linked_to_type,
       linkedToId: linked_to_id,
+      from,
+      to,
       cursor,
       limit,
     });

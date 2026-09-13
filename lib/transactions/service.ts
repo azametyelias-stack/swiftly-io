@@ -6,6 +6,8 @@ import { BadRequestError, NotFoundError } from "@/lib/http/errors";
 import { assertOwnership } from "@/lib/auth/guard";
 import type { AuthUser } from "@/lib/auth/authenticate";
 import {
+  encodeCursor,
+  parseCursor,
   resolveScoringAxis,
   type LinkedToType,
   type TxAccountRef,
@@ -131,6 +133,16 @@ export async function listTransactions(
     account?: string;
     linkedToType?: LinkedToType;
     linkedToId?: string;
+    /** premier jour de la fenêtre, INCLUS */
+    from?: string;
+    /**
+     * Lendemain du dernier jour, EXCLU — la même convention que
+     * `PeriodRange.end` (`lib/dashboard/period.ts`), pour que l'appelant passe
+     * la période telle qu'elle sort de `resolvePeriod` sans recalculer une
+     * veille : une soustraction d'un jour recopiée à chaque appel finit par
+     * manquer quelque part.
+     */
+    to?: string;
     cursor?: string;
     limit: number;
   },
@@ -139,9 +151,27 @@ export async function listTransactions(
     .from("transactions")
     .select(LIST_COLUMNS)
     .eq("user_id", userId)
+    /*
+     * `created_at` en deuxième clé, et c'est la correction qui compte ici.
+     *
+     * `occurred_on` est une DATE : toutes les transactions d'un même jour y sont
+     * à égalité. Le départage tombait donc sur `id`, un uuid v4 — c'est-à-dire
+     * au hasard. Une journée s'affichait dans le désordre, et le Dashboard, qui
+     * ne garde que les premières lignes, pouvait ne pas même retenir les plus
+     * récentes. L'heure d'ENREGISTREMENT tranche maintenant, la dernière saisie
+     * en tête (SCREEN-4 § 10).
+     *
+     * `id` reste en troisième : deux lignes peuvent partager `created_at` à la
+     * microseconde près (un import, une récurrence traitée en lot), et un tri
+     * qui ne départage pas totalement rend la pagination par keyset instable.
+     */
     .order("occurred_on", { ascending: false })
+    .order("created_at", { ascending: false })
     .order("id", { ascending: false })
     .limit(opts.limit + 1);
+
+  if (opts.from) q = q.gte("occurred_on", opts.from);
+  if (opts.to) q = q.lt("occurred_on", opts.to);
 
   if (opts.type) q = q.eq("type", opts.type);
   if (opts.account) {
@@ -152,13 +182,28 @@ export async function listTransactions(
   if (opts.linkedToType) q = q.eq("linked_to_type", opts.linkedToType);
   if (opts.linkedToId) q = q.eq("linked_to_id", opts.linkedToId);
 
-  if (opts.cursor) {
-    const [date, id] = opts.cursor.split("|");
-    if (date && id) {
-      q = q.or(
-        `occurred_on.lt.${date},and(occurred_on.eq.${date},id.lt.${id})`,
-      );
-    }
+  /*
+   * Le keyset, qui énumère EXACTEMENT les colonnes du ORDER BY ci-dessus.
+   *
+   * Les trois morceaux sortent de `parseCursor`, qui les valide un par un :
+   * ils sont interpolés dans un filtre PostgREST, où une virgule ouvrirait une
+   * branche de `or(...)` non voulue. Un curseur malformé vaut « pas de
+   * curseur » plutôt qu'une requête bricolée.
+   *
+   * `created_at` est entre guillemets : un timestamp contient `:` et `.`, que
+   * PostgREST traite comme des séparateurs dans une valeur nue.
+   */
+  const cursor = parseCursor(opts.cursor);
+  if (cursor) {
+    const { occurredOn: d, createdAt: c, id } = cursor;
+    q = q.or(
+      c === null
+        ? // Ancien format `occurred_on|id`, émis par une page ouverte avant ce
+          // déploiement : on le lit avec son ancienne règle plutôt que de le
+          // jeter, sinon la page suivante repartirait du début.
+          `occurred_on.lt.${d},and(occurred_on.eq.${d},id.lt.${id})`
+        : `occurred_on.lt.${d},and(occurred_on.eq.${d},created_at.lt."${c}"),and(occurred_on.eq.${d},created_at.eq."${c}",id.lt.${id})`,
+    );
   }
 
   const { data, error } = await q;
@@ -182,7 +227,7 @@ export async function listTransactions(
   const last = page.at(-1);
   return {
     items: page,
-    nextCursor: hasMore && last ? `${last.occurred_on}|${last.id}` : null,
+    nextCursor: hasMore && last ? encodeCursor(last) : null,
   };
 }
 

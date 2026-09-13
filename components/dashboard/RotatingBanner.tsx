@@ -5,31 +5,48 @@ import {
   useRef,
   useState,
   type PointerEvent as ReactPointerEvent,
+  type ReactNode,
 } from "react";
 import Link from "next/link";
 
-import { useMessages } from "@/lib/i18n/useMessages";
+import { TONE_COLOR, type ProgressTone } from "@/components/ui/ProgressBar";
 
 /**
- * "Objectif du mois" banner (SCREEN-4 § 7). Items rotate every 30 s, can be
- * swiped, show position dots, pause on interaction, and — for a ready-but-unread
- * report — blink and sort first. Urgent items (low balance…) sort ahead of tips.
+ * Le bandeau « Objectif du mois » (SCREEN-4 § 7). Les items tournent toutes les
+ * 30 s, se balayent à la main, affichent des points de position, se mettent en
+ * pause dès qu'on y touche, et — pour un rapport prêt et non lu — clignotent et
+ * passent en tête. Les urgents (budget au bord du dépassement…) devancent les
+ * simples conseils.
  *
- * Lot 2 feeds it `[]` (no projects / alerts / reports yet) → the "Fixez un
- * objectif" placeholder. The real item sources are wired in Lots 4-6.
+ * Il ne sait rien des budgets ni des projets : `ObjectivesBanner` lui apporte
+ * des items déjà construits et ordonnés. Son état vide est un `ReactNode` que
+ * l'appelant fournit, parce que sur le Dashboard c'est un BOUTON (« Fixez un
+ * objectif » ouvre le formulaire) et qu'un composant de présentation n'a pas à
+ * savoir ce qu'ouvre ce bouton.
  */
 
 const ROTATE_MS = 30_000;
 const RESUME_AFTER_MS = 20_000;
 const SWIPE_PX = 40;
 
+/**
+ * Au-delà de ça, le doigt a glissé : ce n'est plus un tap, et la carte ne doit
+ * pas naviguer. Sans ce garde, un balayage pour passer à l'objectif suivant
+ * ouvrait aussi la fiche de l'objectif qu'on quittait.
+ */
+const TAP_SLOP = 8;
+
 export interface BannerItem {
   id: string;
   label: string;
   title: string;
   caption?: string;
-  /** 0–100; renders the progress rail */
+  /** 0–100 ; affiche la barre de progression */
   progress?: number;
+  /** Couleur de la barre. Un budget vire à l'orange puis au rouge, une épargne reste verte. */
+  tone?: ProgressTone;
+  /** Sous la barre : « 75 000 F / 100 000 F » (maquette `04-dashboard.png`). */
+  detail?: string;
   href?: string;
   urgent?: boolean;
   blink?: boolean;
@@ -42,12 +59,18 @@ function ordered(items: BannerItem[]): BannerItem[] {
   });
 }
 
-export function RotatingBanner({ items }: { items: BannerItem[] }) {
-  const m = useMessages();
+export function RotatingBanner({
+  items,
+  empty,
+}: {
+  items: BannerItem[];
+  empty?: ReactNode;
+}) {
   const sorted = ordered(items);
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
-  const dragStart = useRef<number | null>(null);
+  const dragStart = useRef<{ x: number; y: number } | null>(null);
+  const moved = useRef(false);
   const resumeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -71,12 +94,24 @@ export function RotatingBanner({ items }: { items: BannerItem[] }) {
   };
 
   const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
-    dragStart.current = e.clientX;
+    dragStart.current = { x: e.clientX, y: e.clientY };
+    moved.current = false;
+  };
+  const onPointerMove = (e: ReactPointerEvent<HTMLDivElement>) => {
+    const start = dragStart.current;
+    if (!start) return;
+    if (
+      Math.abs(e.clientX - start.x) > TAP_SLOP ||
+      Math.abs(e.clientY - start.y) > TAP_SLOP
+    ) {
+      moved.current = true;
+    }
   };
   const onPointerUp = (e: ReactPointerEvent<HTMLDivElement>) => {
-    if (dragStart.current === null || sorted.length <= 1) return;
-    const dx = e.clientX - dragStart.current;
+    const start = dragStart.current;
     dragStart.current = null;
+    if (!start || sorted.length <= 1) return;
+    const dx = e.clientX - start.x;
     if (Math.abs(dx) < SWIPE_PX) return;
     interact();
     setIndex((i) =>
@@ -84,20 +119,27 @@ export function RotatingBanner({ items }: { items: BannerItem[] }) {
     );
   };
 
-  if (sorted.length === 0) {
-    return (
-      <div className="rounded-[var(--radius-card)] border border-surface-divider bg-surface-card p-4">
-        <p className="t-body font-semibold text-text-primary">{m.dashboard.banner.emptyTitle}</p>
-        <p className="t-secondary mt-1 text-text-secondary">{m.dashboard.banner.emptyBody}</p>
-      </div>
-    );
-  }
+  if (sorted.length === 0) return <>{empty ?? null}</>;
 
-  const active = sorted[Math.min(index, sorted.length - 1)]!;
+  /*
+   * L'index est RAMENÉ dans les bornes à la lecture, pas corrigé par un effet.
+   *
+   * Un objectif supprimé ailleurs raccourcit la liste, et `index` peut alors
+   * pointer au-delà de la fin. Le remettre à zéro depuis un `useEffect`
+   * marcherait, mais au prix d'un rendu de plus à chaque fois — et le projet
+   * s'interdit `setState` dans un effet (règle `react-hooks/set-state-in-effect`,
+   * même raison que dans `useDashboard`). Une valeur dérivée règle la chose sans
+   * rendu supplémentaire, et le prochain tour de rotation replace `index` dans
+   * les bornes tout seul.
+   */
+  const activeIndex = Math.min(index, sorted.length - 1);
+  const active = sorted[activeIndex]!;
+  const barColor = TONE_COLOR[active.tone ?? "green"];
 
   const card = (
     <div
       onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
       onClick={interact}
       className={[
@@ -122,16 +164,33 @@ export function RotatingBanner({ items }: { items: BannerItem[] }) {
       </div>
 
       {typeof active.progress === "number" ? (
-        <div className="flex items-center gap-2.5">
-          <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/20">
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-2.5">
             <span
-              className="block h-full rounded-full bg-ink-in"
-              style={{ width: `${Math.max(0, Math.min(100, active.progress))}%` }}
-            />
-          </span>
-          <span className="flex-none text-[12px] font-semibold text-ink-on-surface/80 tabular">
-            {Math.round(active.progress)} %
-          </span>
+              className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/20"
+              role="progressbar"
+              aria-valuenow={Math.round(active.progress)}
+              aria-valuemin={0}
+              aria-valuemax={100}
+            >
+              <span
+                className="block h-full rounded-full transition-[width] duration-500"
+                style={{
+                  width: `${Math.max(0, Math.min(100, active.progress))}%`,
+                  background: barColor,
+                }}
+              />
+            </span>
+            <span className="flex-none text-[12px] font-semibold text-ink-on-surface/80 tabular">
+              {Math.round(active.progress)} %
+            </span>
+          </div>
+          {/* Les montants sous la barre, comme sur `04-dashboard.png`. */}
+          {active.detail ? (
+            <span className="text-[12px] text-ink-on-surface/70 tabular">
+              {active.detail}
+            </span>
+          ) : null}
         </div>
       ) : null}
     </div>
@@ -140,19 +199,30 @@ export function RotatingBanner({ items }: { items: BannerItem[] }) {
   return (
     <div className="flex flex-col gap-2">
       {active.href ? (
-        <Link href={active.href} className="block">
+        <Link
+          href={active.href}
+          className="block"
+          // Le balayage qui fait tourner le bandeau se termine par un `click` :
+          // sans ça, changer d'objectif ouvrait la fiche de celui qu'on quitte.
+          onClick={(e) => {
+            if (moved.current) e.preventDefault();
+          }}
+        >
           {card}
         </Link>
       ) : (
         card
       )}
       {sorted.length > 1 ? (
-        <div className="flex justify-center gap-1.5">
+        // `flex-wrap` : au-delà d'une quinzaine d'objectifs la rangée de points
+        // dépasserait la largeur du téléphone. Elle passe à la ligne plutôt que
+        // de déborder — aucun plafond arbitraire sur le nombre d'objectifs.
+        <div className="flex flex-wrap justify-center gap-1.5">
           {sorted.map((it, i) => (
             <span
               key={it.id}
               className={`h-1 rounded-full transition-all ${
-                i === index ? "w-3.5 bg-text-primary" : "w-1 bg-text-quaternary"
+                i === activeIndex ? "w-3.5 bg-text-primary" : "w-1 bg-text-quaternary"
               }`}
             />
           ))}

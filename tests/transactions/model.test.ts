@@ -8,9 +8,11 @@ import {
   directionOf,
   draftToPayload,
   emptyDraft,
+  encodeCursor,
   groupByPeriod,
   matchesTypeFilter,
   parseAmount,
+  parseCursor,
   resolveScoringAxis,
   sortRows,
   stepErrors,
@@ -193,4 +195,65 @@ test("transactionToDraft round-trips through the wizard", () => {
   assert.equal(draft.destinationAccountId, "acc-2");
   assert.equal(draft.recurrence, "monthly");
   assert.equal(canAdvance(draft, 2), true);
+});
+
+// ── curseur de pagination ──────────────────────────────────────────────────
+// Le curseur DOIT énumérer les mêmes colonnes que le ORDER BY du service, sinon
+// une page saute des lignes. Et ses morceaux finissent dans un filtre PostgREST,
+// où une virgule ouvre une branche de `or(...)` : d'où la validation stricte.
+
+const UUID_A = "0b3f1c2d-4e5a-4b6c-8d7e-9f0a1b2c3d4e";
+
+test("encodeCursor porte les trois clés de tri", () => {
+  assert.equal(
+    encodeCursor({
+      occurred_on: "2026-09-13",
+      created_at: "2026-09-13T10:22:31.123456+00:00",
+      id: UUID_A,
+    }),
+    `2026-09-13|2026-09-13T10:22:31.123456+00:00|${UUID_A}`,
+  );
+});
+
+test("parseCursor relit ce qu'encodeCursor a écrit", () => {
+  const row = {
+    occurred_on: "2026-09-13",
+    created_at: "2026-09-13T10:22:31.123456+00:00",
+    id: UUID_A,
+  };
+  assert.deepEqual(parseCursor(encodeCursor(row)), {
+    occurredOn: "2026-09-13",
+    createdAt: "2026-09-13T10:22:31.123456+00:00",
+    id: UUID_A,
+  });
+});
+
+test("parseCursor accepte le Z et l'absence de fraction de seconde", () => {
+  assert.ok(parseCursor(`2026-09-13|2026-09-13T10:22:31Z|${UUID_A}`));
+  assert.ok(parseCursor(`2026-09-13|2026-09-13T10:22:31.1+02:00|${UUID_A}`));
+});
+
+test("parseCursor lit encore l'ancien format à deux clés", () => {
+  assert.deepEqual(parseCursor(`2026-09-13|${UUID_A}`), {
+    occurredOn: "2026-09-13",
+    createdAt: null,
+    id: UUID_A,
+  });
+});
+
+test("parseCursor refuse tout ce qui pourrait s'échapper dans un filtre", () => {
+  for (const bad of [
+    "",
+    undefined,
+    null,
+    "pas-une-date|2026-09-13T10:22:31Z|" + UUID_A,
+    `2026-09-13|2026-09-13T10:22:31Z|pas-un-uuid`,
+    `2026-09-13|pas-un-timestamp|${UUID_A}`,
+    // la virgule ouvrirait une branche de `or(...)`
+    `2026-09-13,user_id.neq.x|2026-09-13T10:22:31Z|${UUID_A}`,
+    `2026-09-13|2026-09-13T10:22:31Z",or(id.not.is.null)|${UUID_A}`,
+    `2026-09-13|2026-09-13T10:22:31Z|${UUID_A}|de-trop`,
+  ]) {
+    assert.equal(parseCursor(bad as string), null, String(bad));
+  }
 });

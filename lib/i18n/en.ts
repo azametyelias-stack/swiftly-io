@@ -45,12 +45,19 @@ export const en: Messages = {
     },
     banner: {
       emptyTitle: "Set a goal",
-      emptyBody: "The banner will show your progress here.",
+      emptyBody: "Tap here to create a budget or a savings goal.",
+      budgetLabel: "This month's budget",
+      savingsLabel: "Goal of the month",
+      chooseTitle: "What would you like to set?",
+      chooseBudget: "A budget by category",
+      chooseSavings: "A savings goal",
+      overBudget: "Over",
     },
     templates: {
       title: "Templates",
       seeAll: "See all",
       create: "Create a template",
+      options: "Template options",
       emptyBody: "A template saves an amount and category you use often.",
     },
     accounts: {
@@ -60,6 +67,11 @@ export const en: Messages = {
     history: {
       title: "Recent history",
       seeMore: "See more",
+      seeLess: "See less",
+      openFull: "Open the full history",
+      sortLabel: "Sort by",
+      menuDetails: "View details",
+      truncated: "This period is too long to show in full here — open the full history.",
       empty: "No transactions yet.",
       forNote: "for {note}",
       linkedTo: "linked to {name}",

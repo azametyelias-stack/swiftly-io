@@ -5,11 +5,18 @@
  * green 0-50 %, orange 51-91 %, red 92 %+. The bar fills to 100 % max; an
  * over-budget state stays red and full.
  */
-const TONE_COLOR = {
+export type ProgressTone = "green" | "orange" | "red";
+
+/**
+ * Exporté parce que le bandeau du Dashboard (SCREEN-4 § 7) peint la même
+ * progression sur un fond SOMBRE : il lui faut sa propre piste, mais exactement
+ * ces couleurs de remplissage. Deux palettes auraient dérivé.
+ */
+export const TONE_COLOR: Record<ProgressTone, string> = {
   green: "var(--semantic-in)",
   orange: "#F5A524",
   red: "var(--semantic-out)",
-} as const;
+};
 
 export function ProgressBar({
   ratio,
@@ -17,7 +24,7 @@ export function ProgressBar({
   height = 8,
 }: {
   ratio: number;
-  tone: "green" | "orange" | "red";
+  tone: ProgressTone;
   height?: number;
 }) {
   const width = Math.max(0, Math.min(1, ratio)) * 100;

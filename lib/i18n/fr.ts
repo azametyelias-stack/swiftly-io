@@ -46,12 +46,19 @@ export const fr = {
     },
     banner: {
       emptyTitle: "Fixez un objectif",
-      emptyBody: "Le bandeau affichera votre progression ici.",
+      emptyBody: "Touchez ici pour créer un budget ou un objectif d'épargne.",
+      budgetLabel: "Budget du mois",
+      savingsLabel: "Objectif du mois",
+      chooseTitle: "Que voulez-vous fixer ?",
+      chooseBudget: "Un budget par catégorie",
+      chooseSavings: "Un objectif d'épargne",
+      overBudget: "Dépassé",
     },
     templates: {
       title: "Templates",
       seeAll: "Voir tout",
       create: "Créer un template",
+      options: "Options du template",
       emptyBody:
         "Un template enregistre un montant et une catégorie que vous répétez souvent.",
     },
@@ -62,6 +69,11 @@ export const fr = {
     history: {
       title: "Historique récent",
       seeMore: "Voir plus",
+      seeLess: "Voir moins",
+      openFull: "Ouvrir l'historique complet",
+      sortLabel: "Trier par",
+      menuDetails: "Voir les détails",
+      truncated: "Période trop longue pour être affichée en entier ici — ouvrez l'historique complet.",
       empty: "Aucune transaction pour l'instant.",
       forNote: "pour {note}",
       linkedTo: "lié à {name}",

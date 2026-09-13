@@ -5,9 +5,9 @@ import Link from "next/link";
 
 import { BalanceCurve } from "@/components/dashboard/BalanceCurve";
 import { MoneyDropdown } from "@/components/dashboard/MoneyDropdown";
+import { ObjectivesBanner } from "@/components/dashboard/ObjectivesBanner";
 import { Odometer } from "@/components/dashboard/Odometer";
 import { RecentHistory } from "@/components/dashboard/RecentHistory";
-import { RotatingBanner } from "@/components/dashboard/RotatingBanner";
 import { TemplatesCarousel } from "@/components/dashboard/TemplatesCarousel";
 import { useNavShell } from "@/components/nav/useNavShell";
 import {
@@ -15,7 +15,6 @@ import {
   ChevronDownIcon,
   EyeIcon,
   EyeOffIcon,
-  FilterIcon,
   MenuIcon,
   PlusIcon,
 } from "@/components/nav/icons";
@@ -342,7 +341,7 @@ export function DashboardView() {
       <div className="bg-brand-deep">
         <div className="bg-surface-card px-4 pb-24 pt-0 text-text-primary">
           <div className="flex flex-col gap-3">
-          <RotatingBanner items={[]} />
+          <ObjectivesBanner currency={currency} />
 
           <PanelSection title={m.dashboard.templates.title} action={{ label: m.dashboard.templates.seeAll, href: "/templates" }}>
             <TemplatesCarousel currency={currency} />
@@ -369,17 +368,16 @@ export function DashboardView() {
             </Link>
           </PanelSection>
 
-          <PanelSection
-            title={m.dashboard.history.title}
-            action={{ label: m.dashboard.history.seeMore, href: "/historiques" }}
-            trailing={
-              <Link href="/historiques" aria-label="Filtrer" className="grid size-8 place-items-center text-text-tertiary">
-                <FilterIcon width={18} height={18} />
-              </Link>
-            }
-          >
-            <RecentHistory accountId={data?.account.id ?? accountId} />
-          </PanelSection>
+          {/* Ce bloc porte sa propre coque de section : son en-tête est un lien,
+              son tri est un menu et son « Voir plus » vit EN BAS — trois choses
+              que le gabarit `PanelSection`, dont l'action est un lien logé en
+              haut à droite, ne sait pas faire. */}
+          <RecentHistory
+            accountId={data?.account.id ?? accountId}
+            period={period}
+            currency={currency}
+            onChanged={refresh}
+          />
           </div>
         </div>
       </div>
@@ -466,12 +464,10 @@ function VariationLine({
 function PanelSection({
   title,
   action,
-  trailing,
   children,
 }: {
   title: string;
   action?: { label: string; href: string };
-  trailing?: ReactNode;
   children: ReactNode;
 }) {
   return (
@@ -485,7 +481,6 @@ function PanelSection({
               <ChevronDownIcon width={14} height={14} className="-rotate-90" />
             </Link>
           ) : null}
-          {trailing}
         </div>
       </div>
       {children}
