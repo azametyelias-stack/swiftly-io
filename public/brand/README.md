@@ -6,7 +6,8 @@ Reference: `DESIGN-GLOBAL.md` (le fond d'écran partagé).
 | File | Use |
 | --- | --- |
 | `nuit.jpg` | Night navy gradient — the identity zone. Full-bleed on SCREEN-01 (Landing) with a black bottom overlay; a header band on SCREEN-02/03; the dashboard header + logo pill. Same asset, cropped differently per screen. |
-| `objectif-spheres.jpg` | Background of the dashboard "objective" banner. |
+| `objectif-spheres.jpg` | Background of the dashboard "objective" banner, slide 1 (blue). |
+| `objectif-spheres-2.jpg` | Background of the dashboard "objective" banner, slide 2 (green) — the rotation alternates between the two. |
 
 **Serving** — one static file, referenced through `next/image`, which emits
 `srcset` + AVIF/WebP at request time and lets the browser cache it across

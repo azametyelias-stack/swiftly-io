@@ -30,6 +30,18 @@ const RESUME_AFTER_MS = 20_000;
 const SWIPE_PX = 40;
 
 /**
+ * Le fond du bandeau (maquette `Swiftly - Lot 2 Core UI.dc.html`, la carte
+ * « Objectif du mois ») : le dégradé bleu ET la photo de sphères en dessous —
+ * `background-image: linear-gradient(...), url(...)`, deux couches. La
+ * maquette ne fournissait qu'une image ; la rotation en alterne deux, une par
+ * position de slide, pour que le bandeau ne fige pas visuellement quand deux
+ * objectifs se suivent.
+ */
+const SLIDE_BACKGROUNDS = ["/brand/objectif-spheres.jpg", "/brand/objectif-spheres-2.jpg"];
+const CARD_GRADIENT =
+  "linear-gradient(100deg,rgba(15,32,150,0.9) 0%,rgba(21,43,199,0.62) 48%,rgba(6,9,45,0.55) 100%)";
+
+/**
  * Au-delà de ça, le doigt a glissé : ce n'est plus un tap, et la carte ne doit
  * pas naviguer. Sans ce garde, un balayage pour passer à l'objectif suivant
  * ouvrait aussi la fiche de l'objectif qu'on quittait.
@@ -135,6 +147,7 @@ export function RotatingBanner({
   const activeIndex = Math.min(index, sorted.length - 1);
   const active = sorted[activeIndex]!;
   const barColor = TONE_COLOR[active.tone ?? "green"];
+  const slideBg = SLIDE_BACKGROUNDS[activeIndex % SLIDE_BACKGROUNDS.length];
 
   const card = (
     <div
@@ -144,9 +157,13 @@ export function RotatingBanner({
       onClick={interact}
       className={[
         "flex flex-col gap-2 rounded-[16px] bg-brand-accent p-3.5 text-ink-on-surface",
-        "bg-[linear-gradient(100deg,rgba(15,32,150,0.9)_0%,rgba(21,43,199,0.62)_48%,rgba(6,9,45,0.55)_100%)]",
         active.blink ? "animate-[sf-blink_1.2s_ease-in-out_infinite] motion-reduce:animate-none" : "",
       ].join(" ")}
+      style={{
+        backgroundImage: `${CARD_GRADIENT}, url('${slideBg}')`,
+        backgroundSize: "cover, cover",
+        backgroundPosition: "center, 52% 45%",
+      }}
     >
       <div className="flex items-center gap-2.5">
         <span className="grid size-7 flex-none place-items-center rounded-full bg-white/15 text-[13px]">
