@@ -213,10 +213,12 @@ export function RotatingBanner({
         première chose qu'on remarquerait.
 
         La maquette d'Elias est deux fois plus large que haute par rapport à un
-        téléphone (852 × 147 relevés, contre 358 × 130 ici) : on ne peut pas
-        garder À LA FOIS la hauteur relative du massif et son étroitesse. C'est
-        la hauteur qui a été gardée — sans elle le drapeau tombe au niveau de la
-        barre et le dessin ne se lit plus.
+        téléphone (852 × 147 relevés) : on ne peut pas garder À LA FOIS la
+        hauteur relative du massif et son étroitesse. C'est la hauteur qui a été
+        gardée — sans elle le drapeau tombe au niveau de la barre et le dessin
+        ne se lit plus. Elle reste un pourcentage de la carte : quand la carte a
+        été resserrée (retour du 2026-09-16, vu au téléphone), le massif a suivi
+        sans qu'on y touche.
       */}
       <SummitArt
         far={paint.far}
@@ -230,18 +232,25 @@ export function RotatingBanner({
         `items-start` et non `items-center` : sur la maquette le haut du disque
         est aligné sur le haut du libellé, pas sur le milieu de la colonne — le
         disque remonte donc vers le titre au lieu de flotter au centre.
+
+        Toute cette colonne — disque, textes, espacements — a été ramenée aux
+        trois quarts de sa première taille (retour d'Elias, vu sur son
+        téléphone : trop haut, écritures trop grandes par rapport à la
+        maquette). Un seul geste ne suffisait pas : la hauteur de la carte
+        n'est pas posée en dur, elle est la SOMME de ces mesures — il fallait
+        rapetisser chacune, pas fixer un `max-height` qui aurait coupé le bas.
       */}
-      <div className="relative flex items-start gap-4 px-4 pb-3.5 pt-5">
+      <div className="relative flex items-start gap-3 px-3.5 pb-2.5 pt-3.5">
         <span
-          className="grid size-16 flex-none place-items-center rounded-full"
+          className="grid size-12 flex-none place-items-center rounded-full"
           style={{ background: paint.disc }}
         >
-          <TargetArrowIcon color={paint.glyph} casing={paint.disc} width={34} height={34} />
+          <TargetArrowIcon color={paint.glyph} casing={paint.disc} width={26} height={26} />
         </span>
 
         <div className="flex min-w-0 flex-1 flex-col">
           <div className="flex items-baseline gap-2">
-            <span className="truncate text-[13px] leading-4 text-ink-on-surface/65">
+            <span className="truncate text-[11px] leading-3 text-ink-on-surface/65">
               {active.label}
             </span>
             {/* « Dépassé » : le seul mot que la maquette ne prévoyait pas, posé
@@ -249,7 +258,7 @@ export function RotatingBanner({
                 pastille depuis que le disque porte la cible. */}
             {active.caption ? (
               <span
-                className="ml-auto flex-none text-[12px] font-semibold tabular"
+                className="ml-auto flex-none text-[10px] font-semibold tabular"
                 style={{ color: paint.amount }}
               >
                 {active.caption}
@@ -257,7 +266,7 @@ export function RotatingBanner({
             ) : null}
           </div>
 
-          <span className="mt-1.5 truncate text-[22px] font-bold leading-7">{active.title}</span>
+          <span className="mt-1 truncate text-[16px] font-bold leading-5">{active.title}</span>
 
           {typeof progress === "number" ? (
             <>
@@ -268,7 +277,7 @@ export function RotatingBanner({
                 courent jusqu'au bord et passent devant le massif.
               */}
               <span
-                className="mt-2 block h-2 w-[68%] overflow-hidden rounded-full"
+                className="mt-1.5 block h-1.5 w-[64%] overflow-hidden rounded-full"
                 role="progressbar"
                 aria-valuenow={Math.round(progress)}
                 aria-valuemin={0}
@@ -285,7 +294,7 @@ export function RotatingBanner({
               </span>
 
               <div
-                className="mt-2.5 flex items-baseline justify-between gap-2 text-[15px] font-semibold leading-5 tabular"
+                className="mt-2 flex items-baseline justify-between gap-2 text-[12px] font-semibold leading-4 tabular"
                 style={{ color: paint.amount }}
               >
                 <span className="truncate">{active.detail}</span>
