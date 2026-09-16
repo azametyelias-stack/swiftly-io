@@ -322,13 +322,22 @@ export function DashboardView() {
           celui-ci : la coupure nette d'avant est conservée.
         */}
         <div className="relative z-10 bg-brand-deep">
-          <div className="h-[var(--radius-content-top)] rounded-t-[var(--radius-content-top)] bg-surface-card" />
+          <div className="h-[var(--radius-content-top)] rounded-t-[var(--radius-content-top)] bg-surface-page" />
         </div>
       </div>
 
-      {/* White panel — flows right after the button, same page scroll. Son haut
-          arrondi est porté par la lèvre ci-dessus : ici le bord est droit et
-          vient s'y aboucher, sans couture (même blanc, même largeur).
+      {/* La feuille de contenu — elle suit le bouton dans le même défilement de
+          page. Son haut arrondi est porté par la lèvre ci-dessus : ici le bord
+          est droit et vient s'y aboucher, sans couture (même fond, même
+          largeur).
+
+          Ce fond est `--surface-page` (#EBEBEF) et non `--surface-card` (blanc)
+          depuis le 2026-09-16 : le Dashboard était le seul écran de l'app à
+          poser son contenu sur du blanc pur, et ses propres cartes (les
+          `PanelSection`, qui sont blanches) s'y noyaient faute de contraste.
+          Tous les autres écrans — Historique, Budgets, Projets, Comptes… —
+          ouvrent déjà leur feuille en `--surface-page` ; c'est ce que la lèvre
+          au-dessus peint aussi, sans quoi la couture reparaîtrait.
 
           Ce bloc n'est plus positionné, et c'est volontaire. Il défile sous la
           barre d'état : s'il restait en `z-10`, son blanc passerait AU-DESSUS du
@@ -339,7 +348,7 @@ export function DashboardView() {
           d'autre : aucun de ses descendants ne s'y accroche en `absolute` (le
           seul de l'écran est le menu déroulant, et il vit dans la coquille). */}
       <div className="bg-brand-deep">
-        <div className="bg-surface-card px-4 pb-24 pt-0 text-text-primary">
+        <div className="bg-surface-page px-4 pb-24 pt-0 text-text-primary">
           <div className="flex flex-col gap-3">
           <ObjectivesBanner currency={currency} />
 

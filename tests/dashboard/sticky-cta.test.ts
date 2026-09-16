@@ -29,6 +29,30 @@ const read = (p: string) =>
 const VIEW = read("components/dashboard/DashboardView.tsx");
 const CSS = read("app/globals.css");
 
+/**
+ * Le repère du début de la feuille de contenu dans la source.
+ *
+ * Nommé plutôt que recopié trois fois : c'était une phrase du commentaire, et
+ * la reformuler faisait silencieusement retomber `indexOf` sur -1 — donc un
+ * `slice(-1)` d'un caractère, sur lequel toutes les assertions passaient
+ * encore. Un `indexOf` qui échoue doit échouer bruyamment.
+ */
+const PANEL_MARK = "La feuille de contenu";
+function after(mark: string): string {
+  const i = VIEW.indexOf(mark);
+  assert.notEqual(i, -1, `repère introuvable dans DashboardView.tsx : « ${mark} »`);
+  return VIEW.slice(i);
+}
+
+/**
+ * La couleur de la feuille du Dashboard — la MÊME que celle de tous les autres
+ * écrans depuis le 2026-09-16. Elle était `--surface-card` (blanc pur) et le
+ * Dashboard était le seul à l'être ; les cartes blanches posées dessus n'avaient
+ * plus aucun contraste. La lèvre et la feuille doivent la partager, sinon la
+ * couture que la lèvre existe pour effacer revient.
+ */
+const SHEET = "bg-surface-page";
+
 /* ── 1. la barre d'état ──────────────────────────────────────────────────── */
 
 test("la hauteur de la barre d'état est un jeton, pas un env() recopié", () => {
@@ -80,12 +104,14 @@ test("le cadre de la barre d'état ne pousse rien et ne se fige pas en `fixed`",
 test("le haut arrondi de la feuille est épinglé avec le bouton", () => {
   const band = VIEW.slice(
     VIEW.indexOf('className="sticky z-20 overflow-hidden"'),
-    VIEW.indexOf("White panel"),
+    VIEW.indexOf(PANEL_MARK),
   );
   assert.ok(band.length > 0, "la bande collante doit exister");
   assert.match(
     band,
-    /h-\[var\(--radius-content-top\)\] rounded-t-\[var\(--radius-content-top\)\] bg-surface-card/,
+    new RegExp(
+      `h-\\[var\\(--radius-content-top\\)\\] rounded-t-\\[var\\(--radius-content-top\\)\\] ${SHEET}`,
+    ),
     "la lèvre : hauteur = rayon, pour que l'arc s'achève sur son bord",
   );
   assert.ok(
@@ -95,15 +121,37 @@ test("le haut arrondi de la feuille est épinglé avec le bouton", () => {
 });
 
 test("la feuille ne porte plus son propre arrondi — sinon il y en aurait deux", () => {
-  const panel = VIEW.slice(VIEW.indexOf("White panel"));
+  const panel = after(PANEL_MARK);
   assert.ok(
     !/rounded-t-\[var\(--radius-content-top\)\]/.test(panel),
     "deux arcs superposés se décalent et laissent un ressaut sur les côtés",
   );
-  assert.match(panel, /className="bg-surface-card px-4 pb-24 pt-0 text-text-primary"/);
+  assert.match(panel, new RegExp(`className="${SHEET} px-4 pb-24 pt-0 text-text-primary"`));
 });
 
-test("le blanc de la feuille se peint SOUS le cadre de la barre d'état", () => {
+test("la feuille du Dashboard a la couleur de page des autres écrans", () => {
+  /*
+   * Le défaut signalé par Elias le 2026-09-16 : « si tu regardes bien tous les
+   * autres pages ont une couleur de page différente à la couleur du dashboard ».
+   * L'Historique, les Budgets, les Projets ouvrent tous leur feuille en
+   * `--surface-page` ; le Dashboard était resté en blanc pur, et ses propres
+   * cartes — blanches elles aussi — s'y confondaient.
+   *
+   * Le bouton « Nouvelle transaction », lui, RESTE blanc : c'est un bouton posé
+   * sur la nuit, pas une feuille.
+   */
+  const history = read("components/transactions/HistoryScreen.tsx");
+  assert.match(history, /rounded-t-\[var\(--radius-content-top\)\] bg-surface-page/);
+
+  // Seulement la feuille elle-même : les `PanelSection` posées DESSUS restent
+  // blanches, et c'est précisément ce qui leur redonne du contraste.
+  const sheet = after(PANEL_MARK).match(/<div className="[^"]*px-4 pb-24[^"]*"/)?.[0] ?? "";
+  assert.ok(sheet.includes(SHEET), sheet);
+  assert.ok(!sheet.includes("bg-surface-card"), "plus de blanc pur sous les cartes");
+  assert.match(VIEW, /rounded-\[var\(--radius-pill\)\] bg-surface-card/, "le bouton reste blanc");
+});
+
+test("la feuille se peint SOUS le cadre de la barre d'état", () => {
   /*
    * L'ordre de peinture est le vrai piège de cet écran, et il tient à trois
    * pièces qui se croisent en haut :
@@ -120,7 +168,7 @@ test("le blanc de la feuille se peint SOUS le cadre de la barre d'état", () => 
    * mais vient après dans le DOM (donc au-dessus du cadre). Remettre `relative`
    * ou un `z-` sur la feuille casse la chaîne en silence — d'où ce test.
    */
-  const panel = VIEW.slice(VIEW.indexOf("White panel"));
+  const panel = after(PANEL_MARK);
   const wrapper = panel.slice(panel.indexOf("<div className="), panel.indexOf(">") + 1);
   assert.match(wrapper, /<div className="bg-brand-deep">/, "la feuille doit rester non positionnée");
   assert.ok(!/relative|z-\d|sticky|absolute/.test(wrapper), wrapper);

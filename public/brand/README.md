@@ -6,8 +6,16 @@ Reference: `DESIGN-GLOBAL.md` (le fond d'écran partagé).
 | File | Use |
 | --- | --- |
 | `nuit.jpg` | Night navy gradient — the identity zone. Full-bleed on SCREEN-01 (Landing) with a black bottom overlay; a header band on SCREEN-02/03; the dashboard header + logo pill. Same asset, cropped differently per screen. |
-| `objectif-spheres.jpg` | Background of the dashboard "objective" banner, slide 1 (blue). |
-| `objectif-spheres-2.jpg` | Background of the dashboard "objective" banner, slide 2 (green) — the rotation alternates between the two. |
+| `objectif-spheres.jpg` | **Plus référencé** — ancien fond du bandeau « objectif ». |
+| `objectif-spheres-2.jpg` | **Plus référencé** — idem, second slide. |
+
+Les deux `objectif-spheres*.jpg` ont été débranchés le 2026-09-16 : la carte
+« Objectif du mois » a été redessinée (maquette d'Elias) et son fond est
+maintenant vectoriel — `components/dashboard/ObjectiveArt.tsx` plus les halos de
+`RotatingBanner.tsx`. La raison est fonctionnelle, pas esthétique : la teinte de
+la carte change à chaque objectif (`lib/dashboard/bannerTheme.ts`), et une photo
+aurait demandé un fichier par couleur. Les fichiers restent au dépôt tant qu'on
+n'a pas confirmé qu'on n'y reviendra pas.
 
 **Serving** — one static file, referenced through `next/image`, which emits
 `srcset` + AVIF/WebP at request time and lets the browser cache it across

@@ -9,7 +9,9 @@ import {
 } from "react";
 import Link from "next/link";
 
-import { TONE_COLOR, type ProgressTone } from "@/components/ui/ProgressBar";
+import { SummitArt, TargetArrowIcon } from "@/components/dashboard/ObjectiveArt";
+import { type ProgressTone } from "@/components/ui/ProgressBar";
+import { bannerTheme } from "@/lib/dashboard/bannerTheme";
 
 /**
  * Le bandeau « Objectif du mois » (SCREEN-4 § 7). Les items tournent toutes les
@@ -30,16 +32,50 @@ const RESUME_AFTER_MS = 20_000;
 const SWIPE_PX = 40;
 
 /**
- * Le fond du bandeau (maquette `Swiftly - Lot 2 Core UI.dc.html`, la carte
- * « Objectif du mois ») : le dégradé bleu ET la photo de sphères en dessous —
- * `background-image: linear-gradient(...), url(...)`, deux couches. La
- * maquette ne fournissait qu'une image ; la rotation en alterne deux, une par
- * position de slide, pour que le bandeau ne fige pas visuellement quand deux
- * objectifs se suivent.
+ * La nuit de la carte (maquette d'Elias du 2026-09-16) : un fond quasi noir
+ * légèrement bleuté, et DEUX halos de la teinte de l'objectif — un derrière le
+ * disque en haut à gauche, un derrière les sommets en bas à droite. C'est ce
+ * qui empêche la carte de virer à l'aplat noir quand la photo de fond a
+ * disparu.
+ *
+ * `color-mix` plutôt que dix dégradés écrits à la main : la teinte arrive de
+ * `bannerTheme()` et tout le reste en découle (voir ce module). Ajouter une
+ * couleur ne touche donc pas à ce fichier.
  */
-const SLIDE_BACKGROUNDS = ["/brand/objectif-spheres.jpg", "/brand/objectif-spheres-2.jpg"];
-const CARD_GRADIENT =
-  "linear-gradient(100deg,rgba(15,32,150,0.9) 0%,rgba(21,43,199,0.62) 48%,rgba(6,9,45,0.55) 100%)";
+function cardSurface(accent: string): string {
+  return [
+    `radial-gradient(118% 152% at 4% 12%, color-mix(in srgb, ${accent} 22%, transparent) 0%, transparent 58%)`,
+    `radial-gradient(86% 128% at 94% 98%, color-mix(in srgb, ${accent} 26%, transparent) 0%, transparent 60%)`,
+    "linear-gradient(118deg, #101226 0%, #090B18 54%, #0B0E22 100%)",
+  ].join(",");
+}
+
+/**
+ * Le reste de la carte, dérivé de la même teinte. Les proportions viennent du
+ * relevé de la maquette : disque à 24 % de teinte, piste de barre à 16 %, face
+ * éclairée des sommets à 86 %, neige et montants tirés vers le blanc.
+ */
+function cardPaint(accent: string) {
+  const mix = (pct: number, over: string) => `color-mix(in srgb, ${accent} ${pct}%, ${over})`;
+  return {
+    /** Le disque est opaque : la flèche s'en sert pour se découper dans les anneaux. */
+    disc: mix(26, "#0C0D1E"),
+    glyph: mix(72, "#ffffff"),
+    railTrack: mix(16, "#0D0F26"),
+    railFill: `linear-gradient(90deg, ${accent} 0%, ${mix(68, "#120A38")} 100%)`,
+    amount: mix(80, "#ffffff"),
+    /*
+     * Le massif reste DERRIÈRE le texte : les trois plans montent de 13 % à
+     * 62 % de teinte seulement. Une première version montait la face éclairée à
+     * 86 % — les sommets passaient devant le titre au lieu de le porter, et sur
+     * le vert (`--ink-in`, très saturé) la carte devenait illisible.
+     */
+    far: mix(13, "#0A0C1C"),
+    face: mix(26, "#090B1A"),
+    lit: mix(62, "#0B0D1E"),
+    snow: mix(46, "#ffffff"),
+  };
+}
 
 /**
  * Au-delà de ça, le doigt a glissé : ce n'est plus un tap, et la carte ne doit
@@ -146,8 +182,16 @@ export function RotatingBanner({
    */
   const activeIndex = Math.min(index, sorted.length - 1);
   const active = sorted[activeIndex]!;
-  const barColor = TONE_COLOR[active.tone ?? "green"];
-  const slideBg = SLIDE_BACKGROUNDS[activeIndex % SLIDE_BACKGROUNDS.length];
+
+  /*
+   * La teinte tient à la PLACE dans la rotation, pas à la nature de l'objectif :
+   * bleu, puis vert, puis le reste de la palette. C'est la demande d'Elias du
+   * 2026-09-16 — « pour ne pas que tout ce ressemble ». Seul un budget au rouge
+   * échappe à la rotation ; `bannerTheme` s'en charge et est testé pour ça.
+   */
+  const theme = bannerTheme(activeIndex, active.tone);
+  const paint = cardPaint(theme.accent);
+  const progress = active.progress;
 
   const card = (
     <div
@@ -155,61 +199,102 @@ export function RotatingBanner({
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
       onClick={interact}
+      data-objective-card=""
       className={[
-        "flex flex-col gap-2 rounded-[16px] bg-brand-accent p-3.5 text-ink-on-surface",
+        "relative overflow-hidden rounded-[var(--radius-card)] text-ink-on-surface",
         active.blink ? "animate-[sf-blink_1.2s_ease-in-out_infinite] motion-reduce:animate-none" : "",
       ].join(" ")}
-      style={{
-        backgroundImage: `${CARD_GRADIENT}, url('${slideBg}')`,
-        backgroundSize: "cover, cover",
-        backgroundPosition: "center, 52% 45%",
-      }}
+      style={{ background: cardSurface(theme.accent) }}
     >
-      <div className="flex items-center gap-2.5">
-        <span className="grid size-7 flex-none place-items-center rounded-full bg-white/15 text-[13px]">
-          {active.urgent ? "!" : "★"}
-        </span>
-        <span className="flex min-w-0 flex-col">
-          <span className="t-label text-ink-on-surface/60">{active.label}</span>
-          <span className="truncate text-[15px] font-semibold">{active.title}</span>
-        </span>
-        {active.caption ? (
-          <span className="ml-auto flex-none text-[12px] text-ink-on-surface/75 tabular">
-            {active.caption}
-          </span>
-        ) : null}
-      </div>
+      {/*
+        Le massif, collé en bas à droite et DERRIÈRE le contenu. Sa hauteur est
+        relative à la carte (comme sur la maquette, où il en occupe la plus
+        grande part) ; sa largeur suit, `w-auto` — un massif étiré serait la
+        première chose qu'on remarquerait.
 
-      {typeof active.progress === "number" ? (
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2.5">
-            <span
-              className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/20"
-              role="progressbar"
-              aria-valuenow={Math.round(active.progress)}
-              aria-valuemin={0}
-              aria-valuemax={100}
-            >
+        La maquette d'Elias est deux fois plus large que haute par rapport à un
+        téléphone (852 × 147 relevés, contre 358 × 130 ici) : on ne peut pas
+        garder À LA FOIS la hauteur relative du massif et son étroitesse. C'est
+        la hauteur qui a été gardée — sans elle le drapeau tombe au niveau de la
+        barre et le dessin ne se lit plus.
+      */}
+      <SummitArt
+        far={paint.far}
+        face={paint.face}
+        lit={paint.lit}
+        snow={paint.snow}
+        className="pointer-events-none absolute bottom-0 right-0 h-[78%] w-auto"
+      />
+
+      {/*
+        `items-start` et non `items-center` : sur la maquette le haut du disque
+        est aligné sur le haut du libellé, pas sur le milieu de la colonne — le
+        disque remonte donc vers le titre au lieu de flotter au centre.
+      */}
+      <div className="relative flex items-start gap-4 px-4 pb-3.5 pt-5">
+        <span
+          className="grid size-16 flex-none place-items-center rounded-full"
+          style={{ background: paint.disc }}
+        >
+          <TargetArrowIcon color={paint.glyph} casing={paint.disc} width={34} height={34} />
+        </span>
+
+        <div className="flex min-w-0 flex-1 flex-col">
+          <div className="flex items-baseline gap-2">
+            <span className="truncate text-[13px] leading-4 text-ink-on-surface/65">
+              {active.label}
+            </span>
+            {/* « Dépassé » : le seul mot que la maquette ne prévoyait pas, posé
+                au bout du libellé plutôt qu'en pastille — il n'y a plus de
+                pastille depuis que le disque porte la cible. */}
+            {active.caption ? (
               <span
-                className="block h-full rounded-full transition-[width] duration-500"
-                style={{
-                  width: `${Math.max(0, Math.min(100, active.progress))}%`,
-                  background: barColor,
-                }}
-              />
-            </span>
-            <span className="flex-none text-[12px] font-semibold text-ink-on-surface/80 tabular">
-              {Math.round(active.progress)} %
-            </span>
+                className="ml-auto flex-none text-[12px] font-semibold tabular"
+                style={{ color: paint.amount }}
+              >
+                {active.caption}
+              </span>
+            ) : null}
           </div>
-          {/* Les montants sous la barre, comme sur `04-dashboard.png`. */}
-          {active.detail ? (
-            <span className="text-[12px] text-ink-on-surface/70 tabular">
-              {active.detail}
-            </span>
+
+          <span className="mt-1.5 truncate text-[22px] font-bold leading-7">{active.title}</span>
+
+          {typeof progress === "number" ? (
+            <>
+              {/*
+                La barre s'arrête AVANT les sommets — comme sur la maquette, où
+                elle vient buter sur le premier pic. Sa largeur est donc bornée
+                (elle n'occupe pas toute la colonne) : les montants, eux,
+                courent jusqu'au bord et passent devant le massif.
+              */}
+              <span
+                className="mt-2 block h-2 w-[68%] overflow-hidden rounded-full"
+                role="progressbar"
+                aria-valuenow={Math.round(progress)}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                style={{ background: paint.railTrack }}
+              >
+                <span
+                  className="block h-full rounded-full transition-[width] duration-500 motion-reduce:transition-none"
+                  style={{
+                    width: `${Math.max(0, Math.min(100, progress))}%`,
+                    background: paint.railFill,
+                  }}
+                />
+              </span>
+
+              <div
+                className="mt-2.5 flex items-baseline justify-between gap-2 text-[15px] font-semibold leading-5 tabular"
+                style={{ color: paint.amount }}
+              >
+                <span className="truncate">{active.detail}</span>
+                <span className="flex-none">{Math.round(progress)}%</span>
+              </div>
+            </>
           ) : null}
         </div>
-      ) : null}
+      </div>
     </div>
   );
 
